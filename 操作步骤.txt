@@ -1,0 +1,14 @@
+首先 安装 Pwsh 也就是 Powershell 
+
+执行脚本 
+
+
+创建项目
+
+axmol new -p com.kenwk.axxxcs -d d:\mw -l lua --portrait axxxcs
+axmol new -p com.kenwk.axxxcs -d d:\mw\axn -l lua --portrait axxxcs
+在项目 目录 
+
+需要 axmol build -p win32 构建 对应的编译
+
+在用 cmake 文件进行构建

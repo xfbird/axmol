@@ -24,6 +24,7 @@
  ****************************************************************************/
 
 #include "AppDelegate.h"
+#include "yasio/singleton.hpp"
 #include "lua-bindings/manual/LuaEngine.h"
 #include "lua-bindings/manual/lua_module_register.h"
 
@@ -35,8 +36,43 @@
 
 USING_NS_AX;
 using namespace std;
+class SampleLogOutput : public ILogOutput
+{
+public:
+    SampleLogOutput()
+    {
+        auto fu   = FileUtils::getInstance();
+        _filePath = fu->getWritablePath() + "game.log";
+        _fs       = fu->openFileStream(_filePath, ax::IFileStream::Mode::APPEND);
 
-AppDelegate::AppDelegate() {}
+        ax::setLogFmtFlag(ax::LogFmtFlag::Full);
+
+        AXLOGW("further log message will write to {}", _filePath);
+
+        ax::setLogOutput(this);
+    }
+
+    ~SampleLogOutput() override
+    {
+        ax::setLogOutput(nullptr);
+        _fs->close();
+    }
+    virtual void write(std::string_view message, LogLevel) override
+    {
+        if (_fs->size() > _threshold)
+            _fs->resize(0);
+        _fs->write(
+            std::string(message).c_str(), static_cast<int>(message.size()));
+    }
+
+private:
+    std::string _filePath;
+    std::unique_ptr<IFileStream> _fs;
+    int64_t _threshold{1024 * 1024 * 10};  // 10MB
+};
+AppDelegate::AppDelegate() {
+    yasio::singleton<SampleLogOutput>::instance();    
+}
 
 AppDelegate::~AppDelegate() {}
 
