@@ -36,13 +36,17 @@
 #include "lua-bindings/manual/physics3d/axlua_physics3d_manual.h"
 #include "lua-bindings/manual/navmesh/axlua_navmesh_manual.h"
 #include "lua-bindings/manual/fairygui/axlua_fairygui_manual.hpp"
+#include "base/logging.h"
 #include "lua_cjson.h"
+#include "luasocket.h"
+#include "luasocket_scripts.h"
 #include "yasio/bindings/yasio_axlua.hpp"
 
 static void lua_register_extensions(lua_State* L)
 {
-
-    static luaL_Reg lua_exts[] = {{"yasio", luaopen_yasio_axlua}, {"cjson", luaopen_cjson}, {NULL, NULL}};
+    AXLOGD("lua_register_extensions Call");
+    static luaL_Reg lua_exts[] = {
+        {"yasio", luaopen_yasio_axlua}, {"cjson", luaopen_cjson}, {"socket.core", luaopen_socket_core}, {NULL, NULL}};
 
     lua_getglobal(L, "package");
     lua_getfield(L, -1, "preload");
@@ -53,6 +57,7 @@ static void lua_register_extensions(lua_State* L)
         lua_setfield(L, -2, lib->name);
     }
     lua_pop(L, 2);
+    luaopen_luasocket_scripts(L);
 }
 
 int lua_module_register(lua_State* L)

@@ -21,6 +21,7 @@ set(lua_bindings_manual_headers
     manual/navmesh/axlua_navmesh_conversions.h
     manual/base/LuaScriptHandlerMgr.h
     manual/base/axlua_base_manual.hpp
+    manual/base/axlua_base_UserDATAEx.hpp
     manual/AxluaLoader.h
     manual/LuaValue.h
     manual/physics3d/axlua_physics3d_manual.h
@@ -44,6 +45,7 @@ set(lua_bindings_manual_files
     manual/ComponentLua.cpp
     manual/base/LuaScriptHandlerMgr.cpp
     manual/base/axlua_base_manual.cpp
+    manual/base/axlua_base_UserDATAEx.cpp
     manual/physics/axlua_physics_manual.cpp
     manual/3d/axlua_3d_manual.cpp
     manual/cocostudio/CustomGUIReader.cpp
@@ -208,11 +210,15 @@ if(MSVC)
 endif()
 
 get_target_property(lua_ext_depend 3rdparty AX_LUA_DEPEND)
+#message(STATUS "xxx---22 AXLUA libs :${_AX_LUA_LIB} DEPEND=${lua_ext_depend}")
 target_link_libraries(${_AX_LUA_LIB} ${lua_ext_depend})
+target_link_libraries(${_AX_LUA_LIB} axmol)
 
 setup_ax_extension_config(${_AX_LUA_LIB} DNTLINK)
 
 target_include_directories(${_AX_LUA_LIB}
+    PUBLIC ${ax_root}/core
+    PUBLIC ${ax_root}/core/base
     PRIVATE ${ax_root}/3rdparty
     PUBLIC ${ax_root}/3rdparty/lua
     PRIVATE manual/platform/android
