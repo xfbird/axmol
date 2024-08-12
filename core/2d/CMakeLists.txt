@@ -63,7 +63,6 @@ set(_AX_2D_HEADER
     2d/MotionStreak.h
     2d/Menu.h
     2d/DrawNode.h
-    #2d/TMXLayer.h
     2d/Camera.h
     2d/ParallaxNode.h
     2d/SpriteSheetLoader.h
@@ -131,9 +130,7 @@ set(_AX_2D_SRC
     2d/AutoPolygon.cpp
     2d/TextFieldTTF.cpp
     2d/TileMapAtlas.cpp
-    # 2d/TMXLayer.cpp
     2d/TMXObjectGroup.cpp
-    # 2d/TMXTiledMap.cpp
     2d/TMXXMLParser.cpp
     2d/Transition.cpp
     2d/TransitionPageTurn.cpp
