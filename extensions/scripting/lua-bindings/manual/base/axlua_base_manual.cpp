@@ -8700,6 +8700,6 @@ int register_all_ax_bytearray_manual(lua_State* tolua_S)
     tolua_function(tolua_S, "from_intv", tolua_cocos2d_bytearray_intv);
     tolua_function(tolua_S, "from_floatv", tolua_cocos2d_bytearray_floatv);
     tolua_endmodule(tolua_S);
-    tolua_endmodule(tolua_S);
+    // tolua_endmodule(tolua_S);
     return 0;
 }

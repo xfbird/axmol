@@ -416,6 +416,9 @@ function(ax_setup_app_config app_name)
     endif()
     if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
         target_link_options(${app_name} PRIVATE "/STACK:4194304")
+        target_link_options(${app_name} PRIVATE "/NODEFAULTLIB:msvcrt")
+
+        # target_link_options(${app_name} PRIVATE "/NODEFAULTLIB:libcmtd")
     endif()
     if(NOT opt_RUNTIME_OUTPUT_DIR)
         # put all output app into bin/${app_name}

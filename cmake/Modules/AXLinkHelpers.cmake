@@ -106,6 +106,7 @@ function(ax_link_cxx_prebuilt APP_NAME AX_ROOT_DIR AX_PREBUILT_DIR)
         PRIVATE ${AX_ROOT_DIR}/3rdparty/lua/plainlua
         PRIVATE ${AX_ROOT_DIR}/3rdparty/lua/tolua/.
         PRIVATE ${AX_ROOT_DIR}/3rdparty/lua/lua-cjson/.
+        PRIVATE ${AX_ROOT_DIR}/3rdparty/lua/luasocket/.
         PRIVATE ${AX_ROOT_DIR}/3rdparty/zlib/_x/include
         PRIVATE ${AX_ROOT_DIR}/3rdparty/jpeg-turbo/_x/include
         PRIVATE ${AX_ROOT_DIR}/3rdparty/openssl/_x/include
@@ -288,7 +289,7 @@ function(ax_link_lua_prebuilt APP_NAME AX_ROOT_DIR AX_PREBUILT_DIR)
 	        PRIVATE _USRLUASTATIC=1
         )
     endif()
-    target_link_libraries(${APP_NAME} axlua lua-cjson tolua plainlua)
+    target_link_libraries(${APP_NAME} axlua lua-cjson tolua plainlua luasocket)
 
     ax_link_cxx_prebuilt(${APP_NAME} ${AX_ROOT_DIR} ${AX_PREBUILT_DIR})
 

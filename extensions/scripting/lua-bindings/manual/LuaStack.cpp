@@ -48,6 +48,7 @@ extern "C" {
 #include "lua-bindings/manual/base/LuaScriptHandlerMgr.h"
 #include "lua-bindings/auto/axlua_base_auto.hpp"
 #include "lua-bindings/manual/base/axlua_base_manual.hpp"
+#include "lua-bindings/manual/base/axlua_base_UserDATAEx.hpp"
 #include "lua-bindings/manual/LuaBasicConversions.h"
 #include "lua-bindings/auto/axlua_physics_auto.hpp"
 #include "lua-bindings/manual/physics/axlua_physics_manual.hpp"
@@ -85,7 +86,7 @@ int lua_print(lua_State* L)
 {
     std::string t;
     get_string_for_print(L, &t);
-    AXLOGD("[LUA-print] {}", t);
+    AXLOGD("[LP] {}", t);
 
     return 0;
 }
@@ -94,7 +95,7 @@ int lua_release_print(lua_State* L)
 {
     std::string t;
     get_string_for_print(L, &t);
-    AXLOG_WITH_LEVEL(ax::LogLevel::Silent, "[LUA-print] {}", t);
+    AXLOG_WITH_LEVEL(ax::LogLevel::Silent, "[LR] {}", t);
 
     return 0;
 }
@@ -159,11 +160,40 @@ int axlua_log_with_level(lua_State* L)
             axlua_replace_hint(formated_msg, "{}"sv, cur_val, true);
             axlua_replace_hint(formated_msg, pos, cur_val, false);
         }
-        AXLOG_WITH_LEVEL(static_cast<ax::LogLevel>(level), "[LUA]{}", formated_msg);
+        AXLOG_WITH_LEVEL(static_cast<ax::LogLevel>(level), "[L]{}", formated_msg);
     }
     return 0;
 }
 
+int axlua_log_with_level_Line(lua_State* L)
+{
+    int argc                = lua_gettop(L);
+    const int max_fmt_count = 32;
+    if (argc >= 3)
+    {
+        luaL_checkstring(L, 1);
+        auto lines_msg = axlua_tostr(L, 1);
+        luaL_checkinteger(L, 2);
+        int level = lua_tointeger(L, 2);
+        luaL_checkstring(L, 3);
+
+        auto formated_msg = axlua_tostr(L, 3);
+        // AXLOGD("axlua_log_with_level_Line lines_msg:{}  level:{}  formated_msg:{}",lines_msg,level,formated_msg);
+        char fmt_pos_buf[8];
+        const int fmtc = (std::min)((argc - 3), max_fmt_count);
+        for (int fmti = 0; fmti < fmtc; ++fmti)
+        {
+            auto pos     = axlua_format_pos(fmt_pos_buf, sizeof(fmt_pos_buf), fmti);
+            auto cur_val = axlua_tosv(L, fmti + 4);
+
+            axlua_replace_hint(formated_msg, "{}"sv, cur_val, true);
+            axlua_replace_hint(formated_msg, pos, cur_val, false);
+            // AXLOGD("axlua_log_with_level_Line formated_msg:{}  pos:{}  cur_val:{}",formated_msg,pos,cur_val);
+        }
+        AXLOG_WITH_LEVEL(static_cast<ax::LogLevel>(level), "[L][{}]{}", lines_msg, formated_msg);
+    }
+    return 0;
+}
 int lua_version(lua_State* L)
 {
     lua_pushinteger(L, LUA_VERSION_NUM);
@@ -207,6 +237,7 @@ bool LuaStack::init()
     const luaL_Reg global_functions[] = {{"print", lua_print},
                                          {"release_print", lua_release_print},
                                          {"AXLOG_WITH_LEVEL", axlua_log_with_level},
+                                         {"AXLOG_WITH_LEVELEx", axlua_log_with_level_Line},
                                          {"version", lua_version},
                                          {nullptr, nullptr}};
     luaL_register(_state, "_G", global_functions);
@@ -219,6 +250,8 @@ bool LuaStack::init()
     register_all_ax_math_manual(_state);
     register_all_ax_shaders_manual(_state);
     register_all_ax_bytearray_manual(_state);
+    register_all_axlua_bindings_UserDATAEx(_state);
+    register_all_axlua_bindings_TileMapManager(_state);
 
     tolua_luanode_open(_state);
     register_luanode_manual(_state);

@@ -25,6 +25,7 @@
 
 #include "AppDelegate.h"
 #include "MainScene.h"
+#include "yasio/singleton.hpp"
 
 #define USE_AUDIO_ENGINE 1
 
@@ -33,10 +34,42 @@
 #endif
 
 USING_NS_AX;
+using namespace std;
+class SampleLogOutput : public ILogOutput
+{
+public:
+    SampleLogOutput()
+    {
+        auto fu   = FileUtils::getInstance();
+        _filePath = fu->getWritablePath() + "game.log";
+        _fs       = fu->openFileStream(_filePath, ax::IFileStream::Mode::APPEND);
 
+        ax::setLogFmtFlag(ax::LogFmtFlag::Level | ax::LogFmtFlag::TimeStamp | ax::LogFmtFlag::Colored);
+        AXLOGW("further log message will write to {}", _filePath);
+        ax::setLogOutput(this);
+    }
+    ~SampleLogOutput() override
+    {
+        ax::setLogOutput(nullptr);
+        _fs->close();
+    }
+    virtual void write(LogItem& item, const char* tag) override
+    {
+        if (_fs->size() > _threshold)
+            _fs->resize(0);
+        auto sv = item.message();
+        _fs->write(sv.data(), static_cast<int>(sv.size()));
+    }
+private:
+    std::string _filePath;
+    std::unique_ptr<IFileStream> _fs;
+    int64_t _threshold{1024 * 1024 * 10};  // 10MB
+};
 static ax::Size designResolutionSize = ax::Size(1280, 720);
 
-AppDelegate::AppDelegate() {}
+AppDelegate::AppDelegate() {
+    yasio::singleton<SampleLogOutput>::instance();    
+}
 
 AppDelegate::~AppDelegate() {}
 
