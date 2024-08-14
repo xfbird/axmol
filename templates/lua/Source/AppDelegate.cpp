@@ -98,9 +98,7 @@ bool AppDelegate::applicationDidFinishLaunching()
     ScriptEngineManager::getInstance()->setScriptEngine(engine);
     lua_State* L = engine->getLuaStack()->getLuaState();
     lua_module_register(L);
-
     LuaStack* stack = engine->getLuaStack();
-
     // register custom function
     // LuaStack* stack = engine->getLuaStack();
     // register_custom_function(stack->getLuaState());

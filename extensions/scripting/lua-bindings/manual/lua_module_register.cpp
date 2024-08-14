@@ -71,12 +71,12 @@ int lua_module_register(lua_State* L)
     register_spine_module(L);
     register_cocos3d_module(L);
     register_audioengine_module(L);
-#if defined(AX_ENABLE_3D_PHYSICS) && AX_ENABLE_BULLET_INTEGRATION
-    register_physics3d_module(L);
-#endif
-#if defined(AX_ENABLE_NAVMESH)
-    register_navmesh_module(L);
-#endif
+    #if defined(AX_ENABLE_3D_PHYSICS) && AX_ENABLE_BULLET_INTEGRATION
+        register_physics3d_module(L);
+    #endif
+    #if defined(AX_ENABLE_NAVMESH)
+        register_navmesh_module(L);
+    #endif
     register_fairygui_module(L);
     // register extensions: yaiso, lua-cjson
     lua_register_extensions(L);
