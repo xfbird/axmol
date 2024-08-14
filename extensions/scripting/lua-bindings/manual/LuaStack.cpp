@@ -255,18 +255,18 @@ bool LuaStack::init()
 
     tolua_luanode_open(_state);
     register_luanode_manual(_state);
-#if defined(AX_ENABLE_PHYSICS)
-    register_all_ax_physics(_state);
-    register_all_ax_physics_manual(_state);
-#endif
+    #if defined(AX_ENABLE_PHYSICS)
+        register_all_ax_physics(_state);
+        register_all_ax_physics_manual(_state);
+    #endif
 
-#if (AX_TARGET_PLATFORM == AX_PLATFORM_IOS || AX_TARGET_PLATFORM == AX_PLATFORM_MAC)
-    LuaObjcBridge::luaopen_luaoc(_state);
-#endif
+    #if (AX_TARGET_PLATFORM == AX_PLATFORM_IOS || AX_TARGET_PLATFORM == AX_PLATFORM_MAC)
+        LuaObjcBridge::luaopen_luaoc(_state);
+    #endif
 
-#if (AX_TARGET_PLATFORM == AX_PLATFORM_ANDROID)
-    LuaJavaBridge::luaopen_luaj(_state);
-#endif
+    #if (AX_TARGET_PLATFORM == AX_PLATFORM_ANDROID)
+        LuaJavaBridge::luaopen_luaj(_state);
+    #endif
 
     tolua_script_handler_mgr_open(_state);
 
@@ -297,11 +297,11 @@ void LuaStack::addLuaLoader(lua_CFunction func)
     if (!func)
         return;
 
-#if LUA_VERSION_NUM >= 504 || (LUA_VERSION_NUM >= 502 && !defined(LUA_COMPAT_LOADERS))
-    const char* realname = "searchers";
-#else
-    const char* realname = "loaders";
-#endif
+    #if LUA_VERSION_NUM >= 504 || (LUA_VERSION_NUM >= 502 && !defined(LUA_COMPAT_LOADERS))
+        const char* realname = "searchers";
+    #else
+        const char* realname = "loaders";
+    #endif
 
     // stack content after the invoking of the function
     // get loader table
