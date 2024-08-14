@@ -687,10 +687,11 @@ std::string FileUtils::fullPathForFilename(std::string_view filename) const
     for (const auto& searchIt : _searchPathArray)
     {
         fullpath = this->getPathForFilename(filename, searchIt);
-
+        // AXLOGD("fullPathForFilename:  filename:{} >-in-> searchIt {} --->fullpath:{}",filename,searchIt,fullpath );
         if (!fullpath.empty())
         {
             // Using the filename passed in as key.
+            
             _fullPathCache.emplace(filename, fullpath);
             return fullpath;
         }
@@ -698,7 +699,7 @@ std::string FileUtils::fullPathForFilename(std::string_view filename) const
 
     if (isPopupNotify())
     {
-        AXLOGD("fullPathForFilename: No file found at {}. Possible missing file.", filename);
+        AXLOGW("fullPathForFilename: No file found at {}. Possible missing file.", filename);
     }
 
     // The file wasn't found, return empty string.
@@ -748,7 +749,7 @@ std::string FileUtils::fullPathForDirectory(std::string_view dir) const
 
             if (result.empty() && isPopupNotify())
             {
-                AXLOGD("fullPathForDirectory: No directory found at {}. Possible missing directory.", dir);
+                AXLOGW("fullPathForDirectory: No directory found at {}. Possible missing directory.", dir);
             }
         }
     }
@@ -904,6 +905,7 @@ bool FileUtils::isFileExist(std::string_view filename) const
     else
     {
         std::string fullpath = fullPathForFilename(filename);
+        // AXLOGD("isFileExist:  filename:{} --->fullpath:{}",filename,fullpath );        
         return !fullpath.empty();
     }
 }
@@ -911,6 +913,7 @@ bool FileUtils::isFileExist(std::string_view filename) const
 void FileUtils::isFileExist(std::string_view filename, std::function<void(bool)> callback) const
 {
     auto fullPath = fullPathForFilename(filename);
+    // AXLOGD("isFileExist cbv :  filename:{} --->fullpath:{}",filename,fullPath);        
     performOperationOffthread(
         [path = std::string{fullPath}]() -> bool { return FileUtils::getInstance()->isFileExist(path); },
         std::move(callback));
