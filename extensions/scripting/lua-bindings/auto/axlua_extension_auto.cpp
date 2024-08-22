@@ -8243,7 +8243,7 @@ int lua_ax_extension_PUParticleSystem3D_makeParticleLocal(lua_State* tolua_S)
     {
         ax::PUParticle3D* arg0;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR PUParticle3D*
+        //#pragma warning NO CONVERSION TO NATIVE FOR PUParticle3D*
 		ok = false;
         if(!ok)
         {

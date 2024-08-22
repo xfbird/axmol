@@ -5485,7 +5485,7 @@ int lua_ax_physics_PhysicsBody_getCPBody(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = cobj->getCPBody();
-        #pragma warning NO CONVERSION FROM NATIVE FOR cpBody*;
+        //#pragma warning NO CONVERSION FROM NATIVE FOR cpBody*;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.PhysicsBody:getCPBody",argc, 0);

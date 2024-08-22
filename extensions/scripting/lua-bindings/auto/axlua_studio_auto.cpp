@@ -10608,7 +10608,7 @@ int lua_ax_studio_ArmatureDataManager_getRelativeData(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = cobj->getRelativeData(arg0);
-        #pragma warning NO CONVERSION FROM NATIVE FOR RelativeData*;
+        //#pragma warning NO CONVERSION FROM NATIVE FOR RelativeData*;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ccs.ArmatureDataManager:getRelativeData",argc, 1);

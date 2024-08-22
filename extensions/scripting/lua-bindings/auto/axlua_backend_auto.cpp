@@ -929,7 +929,7 @@ int lua_ax_backend_Program_getUniformBufferSize(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = cobj->getUniformBufferSize(arg0);
-        #pragma warning NO CONVERSION FROM NATIVE FOR ??;
+        //#pragma warning NO CONVERSION FROM NATIVE FOR ??;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "axb.Program:getUniformBufferSize",argc, 1);
@@ -1091,7 +1091,7 @@ int lua_ax_backend_VertexLayout_getStride(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = cobj->getStride();
-        #pragma warning NO CONVERSION FROM NATIVE FOR ??;
+        //#pragma warning NO CONVERSION FROM NATIVE FOR ??;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "axb.VertexLayout:getStride",argc, 0);
@@ -1676,7 +1676,7 @@ int lua_ax_backend_ProgramState_getBatchId(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = cobj->getBatchId();
-        #pragma warning NO CONVERSION FROM NATIVE FOR unsigned long long;
+        //#pragma warning NO CONVERSION FROM NATIVE FOR unsigned long long;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "axb.ProgramState:getBatchId",argc, 0);
@@ -1983,7 +1983,7 @@ int lua_ax_backend_TextureBackend_updateTextureDescriptor(lua_State* tolua_S)
     {
         ax::backend::TextureDescriptor arg0;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR TextureDescriptor
+        //#pragma warning NO CONVERSION TO NATIVE FOR TextureDescriptor
 		ok = false;
         if(!ok)
         {
@@ -1999,7 +1999,7 @@ int lua_ax_backend_TextureBackend_updateTextureDescriptor(lua_State* tolua_S)
         ax::backend::TextureDescriptor arg0;
         int arg1;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR TextureDescriptor
+        //#pragma warning NO CONVERSION TO NATIVE FOR TextureDescriptor
 		ok = false;
 
         ok &= luaval_to_int32(tolua_S, 3,(int *)&arg1, "axb.TextureBackend:updateTextureDescriptor");
@@ -2476,7 +2476,7 @@ int lua_ax_backend_Texture2DBackend_getWidth(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = cobj->getWidth();
-        #pragma warning NO CONVERSION FROM NATIVE FOR ??;
+        //#pragma warning NO CONVERSION FROM NATIVE FOR ??;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "axb.Texture2DBackend:getWidth",argc, 0);
@@ -2523,7 +2523,7 @@ int lua_ax_backend_Texture2DBackend_getHeight(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = cobj->getHeight();
-        #pragma warning NO CONVERSION FROM NATIVE FOR ??;
+        //#pragma warning NO CONVERSION FROM NATIVE FOR ??;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "axb.Texture2DBackend:getHeight",argc, 0);
@@ -2590,7 +2590,7 @@ int lua_ax_backend_TextureCubemapBackend_updateFaceData(lua_State* tolua_S)
 
         ok &= luaval_to_int32(tolua_S, 2,(int *)&arg0, "axb.TextureCubemapBackend:updateFaceData");
 
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        //#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
         if(!ok)
         {
@@ -2609,7 +2609,7 @@ int lua_ax_backend_TextureCubemapBackend_updateFaceData(lua_State* tolua_S)
 
         ok &= luaval_to_int32(tolua_S, 2,(int *)&arg0, "axb.TextureCubemapBackend:updateFaceData");
 
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        //#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
 
         ok &= luaval_to_int32(tolua_S, 4,(int *)&arg2, "axb.TextureCubemapBackend:updateFaceData");
@@ -3662,7 +3662,7 @@ int lua_ax_backend_ProgramManager_registerCustomProgram(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = cobj->registerCustomProgram(arg0, arg1);
-        #pragma warning NO CONVERSION FROM NATIVE FOR unsigned long long;
+        //#pragma warning NO CONVERSION FROM NATIVE FOR unsigned long long;
         return 1;
     }
     if (argc == 3) 
@@ -3682,7 +3682,7 @@ int lua_ax_backend_ProgramManager_registerCustomProgram(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = cobj->registerCustomProgram(arg0, arg1, arg2);
-        #pragma warning NO CONVERSION FROM NATIVE FOR unsigned long long;
+        //#pragma warning NO CONVERSION FROM NATIVE FOR unsigned long long;
         return 1;
     }
     if (argc == 4) 
@@ -3705,7 +3705,7 @@ int lua_ax_backend_ProgramManager_registerCustomProgram(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = cobj->registerCustomProgram(arg0, arg1, arg2, arg3);
-        #pragma warning NO CONVERSION FROM NATIVE FOR unsigned long long;
+        //#pragma warning NO CONVERSION FROM NATIVE FOR unsigned long long;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "axb.ProgramManager:registerCustomProgram",argc, 2);
@@ -3778,7 +3778,7 @@ int lua_ax_backend_ProgramManager_loadProgram(lua_State* tolua_S)
     do{
         if (argc == 1) {
             unsigned long long arg0;
-            #pragma warning NO CONVERSION TO NATIVE FOR unsigned long long
+            //#pragma warning NO CONVERSION TO NATIVE FOR unsigned long long
 		ok = false;
 
             if (!ok) { break; }

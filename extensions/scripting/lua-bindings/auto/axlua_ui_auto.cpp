@@ -36102,7 +36102,7 @@ int lua_ax_ui_EditBox_keyboardWillShow(lua_State* tolua_S)
     {
         ax::IMEKeyboardNotificationInfo arg0;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR IMEKeyboardNotificationInfo
+        //#pragma warning NO CONVERSION TO NATIVE FOR IMEKeyboardNotificationInfo
 		ok = false;
         if(!ok)
         {
@@ -36153,7 +36153,7 @@ int lua_ax_ui_EditBox_keyboardDidShow(lua_State* tolua_S)
     {
         ax::IMEKeyboardNotificationInfo arg0;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR IMEKeyboardNotificationInfo
+        //#pragma warning NO CONVERSION TO NATIVE FOR IMEKeyboardNotificationInfo
 		ok = false;
         if(!ok)
         {
@@ -36204,7 +36204,7 @@ int lua_ax_ui_EditBox_keyboardWillHide(lua_State* tolua_S)
     {
         ax::IMEKeyboardNotificationInfo arg0;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR IMEKeyboardNotificationInfo
+        //#pragma warning NO CONVERSION TO NATIVE FOR IMEKeyboardNotificationInfo
 		ok = false;
         if(!ok)
         {
@@ -36255,7 +36255,7 @@ int lua_ax_ui_EditBox_keyboardDidHide(lua_State* tolua_S)
     {
         ax::IMEKeyboardNotificationInfo arg0;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR IMEKeyboardNotificationInfo
+        //#pragma warning NO CONVERSION TO NATIVE FOR IMEKeyboardNotificationInfo
 		ok = false;
         if(!ok)
         {

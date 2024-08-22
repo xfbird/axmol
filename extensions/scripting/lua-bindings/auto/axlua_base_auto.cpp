@@ -7,6 +7,13 @@
 #include "renderer/backend/RenderTarget.h"
 #include "lua-bindings/manual/tolua_fix.h"
 #include "lua-bindings/manual/LuaBasicConversions.h"
+#include "lua-bindings/manual/base/axlua_base_manual.hpp"
+#include "lua-bindings/manual/LuaValue.h"
+#include "lua-bindings/manual/LuaEngine.h"
+
+
+
+#include "base/Logging.h"
 
 int lua_ax_base_Object_retain(lua_State* tolua_S)
 {
@@ -830,14 +837,14 @@ int lua_ax_base_Texture2D_updateWithMipmaps(lua_State* tolua_S)
     argc = lua_gettop(tolua_S)-1;
     if (argc == 6) 
     {
-        ax::_MipmapInfo* arg0;
-        int arg1;
+        ax::_MipmapInfo* arg0=nullptr;
+        int arg1=0;
         ax::backend::PixelFormat arg2;
         ax::backend::PixelFormat arg3;
         int arg4;
         int arg5;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR _MipmapInfo*
+        // ////////#pragma warning NO CONVERSION TO NATIVE FOR _MipmapInfo*
 		ok = false;
 
         ok &= luaval_to_int32(tolua_S, 3,(int *)&arg1, "ax.Texture2D:updateWithMipmaps");
@@ -860,15 +867,15 @@ int lua_ax_base_Texture2D_updateWithMipmaps(lua_State* tolua_S)
     }
     if (argc == 7) 
     {
-        ax::_MipmapInfo* arg0;
-        int arg1;
+        ax::_MipmapInfo* arg0=nullptr;
+        int arg1=0;
         ax::backend::PixelFormat arg2;
         ax::backend::PixelFormat arg3;
-        int arg4;
-        int arg5;
-        bool arg6;
+        int arg4=0;
+        int arg5=0;
+        bool arg6=0;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR _MipmapInfo*
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR _MipmapInfo*
 		ok = false;
 
         ok &= luaval_to_int32(tolua_S, 3,(int *)&arg1, "ax.Texture2D:updateWithMipmaps");
@@ -893,16 +900,16 @@ int lua_ax_base_Texture2D_updateWithMipmaps(lua_State* tolua_S)
     }
     if (argc == 8) 
     {
-        ax::_MipmapInfo* arg0;
-        int arg1;
+        ax::_MipmapInfo* arg0=nullptr;
+        int arg1=0;
         ax::backend::PixelFormat arg2;
         ax::backend::PixelFormat arg3;
-        int arg4;
-        int arg5;
-        bool arg6;
-        int arg7;
+        int arg4=0;
+        int arg5=0;
+        bool arg6=0;
+        int arg7=0;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR _MipmapInfo*
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR _MipmapInfo*
 		ok = false;
 
         ok &= luaval_to_int32(tolua_S, 3,(int *)&arg1, "ax.Texture2D:updateWithMipmaps");
@@ -965,13 +972,13 @@ int lua_ax_base_Texture2D_updateWithSubData(lua_State* tolua_S)
     argc = lua_gettop(tolua_S)-1;
     if (argc == 5) 
     {
-        void* arg0;
-        int arg1;
-        int arg2;
-        int arg3;
-        int arg4;
+        void* arg0=nullptr;
+        int arg1=0;
+        int arg2=0;
+        int arg3=0;
+        int arg4=0;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
 
         ok &= luaval_to_int32(tolua_S, 3,(int *)&arg1, "ax.Texture2D:updateWithSubData");
@@ -992,14 +999,14 @@ int lua_ax_base_Texture2D_updateWithSubData(lua_State* tolua_S)
     }
     if (argc == 6) 
     {
-        void* arg0;
-        int arg1;
-        int arg2;
-        int arg3;
-        int arg4;
-        int arg5;
+        void* arg0=nullptr;
+        int arg1=0;
+        int arg2=0;
+        int arg3=0;
+        int arg4=0;
+        int arg5=0;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
 
         ok &= luaval_to_int32(tolua_S, 3,(int *)&arg1, "ax.Texture2D:updateWithSubData");
@@ -1452,7 +1459,7 @@ int lua_ax_base_Texture2D_updateTextureDescriptor(lua_State* tolua_S)
     {
         ax::backend::TextureDescriptor arg0;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR TextureDescriptor
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR TextureDescriptor
 		ok = false;
         if(!ok)
         {
@@ -1468,7 +1475,7 @@ int lua_ax_base_Texture2D_updateTextureDescriptor(lua_State* tolua_S)
         ax::backend::TextureDescriptor arg0;
         bool arg1;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR TextureDescriptor
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR TextureDescriptor
 		ok = false;
 
         ok &= luaval_to_boolean(tolua_S, 3,&arg1, "ax.Texture2D:updateTextureDescriptor");
@@ -10854,7 +10861,7 @@ int lua_ax_base_Node_getOnEnterTransitionDidFinishCallback(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = cobj->getOnEnterTransitionDidFinishCallback();
-        #pragma warning NO CONVERSION FROM NATIVE FOR std::function;
+        ////////#pragma warning NO CONVERSION FROM NATIVE FOR std::function;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.Node:getOnEnterTransitionDidFinishCallback",argc, 0);
@@ -10955,7 +10962,7 @@ int lua_ax_base_Node_getOnExitTransitionDidStartCallback(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = cobj->getOnExitTransitionDidStartCallback();
-        #pragma warning NO CONVERSION FROM NATIVE FOR std::function;
+        ////////#pragma warning NO CONVERSION FROM NATIVE FOR std::function;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.Node:getOnExitTransitionDidStartCallback",argc, 0);
@@ -11284,9 +11291,9 @@ int lua_ax_base_Node_setProgramStateByProgramId(lua_State* tolua_S)
     argc = lua_gettop(tolua_S)-1;
     if (argc == 1) 
     {
-        unsigned long long arg0;
+        unsigned long long arg0=0;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR unsigned long long
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR unsigned long long
 		ok = false;
         if(!ok)
         {
@@ -14287,7 +14294,7 @@ int lua_ax_base_GLView_setGLContextAttrs(lua_State* tolua_S)
     if (argc == 1)
     {
         GLContextAttrs arg0;
-        #pragma warning NO CONVERSION TO NATIVE FOR GLContextAttrs
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR GLContextAttrs
 		ok = false;
         if(!ok)
         {
@@ -14329,7 +14336,7 @@ int lua_ax_base_GLView_getGLContextAttrs(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = ax::GLView::getGLContextAttrs();
-        #pragma warning NO CONVERSION FROM NATIVE FOR GLContextAttrs;
+        ////////#pragma warning NO CONVERSION FROM NATIVE FOR GLContextAttrs;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d\n ", "ax.GLView:getGLContextAttrs",argc, 0);
@@ -21056,9 +21063,9 @@ int lua_ax_base_PolygonInfo_setQuad(lua_State* tolua_S)
     argc = lua_gettop(tolua_S)-1;
     if (argc == 1) 
     {
-        ax::V3F_C4B_T2F_Quad* arg0;
+        ax::V3F_C4B_T2F_Quad* arg0=nullptr;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR V3F_C4B_T2F_Quad*
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR V3F_C4B_T2F_Quad*
 		ok = false;
         if(!ok)
         {
@@ -21107,10 +21114,10 @@ int lua_ax_base_PolygonInfo_setQuads(lua_State* tolua_S)
     argc = lua_gettop(tolua_S)-1;
     if (argc == 2) 
     {
-        ax::V3F_C4B_T2F_Quad* arg0;
+        ax::V3F_C4B_T2F_Quad* arg0=nullptr;
         int arg1;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR V3F_C4B_T2F_Quad*
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR V3F_C4B_T2F_Quad*
 		ok = false;
 
         ok &= luaval_to_int32(tolua_S, 3,(int *)&arg1, "ax.PolygonInfo:setQuads");
@@ -21163,7 +21170,7 @@ int lua_ax_base_PolygonInfo_setTriangles(lua_State* tolua_S)
     {
         ax::TrianglesCommand::Triangles arg0;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR Triangles
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR Triangles
 		ok = false;
         if(!ok)
         {
@@ -21648,24 +21655,24 @@ int lua_ax_base_SpriteFrame_getRectInPixels(lua_State* tolua_S)
     ax::SpriteFrame* cobj = nullptr;
     bool ok  = true;
 
-#if _AX_DEBUG >= 1
-    tolua_Error tolua_err;
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
 
 
-#if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrame",0,&tolua_err)) goto tolua_lerror;
-#endif
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrame",0,&tolua_err)) goto tolua_lerror;
+    #endif
 
     cobj = (ax::SpriteFrame*)tolua_tousertype(tolua_S,1,0);
 
-#if _AX_DEBUG >= 1
-    if (!cobj) 
-    {
-        tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrame_getRectInPixels'", nullptr);
-        return 0;
-    }
-#endif
+    #if _AX_DEBUG >= 1
+        if (!cobj) 
+        {
+            tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrame_getRectInPixels'", nullptr);
+            return 0;
+        }
+    #endif
 
     argc = lua_gettop(tolua_S)-1;
     if (argc == 0) 
@@ -21695,24 +21702,24 @@ int lua_ax_base_SpriteFrame_setRectInPixels(lua_State* tolua_S)
     ax::SpriteFrame* cobj = nullptr;
     bool ok  = true;
 
-#if _AX_DEBUG >= 1
-    tolua_Error tolua_err;
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
 
 
-#if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrame",0,&tolua_err)) goto tolua_lerror;
-#endif
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrame",0,&tolua_err)) goto tolua_lerror;
+    #endif
 
     cobj = (ax::SpriteFrame*)tolua_tousertype(tolua_S,1,0);
 
-#if _AX_DEBUG >= 1
-    if (!cobj) 
-    {
-        tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrame_setRectInPixels'", nullptr);
-        return 0;
-    }
-#endif
+    #if _AX_DEBUG >= 1
+        if (!cobj) 
+        {
+            tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrame_setRectInPixels'", nullptr);
+            return 0;
+        }
+    #endif
 
     argc = lua_gettop(tolua_S)-1;
     if (argc == 1) 
@@ -21732,10 +21739,10 @@ int lua_ax_base_SpriteFrame_setRectInPixels(lua_State* tolua_S)
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.SpriteFrame:setRectInPixels",argc, 1);
     return 0;
 
-#if _AX_DEBUG >= 1
-    tolua_lerror:
-    tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrame_setRectInPixels'.",&tolua_err);
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_lerror:
+        tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrame_setRectInPixels'.",&tolua_err);
+    #endif
 
     return 0;
 }
@@ -21745,24 +21752,24 @@ int lua_ax_base_SpriteFrame_isRotated(lua_State* tolua_S)
     ax::SpriteFrame* cobj = nullptr;
     bool ok  = true;
 
-#if _AX_DEBUG >= 1
-    tolua_Error tolua_err;
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
 
 
-#if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrame",0,&tolua_err)) goto tolua_lerror;
-#endif
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrame",0,&tolua_err)) goto tolua_lerror;
+    #endif
 
     cobj = (ax::SpriteFrame*)tolua_tousertype(tolua_S,1,0);
 
-#if _AX_DEBUG >= 1
-    if (!cobj) 
-    {
-        tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrame_isRotated'", nullptr);
-        return 0;
-    }
-#endif
+    #if _AX_DEBUG >= 1
+        if (!cobj) 
+        {
+            tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrame_isRotated'", nullptr);
+            return 0;
+        }
+    #endif
 
     argc = lua_gettop(tolua_S)-1;
     if (argc == 0) 
@@ -21779,10 +21786,10 @@ int lua_ax_base_SpriteFrame_isRotated(lua_State* tolua_S)
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.SpriteFrame:isRotated",argc, 0);
     return 0;
 
-#if _AX_DEBUG >= 1
-    tolua_lerror:
-    tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrame_isRotated'.",&tolua_err);
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_lerror:
+        tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrame_isRotated'.",&tolua_err);
+    #endif
 
     return 0;
 }
@@ -21792,24 +21799,24 @@ int lua_ax_base_SpriteFrame_setRotated(lua_State* tolua_S)
     ax::SpriteFrame* cobj = nullptr;
     bool ok  = true;
 
-#if _AX_DEBUG >= 1
-    tolua_Error tolua_err;
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
 
 
-#if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrame",0,&tolua_err)) goto tolua_lerror;
-#endif
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrame",0,&tolua_err)) goto tolua_lerror;
+    #endif
 
     cobj = (ax::SpriteFrame*)tolua_tousertype(tolua_S,1,0);
 
-#if _AX_DEBUG >= 1
-    if (!cobj) 
-    {
-        tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrame_setRotated'", nullptr);
-        return 0;
-    }
-#endif
+    #if _AX_DEBUG >= 1
+        if (!cobj) 
+        {
+            tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrame_setRotated'", nullptr);
+            return 0;
+        }
+    #endif
 
     argc = lua_gettop(tolua_S)-1;
     if (argc == 1) 
@@ -21829,10 +21836,10 @@ int lua_ax_base_SpriteFrame_setRotated(lua_State* tolua_S)
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.SpriteFrame:setRotated",argc, 1);
     return 0;
 
-#if _AX_DEBUG >= 1
-    tolua_lerror:
-    tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrame_setRotated'.",&tolua_err);
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_lerror:
+        tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrame_setRotated'.",&tolua_err);
+    #endif
 
     return 0;
 }
@@ -21842,24 +21849,24 @@ int lua_ax_base_SpriteFrame_getRect(lua_State* tolua_S)
     ax::SpriteFrame* cobj = nullptr;
     bool ok  = true;
 
-#if _AX_DEBUG >= 1
-    tolua_Error tolua_err;
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
 
 
-#if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrame",0,&tolua_err)) goto tolua_lerror;
-#endif
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrame",0,&tolua_err)) goto tolua_lerror;
+    #endif
 
     cobj = (ax::SpriteFrame*)tolua_tousertype(tolua_S,1,0);
 
-#if _AX_DEBUG >= 1
-    if (!cobj) 
-    {
-        tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrame_getRect'", nullptr);
-        return 0;
-    }
-#endif
+    #if _AX_DEBUG >= 1
+        if (!cobj) 
+        {
+            tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrame_getRect'", nullptr);
+            return 0;
+        }
+    #endif
 
     argc = lua_gettop(tolua_S)-1;
     if (argc == 0) 
@@ -21876,10 +21883,10 @@ int lua_ax_base_SpriteFrame_getRect(lua_State* tolua_S)
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.SpriteFrame:getRect",argc, 0);
     return 0;
 
-#if _AX_DEBUG >= 1
-    tolua_lerror:
-    tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrame_getRect'.",&tolua_err);
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_lerror:
+        tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrame_getRect'.",&tolua_err);
+    #endif
 
     return 0;
 }
@@ -21889,24 +21896,24 @@ int lua_ax_base_SpriteFrame_setRect(lua_State* tolua_S)
     ax::SpriteFrame* cobj = nullptr;
     bool ok  = true;
 
-#if _AX_DEBUG >= 1
-    tolua_Error tolua_err;
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
 
 
-#if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrame",0,&tolua_err)) goto tolua_lerror;
-#endif
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrame",0,&tolua_err)) goto tolua_lerror;
+    #endif
 
     cobj = (ax::SpriteFrame*)tolua_tousertype(tolua_S,1,0);
 
-#if _AX_DEBUG >= 1
-    if (!cobj) 
-    {
-        tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrame_setRect'", nullptr);
-        return 0;
-    }
-#endif
+    #if _AX_DEBUG >= 1
+        if (!cobj) 
+        {
+            tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrame_setRect'", nullptr);
+            return 0;
+        }
+    #endif
 
     argc = lua_gettop(tolua_S)-1;
     if (argc == 1) 
@@ -21926,10 +21933,10 @@ int lua_ax_base_SpriteFrame_setRect(lua_State* tolua_S)
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.SpriteFrame:setRect",argc, 1);
     return 0;
 
-#if _AX_DEBUG >= 1
-    tolua_lerror:
-    tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrame_setRect'.",&tolua_err);
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_lerror:
+        tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrame_setRect'.",&tolua_err);
+    #endif
 
     return 0;
 }
@@ -21939,24 +21946,24 @@ int lua_ax_base_SpriteFrame_getCenterRect(lua_State* tolua_S)
     ax::SpriteFrame* cobj = nullptr;
     bool ok  = true;
 
-#if _AX_DEBUG >= 1
-    tolua_Error tolua_err;
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
 
 
-#if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrame",0,&tolua_err)) goto tolua_lerror;
-#endif
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrame",0,&tolua_err)) goto tolua_lerror;
+    #endif
 
     cobj = (ax::SpriteFrame*)tolua_tousertype(tolua_S,1,0);
 
-#if _AX_DEBUG >= 1
-    if (!cobj) 
-    {
-        tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrame_getCenterRect'", nullptr);
-        return 0;
-    }
-#endif
+    #if _AX_DEBUG >= 1
+        if (!cobj) 
+        {
+            tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrame_getCenterRect'", nullptr);
+            return 0;
+        }
+    #endif
 
     argc = lua_gettop(tolua_S)-1;
     if (argc == 0) 
@@ -21973,10 +21980,10 @@ int lua_ax_base_SpriteFrame_getCenterRect(lua_State* tolua_S)
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.SpriteFrame:getCenterRect",argc, 0);
     return 0;
 
-#if _AX_DEBUG >= 1
-    tolua_lerror:
-    tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrame_getCenterRect'.",&tolua_err);
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_lerror:
+        tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrame_getCenterRect'.",&tolua_err);
+    #endif
 
     return 0;
 }
@@ -21986,24 +21993,24 @@ int lua_ax_base_SpriteFrame_setCenterRectInPixels(lua_State* tolua_S)
     ax::SpriteFrame* cobj = nullptr;
     bool ok  = true;
 
-#if _AX_DEBUG >= 1
-    tolua_Error tolua_err;
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
 
 
-#if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrame",0,&tolua_err)) goto tolua_lerror;
-#endif
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrame",0,&tolua_err)) goto tolua_lerror;
+    #endif
 
     cobj = (ax::SpriteFrame*)tolua_tousertype(tolua_S,1,0);
 
-#if _AX_DEBUG >= 1
-    if (!cobj) 
-    {
-        tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrame_setCenterRectInPixels'", nullptr);
-        return 0;
-    }
-#endif
+    #if _AX_DEBUG >= 1
+        if (!cobj) 
+        {
+            tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrame_setCenterRectInPixels'", nullptr);
+            return 0;
+        }
+    #endif
 
     argc = lua_gettop(tolua_S)-1;
     if (argc == 1) 
@@ -22023,10 +22030,10 @@ int lua_ax_base_SpriteFrame_setCenterRectInPixels(lua_State* tolua_S)
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.SpriteFrame:setCenterRectInPixels",argc, 1);
     return 0;
 
-#if _AX_DEBUG >= 1
-    tolua_lerror:
-    tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrame_setCenterRectInPixels'.",&tolua_err);
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_lerror:
+        tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrame_setCenterRectInPixels'.",&tolua_err);
+    #endif
 
     return 0;
 }
@@ -22036,24 +22043,24 @@ int lua_ax_base_SpriteFrame_hasCenterRect(lua_State* tolua_S)
     ax::SpriteFrame* cobj = nullptr;
     bool ok  = true;
 
-#if _AX_DEBUG >= 1
-    tolua_Error tolua_err;
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
 
 
-#if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrame",0,&tolua_err)) goto tolua_lerror;
-#endif
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrame",0,&tolua_err)) goto tolua_lerror;
+    #endif
 
     cobj = (ax::SpriteFrame*)tolua_tousertype(tolua_S,1,0);
 
-#if _AX_DEBUG >= 1
-    if (!cobj) 
-    {
-        tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrame_hasCenterRect'", nullptr);
-        return 0;
-    }
-#endif
+    #if _AX_DEBUG >= 1
+        if (!cobj) 
+        {
+            tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrame_hasCenterRect'", nullptr);
+            return 0;
+        }
+    #endif
 
     argc = lua_gettop(tolua_S)-1;
     if (argc == 0) 
@@ -22070,10 +22077,10 @@ int lua_ax_base_SpriteFrame_hasCenterRect(lua_State* tolua_S)
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.SpriteFrame:hasCenterRect",argc, 0);
     return 0;
 
-#if _AX_DEBUG >= 1
-    tolua_lerror:
-    tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrame_hasCenterRect'.",&tolua_err);
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_lerror:
+        tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrame_hasCenterRect'.",&tolua_err);
+    #endif
 
     return 0;
 }
@@ -22083,24 +22090,24 @@ int lua_ax_base_SpriteFrame_getOffsetInPixels(lua_State* tolua_S)
     ax::SpriteFrame* cobj = nullptr;
     bool ok  = true;
 
-#if _AX_DEBUG >= 1
-    tolua_Error tolua_err;
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
 
 
-#if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrame",0,&tolua_err)) goto tolua_lerror;
-#endif
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrame",0,&tolua_err)) goto tolua_lerror;
+    #endif
 
     cobj = (ax::SpriteFrame*)tolua_tousertype(tolua_S,1,0);
 
-#if _AX_DEBUG >= 1
-    if (!cobj) 
-    {
-        tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrame_getOffsetInPixels'", nullptr);
-        return 0;
-    }
-#endif
+    #if _AX_DEBUG >= 1
+        if (!cobj) 
+        {
+            tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrame_getOffsetInPixels'", nullptr);
+            return 0;
+        }
+    #endif
 
     argc = lua_gettop(tolua_S)-1;
     if (argc == 0) 
@@ -27159,7 +27166,7 @@ int lua_ax_base_BezierBy_initWithDuration(lua_State* tolua_S)
 
         ok &= luaval_to_number(tolua_S, 2,&arg0, "ax.BezierBy:initWithDuration");
 
-        #pragma warning NO CONVERSION TO NATIVE FOR _ccBezierConfig
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR _ccBezierConfig
 		ok = false;
         if(!ok)
         {
@@ -27271,7 +27278,7 @@ int lua_ax_base_BezierTo_initWithDuration(lua_State* tolua_S)
 
         ok &= luaval_to_number(tolua_S, 2,&arg0, "ax.BezierTo:initWithDuration");
 
-        #pragma warning NO CONVERSION TO NATIVE FOR _ccBezierConfig
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR _ccBezierConfig
 		ok = false;
         if(!ok)
         {
@@ -30520,12 +30527,13 @@ int lua_ax_base_Properties_getPath(lua_State* tolua_S)
     argc = lua_gettop(tolua_S)-1;
     if (argc == 2) 
     {
-        const char* arg0;
-        std::string* arg1;
+        const char* arg0=nullptr;
+        std::string* arg1=nullptr;
 
-        std::string arg0_tmp; ok &= luaval_to_std_string(tolua_S, 2, &arg0_tmp, "ax.Properties:getPath"); arg0 = arg0_tmp.c_str();
+        std::string arg0_tmp; 
+        ok &= luaval_to_std_string(tolua_S, 2, &arg0_tmp, "ax.Properties:getPath"); arg0 = arg0_tmp.c_str();
 
-        #pragma warning NO CONVERSION TO NATIVE FOR basic_string*
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR basic_string*
 		ok = false;
         if(!ok)
         {
@@ -33728,10 +33736,10 @@ int lua_ax_base_FileUtils_writeBinaryToFile(lua_State* tolua_S)
 
     if (argc == 3)
     {
-        const void* arg0;
-        unsigned int arg1;
+        const void* arg0=nullptr;
+        unsigned int arg1=0;
         std::string_view arg2;
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
         ok &= luaval_to_uint32(tolua_S, 3,&arg1, "ax.FileUtils:writeBinaryToFile");
         ok &= luaval_to_std_string_view(tolua_S, 4,&arg2, "ax.FileUtils:writeBinaryToFile");
@@ -34942,11 +34950,11 @@ int lua_ax_base_EventDispatcher_dispatchCustomEvent(lua_State* tolua_S)
     if (argc == 2) 
     {
         std::string_view arg0;
-        void* arg1;
+        void* arg1=nullptr;
 
         ok &= luaval_to_std_string_view(tolua_S, 2,&arg0, "ax.EventDispatcher:dispatchCustomEvent");
 
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
         if(!ok)
         {
@@ -34960,12 +34968,12 @@ int lua_ax_base_EventDispatcher_dispatchCustomEvent(lua_State* tolua_S)
     if (argc == 3) 
     {
         std::string_view arg0;
-        void* arg1;
-        bool arg2;
+        void* arg1=nullptr;
+        bool arg2=false;
 
         ok &= luaval_to_std_string_view(tolua_S, 2,&arg0, "ax.EventDispatcher:dispatchCustomEvent");
 
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
 
         ok &= luaval_to_boolean(tolua_S, 4,&arg2, "ax.EventDispatcher:dispatchCustomEvent");
@@ -68224,22 +68232,24 @@ int lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile(lua_State* tolua_S)
     int argc = 0;
     ax::SpriteFrameCache* cobj = nullptr;
     bool ok  = true;
-#if _AX_DEBUG >= 1
-    tolua_Error tolua_err;
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
 
-#if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrameCache",0,&tolua_err)) goto tolua_lerror;
-#endif
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrameCache",0,&tolua_err)) goto tolua_lerror;
+    #endif
     cobj = (ax::SpriteFrameCache*)tolua_tousertype(tolua_S,1,0);
-#if _AX_DEBUG >= 1
-    if (!cobj)
-    {
-        tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile'", nullptr);
-        return 0;
-    }
-#endif
+    AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile cobj:{} ",fmt::ptr(cobj));
+    #if _AX_DEBUG >= 1
+        if (!cobj)
+        {
+            tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile'", nullptr);
+            return 0;
+        }
+    #endif
     argc = lua_gettop(tolua_S)-1;
+    AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile argc:{} ",argc);
     do{
         if (argc == 2) {
             std::string_view arg0;
@@ -68250,8 +68260,10 @@ int lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile(lua_State* tolua_S)
             ok &= luaval_to_std_string_view(tolua_S, 3,&arg1, "ax.SpriteFrameCache:addSpriteFramesWithFile");
 
             if (!ok) { break; }
+            AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile  SS arg0:{} arg1:{}",arg0,arg1);
             cobj->addSpriteFramesWithFile(arg0, arg1);
             lua_settop(tolua_S, 1);
+            AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile SS return ");
             return 1;
         }
     }while(0);
@@ -68270,8 +68282,10 @@ int lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile(lua_State* tolua_S)
             ok &= luaval_to_uint32(tolua_S, 4,&arg2, "ax.SpriteFrameCache:addSpriteFramesWithFile");
 
             if (!ok) { break; }
+            AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile SSN arg0:{} arg1:{} arg2:{}",arg0,arg1,arg2);
             cobj->addSpriteFramesWithFile(arg0, arg1, arg2);
             lua_settop(tolua_S, 1);
+            AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile SSN return ");
             return 1;
         }
     }while(0);
@@ -68282,8 +68296,10 @@ int lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile(lua_State* tolua_S)
             ok &= luaval_to_std_string_view(tolua_S, 2,&arg0, "ax.SpriteFrameCache:addSpriteFramesWithFile");
 
             if (!ok) { break; }
+            AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile S arg0:{} ",arg0);
             cobj->addSpriteFramesWithFile(arg0);
             lua_settop(tolua_S, 1);
+            AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile S return ");
             return 1;
         }
     }while(0);
@@ -68298,8 +68314,10 @@ int lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile(lua_State* tolua_S)
             ok &= luaval_to_uint32(tolua_S, 3,&arg1, "ax.SpriteFrameCache:addSpriteFramesWithFile");
 
             if (!ok) { break; }
+            AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile SN arg0:{} arg1:{}",arg0,arg1);
             cobj->addSpriteFramesWithFile(arg0, arg1);
             lua_settop(tolua_S, 1);
+            AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile SN return ",arg0,arg1);
             return 1;
         }
     }while(0);
@@ -68314,8 +68332,10 @@ int lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile(lua_State* tolua_S)
             ok &= luaval_to_object<ax::Texture2D>(tolua_S, 3, "ax.Texture2D",&arg1, "ax.SpriteFrameCache:addSpriteFramesWithFile");
 
             if (!ok) { break; }
+            AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile ST arg0:{} arg1:{}",arg0,fmt::ptr(arg1));
             cobj->addSpriteFramesWithFile(arg0, arg1);
             lua_settop(tolua_S, 1);
+            AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile ST return");
             return 1;
         }
     }while(0);
@@ -68334,8 +68354,10 @@ int lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile(lua_State* tolua_S)
             ok &= luaval_to_uint32(tolua_S, 4,&arg2, "ax.SpriteFrameCache:addSpriteFramesWithFile");
 
             if (!ok) { break; }
+            AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile STN arg0:{} arg1:{} arg2:{}",arg0,fmt::ptr(arg1),arg2);
             cobj->addSpriteFramesWithFile(arg0, arg1, arg2);
             lua_settop(tolua_S, 1);
+            AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile STN return",);
             return 1;
         }
     }while(0);
@@ -68343,37 +68365,110 @@ int lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile(lua_State* tolua_S)
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n",  "ax.SpriteFrameCache:addSpriteFramesWithFile",argc, 2);
     return 0;
 
-#if _AX_DEBUG >= 1
-    tolua_lerror:
-    tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile'.",&tolua_err);
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_lerror:
+        tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile'.",&tolua_err);
+    #endif
 
     return 0;
 }
+
+int lua_ax_base_SpriteFrameCache_addSpriteFramesWithFileAsync(lua_State* tolua_S)
+{
+    //  int lua_ax_base_SpriteFrameCache_addSpriteFramesWithFileAsync(lua_State* tolua_S)
+    if (nullptr == tolua_S)
+        return 0;
+
+    int argc = 0;
+    SpriteFrameCache* self = nullptr;
+
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+        if (!tolua_isusertype(tolua_S, 1, "ax.SpriteFrameCache", 0, &tolua_err))
+            goto tolua_lerror;
+    #endif
+
+    self = static_cast<SpriteFrameCache*>(tolua_tousertype(tolua_S, 1, 0));
+    AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFileAsync self:{} ",fmt::ptr(self));
+    #if _AX_DEBUG >= 1
+        if (nullptr == self)
+        {
+            tolua_error(tolua_S, "invalid 'self' in function 'lua_ax_base_SpriteFrameCache_addSpriteFramesWithFileAsync'\n", NULL);
+            return 0;
+        }
+    #endif
+    argc = lua_gettop(tolua_S) - 1;
+    AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFileAsync argc:{} ",argc);
+    if (argc >= 4) // We expect at least 4 arguments: spriteSheetFileName, textureFileName, spriteSheetFormat, and the callback function
+    {
+        #if _AX_DEBUG >= 1
+            if (!tolua_isstring(tolua_S, 2, 0, &tolua_err) ||
+                !tolua_isstring(tolua_S, 3, 0, &tolua_err) ||
+                !tolua_isnumber(tolua_S, 4, 0, &tolua_err) ||
+                !toluafix_isfunction(tolua_S, 5, "LUA_FUNCTION", 0, &tolua_err))
+            {
+                goto tolua_lerror;
+            }
+        #endif
+        auto spriteSheetFileName = axlua_tosv(tolua_S, 2);
+        auto textureFileName = axlua_tosv(tolua_S, 3);
+        uint32_t spriteSheetFormat = static_cast<uint32_t>(lua_tonumber(tolua_S, 4));
+        AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFileAsync spriteSheetFileName:{} textureFileName:{} spriteSheetFormat:{}",spriteSheetFileName,textureFileName,spriteSheetFormat);
+
+        LUA_FUNCTION handler = (toluafix_ref_function(tolua_S, 5, 0));
+        self->addSpriteFramesWithFileAsync(spriteSheetFileName,
+                                           textureFileName,
+                                           spriteSheetFormat,
+                                           [=](Texture2D* tex) {
+                                               AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFileAsync 进入回调");
+                                               auto stack = LuaEngine::getInstance()->getLuaStack();
+                                               int ID = (tex) ? (int)tex->_ID : -1;
+                                               int* luaID = (tex) ? &tex->_luaID : nullptr;
+                                               toluafix_pushusertype_object(stack->getLuaState(), ID, luaID, (void*)tex, "ax.SpriteFrame");
+                                               AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFileAsync 调用lua 函数处理");
+                                               stack->executeFunctionByHandler(handler, 1);
+                                               AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFileAsync 调用lua 函数处理 后处理");
+                                               stack->removeScriptHandler(handler);
+                                           });
+        AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFileAsync 异步调用 回归");
+        return 0;
+    }
+
+    luaL_error(tolua_S, "%s function of SpriteFrameCache has wrong number of arguments: %d, was expecting %d\n",
+               "addSpriteFramesWithFileAsync", argc, 4);
+
+    #if _AX_DEBUG >= 1
+        tolua_lerror:
+            tolua_error(tolua_S, "#ferror in function 'lua_ax_base_SpriteFrameCache_addSpriteFramesWithFileAsync'.", &tolua_err);
+    #endif
+    return 0;
+
+}
+
 int lua_ax_base_SpriteFrameCache_addSpriteFrame(lua_State* tolua_S)
 {
     int argc = 0;
     ax::SpriteFrameCache* cobj = nullptr;
     bool ok  = true;
 
-#if _AX_DEBUG >= 1
-    tolua_Error tolua_err;
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
 
 
-#if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrameCache",0,&tolua_err)) goto tolua_lerror;
-#endif
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrameCache",0,&tolua_err)) goto tolua_lerror;
+    #endif
 
     cobj = (ax::SpriteFrameCache*)tolua_tousertype(tolua_S,1,0);
-
-#if _AX_DEBUG >= 1
-    if (!cobj) 
-    {
-        tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrameCache_addSpriteFrame'", nullptr);
-        return 0;
-    }
-#endif
+    AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFrame cobj:{} ",fmt::ptr(cobj));
+    #if _AX_DEBUG >= 1
+        if (!cobj) 
+        {
+            tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrameCache_addSpriteFrame'", nullptr);
+            return 0;
+        }
+    #endif
 
     argc = lua_gettop(tolua_S)-1;
     if (argc == 2) 
@@ -68389,17 +68484,19 @@ int lua_ax_base_SpriteFrameCache_addSpriteFrame(lua_State* tolua_S)
             tolua_error(tolua_S,"invalid arguments in function 'lua_ax_base_SpriteFrameCache_addSpriteFrame'", nullptr);
             return 0;
         }
+        AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFrame arg0:{} arg1:{}",fmt::ptr(arg0),arg1);
         cobj->addSpriteFrame(arg0, arg1);
         lua_settop(tolua_S, 1);
+        AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFrame return");
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.SpriteFrameCache:addSpriteFrame",argc, 2);
     return 0;
 
-#if _AX_DEBUG >= 1
-    tolua_lerror:
-    tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrameCache_addSpriteFrame'.",&tolua_err);
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_lerror:
+        tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrameCache_addSpriteFrame'.",&tolua_err);
+    #endif
 
     return 0;
 }
@@ -68409,24 +68506,24 @@ int lua_ax_base_SpriteFrameCache_isSpriteFramesWithFileLoaded(lua_State* tolua_S
     ax::SpriteFrameCache* cobj = nullptr;
     bool ok  = true;
 
-#if _AX_DEBUG >= 1
-    tolua_Error tolua_err;
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
 
 
-#if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrameCache",0,&tolua_err)) goto tolua_lerror;
-#endif
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrameCache",0,&tolua_err)) goto tolua_lerror;
+    #endif
 
     cobj = (ax::SpriteFrameCache*)tolua_tousertype(tolua_S,1,0);
-
-#if _AX_DEBUG >= 1
-    if (!cobj) 
-    {
-        tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrameCache_isSpriteFramesWithFileLoaded'", nullptr);
-        return 0;
-    }
-#endif
+    AXLOGD("lua_ax_base_SpriteFrameCache_isSpriteFramesWithFileLoaded cobj:{} ",fmt::ptr(cobj));
+    #if _AX_DEBUG >= 1
+        if (!cobj) 
+        {
+            tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrameCache_isSpriteFramesWithFileLoaded'", nullptr);
+            return 0;
+        }
+    #endif
 
     argc = lua_gettop(tolua_S)-1;
     if (argc == 1) 
@@ -68439,17 +68536,19 @@ int lua_ax_base_SpriteFrameCache_isSpriteFramesWithFileLoaded(lua_State* tolua_S
             tolua_error(tolua_S,"invalid arguments in function 'lua_ax_base_SpriteFrameCache_isSpriteFramesWithFileLoaded'", nullptr);
             return 0;
         }
+        AXLOGD("lua_ax_base_SpriteFrameCache_isSpriteFramesWithFileLoaded arg0:{} ",arg0);
         auto&& ret = cobj->isSpriteFramesWithFileLoaded(arg0);
         tolua_pushboolean(tolua_S,(bool)ret);
+        AXLOGD("lua_ax_base_SpriteFrameCache_isSpriteFramesWithFileLoaded return");
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.SpriteFrameCache:isSpriteFramesWithFileLoaded",argc, 1);
     return 0;
 
-#if _AX_DEBUG >= 1
-    tolua_lerror:
-    tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrameCache_isSpriteFramesWithFileLoaded'.",&tolua_err);
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_lerror:
+        tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrameCache_isSpriteFramesWithFileLoaded'.",&tolua_err);
+    #endif
 
     return 0;
 }
@@ -68459,24 +68558,24 @@ int lua_ax_base_SpriteFrameCache_removeSpriteFrames(lua_State* tolua_S)
     ax::SpriteFrameCache* cobj = nullptr;
     bool ok  = true;
 
-#if _AX_DEBUG >= 1
-    tolua_Error tolua_err;
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
 
 
-#if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrameCache",0,&tolua_err)) goto tolua_lerror;
-#endif
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrameCache",0,&tolua_err)) goto tolua_lerror;
+    #endif
 
     cobj = (ax::SpriteFrameCache*)tolua_tousertype(tolua_S,1,0);
-
-#if _AX_DEBUG >= 1
-    if (!cobj) 
-    {
-        tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrameCache_removeSpriteFrames'", nullptr);
-        return 0;
-    }
-#endif
+    AXLOGD("lua_ax_base_SpriteFrameCache_removeSpriteFrames cobj:{} ",fmt::ptr(cobj));
+    #if _AX_DEBUG >= 1
+        if (!cobj) 
+        {
+            tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrameCache_removeSpriteFrames'", nullptr);
+            return 0;
+        }
+    #endif
 
     argc = lua_gettop(tolua_S)-1;
     if (argc == 0) 
@@ -68488,15 +68587,16 @@ int lua_ax_base_SpriteFrameCache_removeSpriteFrames(lua_State* tolua_S)
         }
         cobj->removeSpriteFrames();
         lua_settop(tolua_S, 1);
+        AXLOGD("lua_ax_base_SpriteFrameCache_removeSpriteFrames return ");
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.SpriteFrameCache:removeSpriteFrames",argc, 0);
     return 0;
 
-#if _AX_DEBUG >= 1
-    tolua_lerror:
-    tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrameCache_removeSpriteFrames'.",&tolua_err);
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_lerror:
+        tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrameCache_removeSpriteFrames'.",&tolua_err);
+    #endif
 
     return 0;
 }
@@ -68506,24 +68606,24 @@ int lua_ax_base_SpriteFrameCache_removeUnusedSpriteFrames(lua_State* tolua_S)
     ax::SpriteFrameCache* cobj = nullptr;
     bool ok  = true;
 
-#if _AX_DEBUG >= 1
-    tolua_Error tolua_err;
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
 
 
-#if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrameCache",0,&tolua_err)) goto tolua_lerror;
-#endif
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrameCache",0,&tolua_err)) goto tolua_lerror;
+    #endif
 
     cobj = (ax::SpriteFrameCache*)tolua_tousertype(tolua_S,1,0);
-
-#if _AX_DEBUG >= 1
-    if (!cobj) 
-    {
-        tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrameCache_removeUnusedSpriteFrames'", nullptr);
-        return 0;
-    }
-#endif
+    AXLOGD("lua_ax_base_SpriteFrameCache_removeUnusedSpriteFrames cobj:{} ",fmt::ptr(cobj));  
+    #if _AX_DEBUG >= 1
+        if (!cobj) 
+        {
+            tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrameCache_removeUnusedSpriteFrames'", nullptr);
+            return 0;
+        }
+    #endif
 
     argc = lua_gettop(tolua_S)-1;
     if (argc == 0) 
@@ -68535,15 +68635,16 @@ int lua_ax_base_SpriteFrameCache_removeUnusedSpriteFrames(lua_State* tolua_S)
         }
         cobj->removeUnusedSpriteFrames();
         lua_settop(tolua_S, 1);
+        AXLOGD("lua_ax_base_SpriteFrameCache_removeUnusedSpriteFrames return ");  
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.SpriteFrameCache:removeUnusedSpriteFrames",argc, 0);
     return 0;
 
-#if _AX_DEBUG >= 1
-    tolua_lerror:
-    tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrameCache_removeUnusedSpriteFrames'.",&tolua_err);
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_lerror:
+        tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrameCache_removeUnusedSpriteFrames'.",&tolua_err);
+    #endif
 
     return 0;
 }
@@ -68553,24 +68654,24 @@ int lua_ax_base_SpriteFrameCache_removeUnusedSpriteSheets(lua_State* tolua_S)
     ax::SpriteFrameCache* cobj = nullptr;
     bool ok  = true;
 
-#if _AX_DEBUG >= 1
-    tolua_Error tolua_err;
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
 
 
-#if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrameCache",0,&tolua_err)) goto tolua_lerror;
-#endif
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrameCache",0,&tolua_err)) goto tolua_lerror;
+    #endif
 
     cobj = (ax::SpriteFrameCache*)tolua_tousertype(tolua_S,1,0);
-
-#if _AX_DEBUG >= 1
-    if (!cobj) 
-    {
-        tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrameCache_removeUnusedSpriteSheets'", nullptr);
-        return 0;
-    }
-#endif
+    AXLOGD("lua_ax_base_SpriteFrameCache_removeUnusedSpriteSheets cobj:{} ",fmt::ptr(cobj));
+    #if _AX_DEBUG >= 1
+        if (!cobj) 
+        {
+            tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrameCache_removeUnusedSpriteSheets'", nullptr);
+            return 0;
+        }
+    #endif
 
     argc = lua_gettop(tolua_S)-1;
     if (argc == 0) 
@@ -68582,15 +68683,16 @@ int lua_ax_base_SpriteFrameCache_removeUnusedSpriteSheets(lua_State* tolua_S)
         }
         cobj->removeUnusedSpriteSheets();
         lua_settop(tolua_S, 1);
+        AXLOGD("lua_ax_base_SpriteFrameCache_removeUnusedSpriteSheets return");
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.SpriteFrameCache:removeUnusedSpriteSheets",argc, 0);
     return 0;
 
-#if _AX_DEBUG >= 1
-    tolua_lerror:
-    tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrameCache_removeUnusedSpriteSheets'.",&tolua_err);
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_lerror:
+        tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrameCache_removeUnusedSpriteSheets'.",&tolua_err);
+    #endif
 
     return 0;
 }
@@ -68600,24 +68702,24 @@ int lua_ax_base_SpriteFrameCache_removeSpriteFrameByName(lua_State* tolua_S)
     ax::SpriteFrameCache* cobj = nullptr;
     bool ok  = true;
 
-#if _AX_DEBUG >= 1
-    tolua_Error tolua_err;
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
 
 
-#if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrameCache",0,&tolua_err)) goto tolua_lerror;
-#endif
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrameCache",0,&tolua_err)) goto tolua_lerror;
+    #endif
 
     cobj = (ax::SpriteFrameCache*)tolua_tousertype(tolua_S,1,0);
-
-#if _AX_DEBUG >= 1
-    if (!cobj) 
-    {
-        tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrameCache_removeSpriteFrameByName'", nullptr);
-        return 0;
-    }
-#endif
+    AXLOGD("lua_ax_base_SpriteFrameCache_removeSpriteFrameByName cobj:{} ",fmt::ptr(cobj));
+    #if _AX_DEBUG >= 1
+        if (!cobj) 
+        {
+            tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrameCache_removeSpriteFrameByName'", nullptr);
+            return 0;
+        }
+    #endif
 
     argc = lua_gettop(tolua_S)-1;
     if (argc == 1) 
@@ -68637,10 +68739,10 @@ int lua_ax_base_SpriteFrameCache_removeSpriteFrameByName(lua_State* tolua_S)
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.SpriteFrameCache:removeSpriteFrameByName",argc, 1);
     return 0;
 
-#if _AX_DEBUG >= 1
-    tolua_lerror:
-    tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrameCache_removeSpriteFrameByName'.",&tolua_err);
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_lerror:
+        tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrameCache_removeSpriteFrameByName'.",&tolua_err);
+    #endif
 
     return 0;
 }
@@ -68650,26 +68752,27 @@ int lua_ax_base_SpriteFrameCache_removeSpriteFramesFromFile(lua_State* tolua_S)
     ax::SpriteFrameCache* cobj = nullptr;
     bool ok  = true;
 
-#if _AX_DEBUG >= 1
-    tolua_Error tolua_err;
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
 
 
-#if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrameCache",0,&tolua_err)) goto tolua_lerror;
-#endif
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrameCache",0,&tolua_err)) goto tolua_lerror;
+    #endif
 
     cobj = (ax::SpriteFrameCache*)tolua_tousertype(tolua_S,1,0);
-
-#if _AX_DEBUG >= 1
-    if (!cobj) 
-    {
-        tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrameCache_removeSpriteFramesFromFile'", nullptr);
-        return 0;
-    }
-#endif
+    AXLOGD("lua_ax_base_SpriteFrameCache_removeSpriteFramesFromFile cobj:{} ",fmt::ptr(cobj));
+    #if _AX_DEBUG >= 1
+        if (!cobj) 
+        {
+            tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrameCache_removeSpriteFramesFromFile'", nullptr);
+            return 0;
+        }
+    #endif
 
     argc = lua_gettop(tolua_S)-1;
+    AXLOGD("lua_ax_base_SpriteFrameCache_removeSpriteFramesFromFile argc:{} ",argc);
     if (argc == 1) 
     {
         std::string_view arg0;
@@ -68680,17 +68783,19 @@ int lua_ax_base_SpriteFrameCache_removeSpriteFramesFromFile(lua_State* tolua_S)
             tolua_error(tolua_S,"invalid arguments in function 'lua_ax_base_SpriteFrameCache_removeSpriteFramesFromFile'", nullptr);
             return 0;
         }
+        AXLOGD("lua_ax_base_SpriteFrameCache_removeSpriteFramesFromFile arg0:{} ",arg0);
         cobj->removeSpriteFramesFromFile(arg0);
         lua_settop(tolua_S, 1);
+        AXLOGD("lua_ax_base_SpriteFrameCache_removeSpriteFramesFromFile return ");
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.SpriteFrameCache:removeSpriteFramesFromFile",argc, 1);
     return 0;
 
-#if _AX_DEBUG >= 1
-    tolua_lerror:
-    tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrameCache_removeSpriteFramesFromFile'.",&tolua_err);
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_lerror:
+        tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrameCache_removeSpriteFramesFromFile'.",&tolua_err);
+    #endif
 
     return 0;
 }
@@ -68800,26 +68905,27 @@ int lua_ax_base_SpriteFrameCache_getSpriteFrameByName(lua_State* tolua_S)
     ax::SpriteFrameCache* cobj = nullptr;
     bool ok  = true;
 
-#if _AX_DEBUG >= 1
-    tolua_Error tolua_err;
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
 
 
-#if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrameCache",0,&tolua_err)) goto tolua_lerror;
-#endif
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrameCache",0,&tolua_err)) goto tolua_lerror;
+    #endif
 
     cobj = (ax::SpriteFrameCache*)tolua_tousertype(tolua_S,1,0);
-
-#if _AX_DEBUG >= 1
-    if (!cobj) 
-    {
-        tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrameCache_getSpriteFrameByName'", nullptr);
-        return 0;
-    }
-#endif
+    AXLOGD("lua_ax_base_SpriteFrameCache_getSpriteFrameByName cobj:{} ",fmt::ptr(cobj));
+    #if _AX_DEBUG >= 1
+        if (!cobj) 
+        {
+            tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrameCache_getSpriteFrameByName'", nullptr);
+            return 0;
+        }
+    #endif
 
     argc = lua_gettop(tolua_S)-1;
+    AXLOGD("lua_ax_base_SpriteFrameCache_getSpriteFrameByName argc:{} ",argc);
     if (argc == 1) 
     {
         std::string_view arg0;
@@ -68830,7 +68936,9 @@ int lua_ax_base_SpriteFrameCache_getSpriteFrameByName(lua_State* tolua_S)
             tolua_error(tolua_S,"invalid arguments in function 'lua_ax_base_SpriteFrameCache_getSpriteFrameByName'", nullptr);
             return 0;
         }
+        AXLOGD("lua_ax_base_SpriteFrameCache_getSpriteFrameByName arg0:{} ",arg0);
         auto&& ret = cobj->getSpriteFrameByName(arg0);
+        AXLOGD("lua_ax_base_SpriteFrameCache_getSpriteFrameByName ret:{} 结果转换为 ax.SpriteFrame 返回 ",fmt::ptr(ret));
         object_to_luaval<ax::SpriteFrame>(tolua_S, "ax.SpriteFrame",(ax::SpriteFrame*)ret);
         return 1;
     }
@@ -68950,24 +69058,24 @@ int lua_ax_base_SpriteFrameCache_getSpriteFrameName(lua_State* tolua_S)
     ax::SpriteFrameCache* cobj = nullptr;
     bool ok  = true;
 
-#if _AX_DEBUG >= 1
-    tolua_Error tolua_err;
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
 
 
-#if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrameCache",0,&tolua_err)) goto tolua_lerror;
-#endif
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrameCache",0,&tolua_err)) goto tolua_lerror;
+    #endif
 
-    cobj = (ax::SpriteFrameCache*)tolua_tousertype(tolua_S,1,0);
+        cobj = (ax::SpriteFrameCache*)tolua_tousertype(tolua_S,1,0);
 
-#if _AX_DEBUG >= 1
-    if (!cobj) 
-    {
-        tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrameCache_getSpriteFrameName'", nullptr);
-        return 0;
-    }
-#endif
+    #if _AX_DEBUG >= 1
+        if (!cobj) 
+        {
+            tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_SpriteFrameCache_getSpriteFrameName'", nullptr);
+            return 0;
+        }
+    #endif
 
     argc = lua_gettop(tolua_S)-1;
     if (argc == 1) 
@@ -68987,10 +69095,10 @@ int lua_ax_base_SpriteFrameCache_getSpriteFrameName(lua_State* tolua_S)
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.SpriteFrameCache:getSpriteFrameName",argc, 1);
     return 0;
 
-#if _AX_DEBUG >= 1
-    tolua_lerror:
-    tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrameCache_getSpriteFrameName'.",&tolua_err);
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_lerror:
+        tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrameCache_getSpriteFrameName'.",&tolua_err);
+    #endif
 
     return 0;
 }
@@ -69205,16 +69313,16 @@ int lua_ax_base_SpriteFrameCache_getInstance(lua_State* tolua_S)
     int argc = 0;
     bool ok  = true;
 
-#if _AX_DEBUG >= 1
-    tolua_Error tolua_err;
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
 
-#if _AX_DEBUG >= 1
-    if (!tolua_isusertable(tolua_S,1,"ax.SpriteFrameCache",0,&tolua_err)) goto tolua_lerror;
-#endif
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertable(tolua_S,1,"ax.SpriteFrameCache",0,&tolua_err)) goto tolua_lerror;
+    #endif
 
     argc = lua_gettop(tolua_S) - 1;
-
+    AXLOGD("lua_ax_base_SpriteFrameCache_getInstance argc:{} ",argc);
     if (argc == 0)
     {
         if(!ok)
@@ -69223,15 +69331,16 @@ int lua_ax_base_SpriteFrameCache_getInstance(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = ax::SpriteFrameCache::getInstance();
+        AXLOGD("lua_ax_base_SpriteFrameCache_getInstance ret:{} ",fmt::ptr(ret));
         object_to_luaval<ax::SpriteFrameCache>(tolua_S, "ax.SpriteFrameCache",(ax::SpriteFrameCache*)ret);
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d\n ", "ax.SpriteFrameCache:getInstance",argc, 0);
     return 0;
-#if _AX_DEBUG >= 1
-    tolua_lerror:
-    tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrameCache_getInstance'.",&tolua_err);
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_lerror:
+        tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrameCache_getInstance'.",&tolua_err);
+    #endif
     return 0;
 }
 int lua_ax_base_SpriteFrameCache_destroyInstance(lua_State* tolua_S)
@@ -69239,16 +69348,16 @@ int lua_ax_base_SpriteFrameCache_destroyInstance(lua_State* tolua_S)
     int argc = 0;
     bool ok  = true;
 
-#if _AX_DEBUG >= 1
-    tolua_Error tolua_err;
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
 
-#if _AX_DEBUG >= 1
-    if (!tolua_isusertable(tolua_S,1,"ax.SpriteFrameCache",0,&tolua_err)) goto tolua_lerror;
-#endif
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertable(tolua_S,1,"ax.SpriteFrameCache",0,&tolua_err)) goto tolua_lerror;
+    #endif
 
     argc = lua_gettop(tolua_S) - 1;
-
+    AXLOGD("lua_ax_base_SpriteFrameCache_destroyInstance argc:{} ",argc);
     if (argc == 0)
     {
         if(!ok)
@@ -69258,14 +69367,15 @@ int lua_ax_base_SpriteFrameCache_destroyInstance(lua_State* tolua_S)
         }
         ax::SpriteFrameCache::destroyInstance();
         lua_settop(tolua_S, 1);
+        AXLOGD("lua_ax_base_SpriteFrameCache_destroyInstance return");
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d\n ", "ax.SpriteFrameCache:destroyInstance",argc, 0);
     return 0;
-#if _AX_DEBUG >= 1
-    tolua_lerror:
-    tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrameCache_destroyInstance'.",&tolua_err);
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_lerror:
+        tolua_error(tolua_S,"#ferror in function 'lua_ax_base_SpriteFrameCache_destroyInstance'.",&tolua_err);
+    #endif
     return 0;
 }
 static int lua_ax_base_SpriteFrameCache_finalize(lua_State* tolua_S)
@@ -69282,6 +69392,9 @@ int lua_register_ax_base_SpriteFrameCache(lua_State* tolua_S)
     tolua_beginmodule(tolua_S,"SpriteFrameCache");
         tolua_function(tolua_S,"init",lua_ax_base_SpriteFrameCache_init);
         tolua_function(tolua_S,"addSpriteFrames",lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile);
+        
+        // tolua_function(tolua_S,"addSpriteFramesWithFile",lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile);
+        tolua_function(tolua_S,"addSpriteFramesWithFileAsync",lua_ax_base_SpriteFrameCache_addSpriteFramesWithFileAsync);        
         tolua_function(tolua_S,"addSpriteFrame",lua_ax_base_SpriteFrameCache_addSpriteFrame);
         tolua_function(tolua_S,"isSpriteFramesWithFileLoaded",lua_ax_base_SpriteFrameCache_isSpriteFramesWithFileLoaded);
         tolua_function(tolua_S,"removeSpriteFrames",lua_ax_base_SpriteFrameCache_removeSpriteFrames);
@@ -69799,7 +69912,7 @@ int lua_ax_base_ParticleEmissionMaskCache_getEmissionMask(lua_State* tolua_S)
 
             if (!ok) { break; }
             const ax::ParticleEmissionMaskDescriptor& ret = cobj->getEmissionMask(arg0);
-            #pragma warning NO CONVERSION FROM NATIVE FOR ParticleEmissionMaskDescriptor;
+            ////////#pragma warning NO CONVERSION FROM NATIVE FOR ParticleEmissionMaskDescriptor;
             return 1;
         }
     }while(0);
@@ -69811,7 +69924,7 @@ int lua_ax_base_ParticleEmissionMaskCache_getEmissionMask(lua_State* tolua_S)
 
             if (!ok) { break; }
             const ax::ParticleEmissionMaskDescriptor& ret = cobj->getEmissionMask(arg0);
-            #pragma warning NO CONVERSION FROM NATIVE FOR ParticleEmissionMaskDescriptor;
+            ////////#pragma warning NO CONVERSION FROM NATIVE FOR ParticleEmissionMaskDescriptor;
             return 1;
         }
     }while(0);
@@ -74067,7 +74180,7 @@ int lua_ax_base_ParticleSystem_getHSV(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = cobj->getHSV();
-        #pragma warning NO CONVERSION FROM NATIVE FOR HSV;
+        ////////#pragma warning NO CONVERSION FROM NATIVE FOR HSV;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.ParticleSystem:getHSV",argc, 0);
@@ -74110,7 +74223,7 @@ int lua_ax_base_ParticleSystem_setHSV(lua_State* tolua_S)
     {
         ax::HSV arg0;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR HSV
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR HSV
 		ok = false;
         if(!ok)
         {
@@ -74165,7 +74278,7 @@ int lua_ax_base_ParticleSystem_getHSVVar(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = cobj->getHSVVar();
-        #pragma warning NO CONVERSION FROM NATIVE FOR HSV;
+        ////////#pragma warning NO CONVERSION FROM NATIVE FOR HSV;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.ParticleSystem:getHSVVar",argc, 0);
@@ -74208,7 +74321,7 @@ int lua_ax_base_ParticleSystem_setHSVVar(lua_State* tolua_S)
     {
         ax::HSV arg0;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR HSV
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR HSV
 		ok = false;
         if(!ok)
         {
@@ -76641,7 +76754,7 @@ int lua_ax_base_ParticleSystem_addEmissionShape(lua_State* tolua_S)
     {
         ax::EmissionShape arg0;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR EmissionShape
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR EmissionShape
 		ok = false;
         if(!ok)
         {
@@ -76695,7 +76808,7 @@ int lua_ax_base_ParticleSystem_setEmissionShape(lua_State* tolua_S)
 
         ok &= luaval_to_ushort(tolua_S, 2, &arg0, "ax.ParticleSystem:setEmissionShape");
 
-        #pragma warning NO CONVERSION TO NATIVE FOR EmissionShape
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR EmissionShape
 		ok = false;
         if(!ok)
         {
@@ -78048,7 +78161,7 @@ int lua_ax_base_ParticleSystem_createMaskShape(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = ax::ParticleSystem::createMaskShape(arg0);
-        #pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
+        ////////#pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
         return 1;
     }
     if (argc == 2)
@@ -78063,7 +78176,7 @@ int lua_ax_base_ParticleSystem_createMaskShape(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = ax::ParticleSystem::createMaskShape(arg0, arg1);
-        #pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
+        ////////#pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
         return 1;
     }
     if (argc == 3)
@@ -78080,7 +78193,7 @@ int lua_ax_base_ParticleSystem_createMaskShape(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = ax::ParticleSystem::createMaskShape(arg0, arg1, arg2);
-        #pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
+        ////////#pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
         return 1;
     }
     if (argc == 4)
@@ -78099,7 +78212,7 @@ int lua_ax_base_ParticleSystem_createMaskShape(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = ax::ParticleSystem::createMaskShape(arg0, arg1, arg2, arg3);
-        #pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
+        ////////#pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
         return 1;
     }
     if (argc == 5)
@@ -78120,7 +78233,7 @@ int lua_ax_base_ParticleSystem_createMaskShape(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = ax::ParticleSystem::createMaskShape(arg0, arg1, arg2, arg3, arg4);
-        #pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
+        ////////#pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d\n ", "ax.ParticleSystem:createMaskShape",argc, 1);
@@ -78156,7 +78269,7 @@ int lua_ax_base_ParticleSystem_createPointShape(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = ax::ParticleSystem::createPointShape(arg0);
-        #pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
+        ////////#pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d\n ", "ax.ParticleSystem:createPointShape",argc, 1);
@@ -78194,7 +78307,7 @@ int lua_ax_base_ParticleSystem_createRectShape(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = ax::ParticleSystem::createRectShape(arg0, arg1);
-        #pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
+        ////////#pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d\n ", "ax.ParticleSystem:createRectShape",argc, 2);
@@ -78234,7 +78347,7 @@ int lua_ax_base_ParticleSystem_createRectTorusShape(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = ax::ParticleSystem::createRectTorusShape(arg0, arg1, arg2);
-        #pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
+        ////////#pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d\n ", "ax.ParticleSystem:createRectTorusShape",argc, 3);
@@ -78272,7 +78385,7 @@ int lua_ax_base_ParticleSystem_createCircleShape(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = ax::ParticleSystem::createCircleShape(arg0, arg1);
-        #pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
+        // ////////#pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
         return 1;
     }
     if (argc == 3)
@@ -78289,7 +78402,7 @@ int lua_ax_base_ParticleSystem_createCircleShape(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = ax::ParticleSystem::createCircleShape(arg0, arg1, arg2);
-        #pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
+        // ////////#pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d\n ", "ax.ParticleSystem:createCircleShape",argc, 2);
@@ -78331,7 +78444,7 @@ int lua_ax_base_ParticleSystem_createConeShape(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = ax::ParticleSystem::createConeShape(arg0, arg1, arg2, arg3);
-        #pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
+        // ////////#pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
         return 1;
     }
     if (argc == 5)
@@ -78352,7 +78465,7 @@ int lua_ax_base_ParticleSystem_createConeShape(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = ax::ParticleSystem::createConeShape(arg0, arg1, arg2, arg3, arg4);
-        #pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
+        ////////#pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d\n ", "ax.ParticleSystem:createConeShape",argc, 4);
@@ -78392,7 +78505,7 @@ int lua_ax_base_ParticleSystem_createTorusShape(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = ax::ParticleSystem::createTorusShape(arg0, arg1, arg2);
-        #pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
+        ////////#pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
         return 1;
     }
     if (argc == 4)
@@ -78411,7 +78524,7 @@ int lua_ax_base_ParticleSystem_createTorusShape(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = ax::ParticleSystem::createTorusShape(arg0, arg1, arg2, arg3);
-        #pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
+        ////////#pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d\n ", "ax.ParticleSystem:createTorusShape",argc, 3);
@@ -78455,7 +78568,7 @@ int lua_ax_base_ParticleSystem_createConeTorusShape(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = ax::ParticleSystem::createConeTorusShape(arg0, arg1, arg2, arg3, arg4);
-        #pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
+        ////////#pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
         return 1;
     }
     if (argc == 6)
@@ -78478,7 +78591,7 @@ int lua_ax_base_ParticleSystem_createConeTorusShape(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = ax::ParticleSystem::createConeTorusShape(arg0, arg1, arg2, arg3, arg4, arg5);
-        #pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
+        ////////#pragma warning NO CONVERSION FROM NATIVE FOR EmissionShape;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d\n ", "ax.ParticleSystem:createConeTorusShape",argc, 5);
@@ -91189,7 +91302,7 @@ int lua_ax_base_Camera_getDefaultViewport(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = ax::Camera::getDefaultViewport();
-        #pragma warning NO CONVERSION FROM NATIVE FOR RectI;
+        ////////#pragma warning NO CONVERSION FROM NATIVE FOR RectI;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d\n ", "ax.Camera:getDefaultViewport",argc, 0);
@@ -91218,7 +91331,7 @@ int lua_ax_base_Camera_setDefaultViewport(lua_State* tolua_S)
     if (argc == 1)
     {
         ax::RectI arg0;
-        #pragma warning NO CONVERSION TO NATIVE FOR RectI
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR RectI
 		ok = false;
         if(!ok)
         {
@@ -97655,7 +97768,7 @@ int lua_ax_base_Pass_setUniformColor(lua_State* tolua_S)
         const void* arg0;
         unsigned int arg1;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
 
         ok &= luaval_to_uint32(tolua_S, 3,&arg1, "ax.Pass:setUniformColor");
@@ -97709,7 +97822,7 @@ int lua_ax_base_Pass_setUniformMatrixPalette(lua_State* tolua_S)
         const void* arg0;
         unsigned int arg1;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
 
         ok &= luaval_to_uint32(tolua_S, 3,&arg1, "ax.Pass:setUniformMatrixPalette");
@@ -97763,7 +97876,7 @@ int lua_ax_base_Pass_setUniformDirLightColor(lua_State* tolua_S)
         const void* arg0;
         unsigned int arg1;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
 
         ok &= luaval_to_uint32(tolua_S, 3,&arg1, "ax.Pass:setUniformDirLightColor");
@@ -97817,7 +97930,7 @@ int lua_ax_base_Pass_setUniformDirLightDir(lua_State* tolua_S)
         const void* arg0;
         unsigned int arg1;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
 
         ok &= luaval_to_uint32(tolua_S, 3,&arg1, "ax.Pass:setUniformDirLightDir");
@@ -97871,7 +97984,7 @@ int lua_ax_base_Pass_setUniformPointLightColor(lua_State* tolua_S)
         const void* arg0;
         unsigned int arg1;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
 
         ok &= luaval_to_uint32(tolua_S, 3,&arg1, "ax.Pass:setUniformPointLightColor");
@@ -97925,7 +98038,7 @@ int lua_ax_base_Pass_setUniformPointLightPosition(lua_State* tolua_S)
         const void* arg0;
         unsigned int arg1;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
 
         ok &= luaval_to_uint32(tolua_S, 3,&arg1, "ax.Pass:setUniformPointLightPosition");
@@ -97979,7 +98092,7 @@ int lua_ax_base_Pass_setUniformPointLightRangeInverse(lua_State* tolua_S)
         const void* arg0;
         unsigned int arg1;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
 
         ok &= luaval_to_uint32(tolua_S, 3,&arg1, "ax.Pass:setUniformPointLightRangeInverse");
@@ -98033,7 +98146,7 @@ int lua_ax_base_Pass_setUniformSpotLightColor(lua_State* tolua_S)
         const void* arg0;
         unsigned int arg1;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
 
         ok &= luaval_to_uint32(tolua_S, 3,&arg1, "ax.Pass:setUniformSpotLightColor");
@@ -98087,7 +98200,7 @@ int lua_ax_base_Pass_setUniformSpotLightPosition(lua_State* tolua_S)
         const void* arg0;
         unsigned int arg1;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
 
         ok &= luaval_to_uint32(tolua_S, 3,&arg1, "ax.Pass:setUniformSpotLightPosition");
@@ -98141,7 +98254,7 @@ int lua_ax_base_Pass_setUniformSpotLightDir(lua_State* tolua_S)
         const void* arg0;
         unsigned int arg1;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
 
         ok &= luaval_to_uint32(tolua_S, 3,&arg1, "ax.Pass:setUniformSpotLightDir");
@@ -98195,7 +98308,7 @@ int lua_ax_base_Pass_setUniformSpotLightInnerAngleCos(lua_State* tolua_S)
         const void* arg0;
         unsigned int arg1;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
 
         ok &= luaval_to_uint32(tolua_S, 3,&arg1, "ax.Pass:setUniformSpotLightInnerAngleCos");
@@ -98249,7 +98362,7 @@ int lua_ax_base_Pass_setUniformSpotLightOuterAngleCos(lua_State* tolua_S)
         const void* arg0;
         unsigned int arg1;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
 
         ok &= luaval_to_uint32(tolua_S, 3,&arg1, "ax.Pass:setUniformSpotLightOuterAngleCos");
@@ -98303,7 +98416,7 @@ int lua_ax_base_Pass_setUniformSpotLightRangeInverse(lua_State* tolua_S)
         const void* arg0;
         unsigned int arg1;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
 
         ok &= luaval_to_uint32(tolua_S, 3,&arg1, "ax.Pass:setUniformSpotLightRangeInverse");
@@ -98357,7 +98470,7 @@ int lua_ax_base_Pass_setUniformAmbientLigthColor(lua_State* tolua_S)
         const void* arg0;
         unsigned int arg1;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
 
         ok &= luaval_to_uint32(tolua_S, 3,&arg1, "ax.Pass:setUniformAmbientLigthColor");
@@ -100557,7 +100670,7 @@ int lua_ax_base_Renderer_setDepthStencilDesc(lua_State* tolua_S)
     {
         ax::backend::DepthStencilDescriptor arg0;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR DepthStencilDescriptor
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR DepthStencilDescriptor
 		ok = false;
         if(!ok)
         {
@@ -100612,7 +100725,7 @@ int lua_ax_base_Renderer_getDepthStencilDesc(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = cobj->getDepthStencilDesc();
-        #pragma warning NO CONVERSION FROM NATIVE FOR DepthStencilDescriptor;
+        ////////#pragma warning NO CONVERSION FROM NATIVE FOR DepthStencilDescriptor;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.Renderer:getDepthStencilDesc",argc, 0);
@@ -100912,7 +101025,7 @@ int lua_ax_base_Renderer_getViewport(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = cobj->getViewport();
-        #pragma warning NO CONVERSION FROM NATIVE FOR RectI;
+        ////////#pragma warning NO CONVERSION FROM NATIVE FOR RectI;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.Renderer:getViewport",argc, 0);
@@ -101115,7 +101228,7 @@ int lua_ax_base_Renderer_getScissorRect(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = cobj->getScissorRect();
-        #pragma warning NO CONVERSION FROM NATIVE FOR RectI;
+        ////////#pragma warning NO CONVERSION FROM NATIVE FOR RectI;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.Renderer:getScissorRect",argc, 0);
@@ -109998,7 +110111,7 @@ int lua_ax_base_TMXTileAnimTask_create(lua_State* tolua_S)
         ax::TMXTileAnimInfo* arg1;
         ax::Vec2 arg2;
         ok &= luaval_to_object<ax::FastTMXLayer>(tolua_S, 2, "ax.FastTMXLayer",&arg0, "ax.TMXTileAnimTask:create");
-        #pragma warning NO CONVERSION TO NATIVE FOR TMXTileAnimInfo*
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR TMXTileAnimInfo*
 		ok = false;
         ok &= luaval_to_vec2(tolua_S, 4, &arg2, "ax.TMXTileAnimTask:create");
         if(!ok)
@@ -110017,7 +110130,7 @@ int lua_ax_base_TMXTileAnimTask_create(lua_State* tolua_S)
         ax::Vec2 arg2;
         unsigned int arg3;
         ok &= luaval_to_object<ax::FastTMXLayer>(tolua_S, 2, "ax.FastTMXLayer",&arg0, "ax.TMXTileAnimTask:create");
-        #pragma warning NO CONVERSION TO NATIVE FOR TMXTileAnimInfo*
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR TMXTileAnimInfo*
 		ok = false;
         ok &= luaval_to_vec2(tolua_S, 4, &arg2, "ax.TMXTileAnimTask:create");
         ok &= luaval_to_uint32(tolua_S, 5,&arg3, "ax.TMXTileAnimTask:create");
@@ -110059,7 +110172,7 @@ int lua_ax_base_TMXTileAnimTask_constructor(lua_State* tolua_S)
 
         ok &= luaval_to_object<ax::FastTMXLayer>(tolua_S, 2, "ax.FastTMXLayer",&arg0, "ax.TMXTileAnimTask:TMXTileAnimTask");
 
-        #pragma warning NO CONVERSION TO NATIVE FOR TMXTileAnimInfo*
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR TMXTileAnimInfo*
 		ok = false;
 
         ok &= luaval_to_vec2(tolua_S, 4, &arg2, "ax.TMXTileAnimTask:TMXTileAnimTask");
@@ -110084,7 +110197,7 @@ int lua_ax_base_TMXTileAnimTask_constructor(lua_State* tolua_S)
 
         ok &= luaval_to_object<ax::FastTMXLayer>(tolua_S, 2, "ax.FastTMXLayer",&arg0, "ax.TMXTileAnimTask:TMXTileAnimTask");
 
-        #pragma warning NO CONVERSION TO NATIVE FOR TMXTileAnimInfo*
+        ////////#pragma warning NO CONVERSION TO NATIVE FOR TMXTileAnimInfo*
 		ok = false;
 
         ok &= luaval_to_vec2(tolua_S, 4, &arg2, "ax.TMXTileAnimTask:TMXTileAnimTask");
@@ -112454,7 +112567,7 @@ int lua_ax_base_ComponentLua_getScriptObject(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = cobj->getScriptObject();
-        #pragma warning NO CONVERSION FROM NATIVE FOR void*;
+        ////////#pragma warning NO CONVERSION FROM NATIVE FOR void*;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.ComponentLua:getScriptObject",argc, 0);

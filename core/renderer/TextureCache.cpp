@@ -178,50 +178,62 @@ void TextureCache::addImageAsync(std::string_view path,
     Texture2D* texture = nullptr;
 
     std::string fullpath = FileUtils::getInstance()->fullPathForFilename(path);
-
+    AXLOGD("TextureCache::addImageAsync fullpath:{} ",fullpath);
     auto it = _textures.find(fullpath);
-    if (it != _textures.end())
+    if (it != _textures.end()){
         texture = it->second;
+        AXLOGD("TextureCache::addImageAsync 缓存中 存在 取出 texture");
+    }
+        
 
     if (texture != nullptr)
     {
+        
         if (callback)
+        {
+            AXLOGD("TextureCache::addImageAsync texture 有效 回调 CallBack");
             callback(texture);
+        }   
         return;
     }
 
     // check if file exists
     if (fullpath.empty() || !FileUtils::getInstance()->isFileExist(fullpath))
     {
+        AXLOGD("TextureCache::addImageAsync 路径为空 或者 文件不存在 回调CallBack 以空调用");
         if (callback)
             callback(nullptr);
         return;
     }
 
     // lazy init
+    AXLOGD("TextureCache::addImageAsync 路径有效");
     if (_loadingThread == nullptr)
     {
         // create a new thread to load images
         _needQuit      = false;
         _loadingThread = new std::thread(&TextureCache::loadImage, this);
+        AXLOGD("TextureCache::addImageAsync _loadingThread  创建");
     }
 
     if (0 == _asyncRefCount)
     {
         Director::getInstance()->getScheduler()->schedule(AX_SCHEDULE_SELECTOR(TextureCache::addImageAsyncCallBack),
                                                           this, 0, false);
+        AXLOGD("TextureCache::addImageAsync _asyncRefCount 为0 执行调度");
     }
 
     ++_asyncRefCount;
 
     // generate async struct
     AsyncStruct* data = new AsyncStruct(fullpath, callback, callbackKey);
-
+    AXLOGD("TextureCache::addImageAsync 创建异步结构");
     // add async struct into queue
     _asyncStructQueue.emplace_back(data);
     std::unique_lock<std::mutex> ul(_requestMutex);
     _requestQueue.emplace_back(data);
     _sleepCondition.notify_one();
+
 }
 
 void TextureCache::unbindImageAsync(std::string_view callbackKey)
@@ -281,8 +293,9 @@ void TextureCache::loadImage()
         ul.unlock();
 
         // load image
+        AXLOGD("TextureCache::addImageAsync 调用image.initWithImageFileThreadSafe  asyncStruct->filename:{}",asyncStruct->filename);
         asyncStruct->loadSuccess = asyncStruct->image.initWithImageFileThreadSafe(asyncStruct->filename);
-
+        
         // ETC1 ALPHA supports.
         if (asyncStruct->loadSuccess && asyncStruct->image.getFileType() == Image::Format::ETC1 &&
             !s_etc1AlphaFileSuffix.empty())
@@ -344,10 +357,10 @@ void TextureCache::addImageAsyncCallBack(float /*dt*/)
                 texture->initWithImage(image, asyncStruct->pixelFormat);
                 // parse 9-patch info
                 this->parseNinePatchImage(image, texture, asyncStruct->filename);
-#if AX_ENABLE_CACHE_TEXTURE_DATA
-                // cache the texture file name
-                VolatileTextureMgr::addImageTexture(texture, asyncStruct->filename);
-#endif
+                #if AX_ENABLE_CACHE_TEXTURE_DATA
+                    // cache the texture file name
+                    VolatileTextureMgr::addImageTexture(texture, asyncStruct->filename);
+                #endif
                 // cache the texture. retain it, since it is added in the map
                 _textures.emplace(asyncStruct->filename, texture);
                 texture->retain();
@@ -369,6 +382,7 @@ void TextureCache::addImageAsyncCallBack(float /*dt*/)
         // call callback function
         if (asyncStruct->callback)
         {
+            AXLOGD("TextureCache::addImageAsyncCallBack 以 texture 回调");
             (asyncStruct->callback)(texture);
         }
 
@@ -381,6 +395,8 @@ void TextureCache::addImageAsyncCallBack(float /*dt*/)
     {
         Director::getInstance()->getScheduler()->unschedule(AX_SCHEDULE_SELECTOR(TextureCache::addImageAsyncCallBack),
                                                             this);
+
+        AXLOGD("TextureCache::addImageAsyncCallBack 使用者用完 解调度注册");
     }
 }
 
@@ -419,11 +435,11 @@ Texture2D* TextureCache::getDummyTexture()
     if (texture) return texture;
 
     // If texture wasn't in cache, create it from RAW data.
-#ifdef NDEBUG
-    unsigned char texls[] = {0, 0, 0, 0};  // 1*1 transparent picture
-#else
-    unsigned char texls[] = {255, 0, 0, 255};  // 1*1 red picture
-#endif
+    #ifdef NDEBUG
+        unsigned char texls[] = {0, 0, 0, 0};  // 1*1 transparent picture
+    #else
+        unsigned char texls[] = {255, 0, 0, 255};  // 1*1 red picture
+    #endif
     Image* image = new Image();  // Notes: andorid: VolatileTextureMgr traits image as dynmaic object
     bool AX_UNUSED isOK = image->initWithRawData(texls, sizeof(texls), 1, 1, sizeof(unsigned char));
     texture = this->addImage(image, key);
@@ -467,10 +483,10 @@ Texture2D* TextureCache::addImage(std::string_view path, PixelFormat format)
 
             if (texture->initWithImage(image, format))
             {
-#if AX_ENABLE_CACHE_TEXTURE_DATA
-                // cache the texture file name
-                VolatileTextureMgr::addImageTexture(texture, fullpath);
-#endif
+    #if AX_ENABLE_CACHE_TEXTURE_DATA
+                    // cache the texture file name
+                    VolatileTextureMgr::addImageTexture(texture, fullpath);
+    #endif
                 // texture already retained, no need to re-retain it
                 _textures.emplace(fullpath, texture);
 
@@ -549,9 +565,9 @@ Texture2D* TextureCache::addImage(Image* image, std::string_view key, PixelForma
 
     } while (0);
 
-#if AX_ENABLE_CACHE_TEXTURE_DATA
-    VolatileTextureMgr::addImage(texture, image);
-#endif
+    #if AX_ENABLE_CACHE_TEXTURE_DATA
+        VolatileTextureMgr::addImage(texture, image);
+    #endif
 
     return texture;
 }
@@ -583,9 +599,9 @@ Texture2D* TextureCache::addImage(const Data& imageData, std::string_view key)
             if (texture->initWithImage(image))
             {
 
-#if AX_ENABLE_CACHE_TEXTURE_DATA
-                VolatileTextureMgr::addImage(texture, image);
-#endif
+    #if AX_ENABLE_CACHE_TEXTURE_DATA
+                    VolatileTextureMgr::addImage(texture, image);
+    #endif
                 _textures.emplace(key, texture);
             }
             else

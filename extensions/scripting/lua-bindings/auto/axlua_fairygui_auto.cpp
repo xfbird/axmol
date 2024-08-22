@@ -1266,7 +1266,7 @@ int lua_ax_fairygui_UIEventDispatcher_dispatchEvent(lua_State* tolua_S)
 
         ok &= luaval_to_int32(tolua_S, 2,(int *)&arg0, "fgui.UIEventDispatcher:dispatchEvent");
 
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        //#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
         if(!ok)
         {
@@ -1285,7 +1285,7 @@ int lua_ax_fairygui_UIEventDispatcher_dispatchEvent(lua_State* tolua_S)
 
         ok &= luaval_to_int32(tolua_S, 2,(int *)&arg0, "fgui.UIEventDispatcher:dispatchEvent");
 
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        //#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
 
         ok &= luaval_to_ccvalue(tolua_S, 4, &arg2, "fgui.UIEventDispatcher:dispatchEvent");
@@ -1355,7 +1355,7 @@ int lua_ax_fairygui_UIEventDispatcher_bubbleEvent(lua_State* tolua_S)
 
         ok &= luaval_to_int32(tolua_S, 2,(int *)&arg0, "fgui.UIEventDispatcher:bubbleEvent");
 
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        //#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
         if(!ok)
         {
@@ -1374,7 +1374,7 @@ int lua_ax_fairygui_UIEventDispatcher_bubbleEvent(lua_State* tolua_S)
 
         ok &= luaval_to_int32(tolua_S, 2,(int *)&arg0, "fgui.UIEventDispatcher:bubbleEvent");
 
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        //#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
 
         ok &= luaval_to_ccvalue(tolua_S, 4, &arg2, "fgui.UIEventDispatcher:bubbleEvent");
@@ -5169,7 +5169,7 @@ int lua_ax_fairygui_GObject_setData(lua_State* tolua_S)
     {
         void* arg0;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        //#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
         if(!ok)
         {
@@ -10917,7 +10917,7 @@ int lua_ax_fairygui_GGraph_drawRegularPolygon(lua_State* tolua_S)
 
         ok &= luaval_to_number(tolua_S, 6,&arg4, "fgui.GGraph:drawRegularPolygon");
 
-        #pragma warning NO CONVERSION TO NATIVE FOR float*
+        //#pragma warning NO CONVERSION TO NATIVE FOR float*
 		ok = false;
         if(!ok)
         {
@@ -10948,7 +10948,7 @@ int lua_ax_fairygui_GGraph_drawRegularPolygon(lua_State* tolua_S)
 
         ok &= luaval_to_number(tolua_S, 6,&arg4, "fgui.GGraph:drawRegularPolygon");
 
-        #pragma warning NO CONVERSION TO NATIVE FOR float*
+        //#pragma warning NO CONVERSION TO NATIVE FOR float*
 		ok = false;
 
         ok &= luaval_to_int32(tolua_S, 8,(int *)&arg6, "fgui.GGraph:drawRegularPolygon");
@@ -31638,7 +31638,7 @@ int lua_ax_fairygui_GTweener_setTargetAny(lua_State* tolua_S)
     {
         void* arg0;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        //#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
         if(!ok)
         {
@@ -31760,7 +31760,7 @@ int lua_ax_fairygui_GTweener_getTarget(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = cobj->getTarget();
-        #pragma warning NO CONVERSION FROM NATIVE FOR void*;
+        //#pragma warning NO CONVERSION FROM NATIVE FOR void*;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "fgui.GTweener:getTarget",argc, 0);

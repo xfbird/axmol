@@ -1096,7 +1096,7 @@ int lua_ax_navmesh_NavMeshAgent_setUserData(lua_State* tolua_S)
     {
         void* arg0;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        //#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
         if(!ok)
         {
@@ -1151,7 +1151,7 @@ int lua_ax_navmesh_NavMeshAgent_getUserData(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = cobj->getUserData();
-        #pragma warning NO CONVERSION FROM NATIVE FOR void*;
+        //#pragma warning NO CONVERSION FROM NATIVE FOR void*;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.NavMeshAgent:getUserData",argc, 0);
