@@ -1705,7 +1705,7 @@ static int tolua_cocos2d_RenderTexture_newImage(lua_State* tolua_S)
     if (argc == 1 || argc == 2)
     {
 #if _AX_DEBUG >= 1
-        ok &= toluafix_isfunction(tolua_S, 2, "LUA_FUNCTION", 0, &tolua_err);
+        ok &= (toluafix_isfunction(tolua_S, 2, "LUA_FUNCTION", 0, &tolua_err)>0);
         if (!ok)
         {
             tolua_error(tolua_S, "invalid arguments in function 'tolua_cocos2d_RenderTexture_newImage'", nullptr);
@@ -6382,32 +6382,32 @@ static int axlua_TextureCache_addImageAsync(lua_State* tolua_S)
     int argc           = 0;
     TextureCache* self = nullptr;
 
-#if _AX_DEBUG >= 1
-    tolua_Error tolua_err;
-    if (!tolua_isusertype(tolua_S, 1, "ax.TextureCache", 0, &tolua_err))
-        goto tolua_lerror;
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+        if (!tolua_isusertype(tolua_S, 1, "ax.TextureCache", 0, &tolua_err))
+            goto tolua_lerror;
+    #endif
 
     self = static_cast<TextureCache*>(tolua_tousertype(tolua_S, 1, 0));
 
-#if _AX_DEBUG >= 1
-    if (nullptr == self)
-    {
-        tolua_error(tolua_S, "invalid 'self' in function 'axlua_TextureCache_addImageAsync'\n", NULL);
-        return 0;
-    }
-#endif
+    #if _AX_DEBUG >= 1
+        if (nullptr == self)
+        {
+            tolua_error(tolua_S, "invalid 'self' in function 'axlua_TextureCache_addImageAsync'\n", NULL);
+            return 0;
+        }
+    #endif
     argc = lua_gettop(tolua_S) - 1;
 
     if (2 == argc)
     {
-#if _AX_DEBUG >= 1
-        if (!tolua_isstring(tolua_S, 2, 0, &tolua_err) ||
-            !toluafix_isfunction(tolua_S, 3, "LUA_FUNCTION", 0, &tolua_err))
-        {
-            goto tolua_lerror;
-        }
-#endif
+        #if _AX_DEBUG >= 1
+                if (!tolua_isstring(tolua_S, 2, 0, &tolua_err) ||
+                    !toluafix_isfunction(tolua_S, 3, "LUA_FUNCTION", 0, &tolua_err))
+                {
+                    goto tolua_lerror;
+                }
+        #endif
         auto configFilePath = axlua_tosv(tolua_S, 2);
         LUA_FUNCTION handler       = (toluafix_ref_function(tolua_S, 3, 0));
 
@@ -6426,10 +6426,10 @@ static int axlua_TextureCache_addImageAsync(lua_State* tolua_S)
     luaL_error(tolua_S, "%s function of TextureCache has wrong number of arguments: %d, was expecting %d\n",
                "ax.TextureCache:addImageAsync", argc, 1);
 
-#if _AX_DEBUG >= 1
-tolua_lerror:
-    tolua_error(tolua_S, "#ferror in function 'axlua_TextureCache_addImageAsync'.", &tolua_err);
-#endif
+    #if _AX_DEBUG >= 1
+    tolua_lerror:
+        tolua_error(tolua_S, "#ferror in function 'axlua_TextureCache_addImageAsync'.", &tolua_err);
+    #endif
     return 0;
 }
 

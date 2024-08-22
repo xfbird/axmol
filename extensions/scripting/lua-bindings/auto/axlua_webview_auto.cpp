@@ -645,7 +645,7 @@ int lua_ax_webview_WebView_getOnJSCallback(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = cobj->getOnJSCallback();
-        #pragma warning NO CONVERSION FROM NATIVE FOR std::function;
+        //#pragma warning NO CONVERSION FROM NATIVE FOR std::function;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "axui.WebView:getOnJSCallback",argc, 0);

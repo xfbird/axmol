@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "2d/SpriteFrameCache.h"
 
 #include <vector>
+#include <queue>
 
 #include "2d/Sprite.h"
 #include "2d/AutoPolygon.h"
@@ -40,19 +41,213 @@ THE SOFTWARE.
 #include "base/Macros.h"
 #include "base/Director.h"
 #include "renderer/Texture2D.h"
+#include "renderer/TextureCache.h"
 #include "base/NinePatchImageParser.h"
 
 using namespace std;
 
 NS_AX_BEGIN
+struct SFCAsyncStruct
+{
+    std::string spriteSheetFn;
+    std::string textureFn;
+    std::function<void(Texture2D*)> callback;
+    uint32_t spriteSheetForn;
+    };
 
 static SpriteFrameCache* _sharedSpriteFrameCache = nullptr;
+static std::queue<SFCAsyncStruct*>* s_pSFCAsyncStructQueue = nullptr;
+
+void SpriteFrameCache::addSpriteFramesWithFileAsync(std::string_view spriteSheetFileName,
+                                               std::string_view textureFileName,
+                                               uint32_t spriteSheetFormat,
+                                               //    int handler
+                                               std::function<void(Texture2D*)> callback
+                                               )
+{
+    addSpriteFramesWithFileAsyncImpl(spriteSheetFileName, textureFileName,spriteSheetFormat,callback);
+}
+void SpriteFrameCache::addSpriteFramesWithFileAsyncImpl(std::string_view spriteSheetFileName,
+                                               std::string_view textureFileName,
+                                               uint32_t spriteSheetFormat,
+                                               std::function<void(Texture2D*)> callback                                            
+                                            )
+{
+    // CCAssert(spriteSheetFileName, "spriteSheetFileName name should not be null");
+    // string texturePath("");
+    AXLOGD("SpriteFrameCache::addSpriteFramesWithFileAsyncImpl spriteSheetFileName:{}  textureFileName:{} ",spriteSheetFileName,textureFileName);
+    // if(!textureFileName.empty())
+        // {
+        //     // CCDictionary* dict = disposeMetadata(pszPlist, texturePath);
+        //     // if(!dict)
+        //     // {
+        //     //     addSpriteFramesWithFileAsyncImpl(pszPlist, texturePath.c_str(), target, selector, handler);
+        //     //     return;
+        //     // }
+        //     // dict->release();
+        // }
+        // else
+        // {
+    // texturePath = textureFileName;
+    // };
+    // AXLOGD("SpriteFrameCache::addSpriteFramesWithFileAsyncImpl {}", texturePath);
+    if(!textureFileName.empty())                                        //材质路径 不为空
+    {
+        Texture2D* texture = Director::getInstance()->getTextureCache()->getTextureForKey(textureFileName);     
+        AXLOGD("SpriteFrameCache::addSpriteFramesWithFileAsyncImpl 对于 textureFileName:{}  查询缓存得到结果 texture:{}",textureFileName,fmt::ptr(texture));
+        if (texture)                                                                                    //已经存在 材质 直接 处理 材质表
+        {
+            AXLOGD("SpriteFrameCache::addSpriteFramesWithFileAsyncImpl addSpriteFramesWithFile:{}",spriteSheetFileName);
+            addSpriteFramesWithFile(spriteSheetFileName, texture);                                     //读入 材质。成功的时候 回调。     
+            if (callback) {
+                AXLOGD("SpriteFrameCache::addSpriteFramesWithFileAsyncImpl texture:{} ok Callback ",spriteSheetFileName);
+                callback(texture);
+            }
+            return;
+        }
+    }
+    if (!s_pSFCAsyncStructQueue)
+    {
+        s_pSFCAsyncStructQueue = new queue<SFCAsyncStruct*>();
+    }
+
+    // generate async struct
+    SFCAsyncStruct *data = new SFCAsyncStruct();
+    data-> spriteSheetFn = spriteSheetFileName;
+    data->textureFn =   textureFileName;
+    data->spriteSheetFn =spriteSheetFormat; 
+    data->callback= callback;
+    s_pSFCAsyncStructQueue->push(data);
+    
+    AXLOGD("SpriteFrameCache::addSpriteFramesWithFileAsyncImpl addImageAsync texture:{}",textureFileName);
+    Director::getInstance()->getTextureCache()->addImageAsync(textureFileName,AX_CALLBACK_1(SpriteFrameCache::addTextureAsyncCallBack, this));
+}
+
+void SpriteFrameCache::addTextureAsyncCallBack(Texture2D* tex)
+{
+    SFCAsyncStruct *pSFCAsyncStruct = nullptr;
+    if (s_pSFCAsyncStructQueue) 
+    {
+        if(!s_pSFCAsyncStructQueue->empty())
+        {
+            pSFCAsyncStruct = s_pSFCAsyncStructQueue->front();
+            s_pSFCAsyncStructQueue->pop();
+            // Object *target = pSFCAsyncStruct->target;
+            // SEL_CallFuncO selector = pSFCAsyncStruct->selector;
+            std::string spriteSheetFileName = pSFCAsyncStruct->spriteSheetFn;
+            std::string textureFileName = pSFCAsyncStruct->textureFn;
+            uint32_t spriteSheetFormat= pSFCAsyncStruct->spriteSheetForn;
+            auto  callback = pSFCAsyncStruct->callback;
+            
+            //CCLOG("CCSpriteFrameCache::addTextureAsyncCallBack plist:%s, texture:%s", pszPlist, texture);
+            if (tex) {
+                addSpriteFramesWithFile(spriteSheetFileName,tex,spriteSheetFormat);
+            }
+            // doAsyncCallBack(target, selector, handler);
+            AXLOGD("SpriteFrameCache::addSpriteFramesWithFileAsyncImpl addImageAsync texture:{}",textureFileName);
+            Director::getInstance()->getTextureCache()->addImageAsync(textureFileName,callback,"addSpriteFramesWithFileAsync");
+            if (callback)
+            {
+                AXLOGD("TextureCache::addImageAsync 无论 tex 都 回调 传回 回调 CallBack");
+                callback(tex);
+            }   
+            delete pSFCAsyncStruct;
+        }
+    };
+}
+
+// void SpriteFrameCache::addTextureAsyncCallBack(CCObject* obj)
+// {
+//     SFCAsyncStruct *pSFCAsyncStruct = nullptr;
+//     std::queue<SFCAsyncStruct*> *pQueue = s_pSFCAsyncStructQueue;
+//     if(pQueue->empty())
+//     {
+//         // do nothing
+//     }
+//     else
+//     {
+//         pSFCAsyncStruct = pQueue->front();
+//         pQueue->pop();
+        
+//         Object *target = pSFCAsyncStruct->target;
+//         SEL_CallFuncO selector = pSFCAsyncStruct->selector;
+//         const char* pszPlist = pSFCAsyncStruct->pszPlist.c_str();
+//         const char* texture = pSFCAsyncStruct->texture.c_str();
+//         int handler = pSFCAsyncStruct->handler;
+        
+//         //CCLOG("CCSpriteFrameCache::addTextureAsyncCallBack plist:%s, texture:%s", pszPlist, texture);
+//         addSpriteFramesWithFile(pszPlist, texture);
+//         doAsyncCallBack(target, selector, handler);
+//         delete pSFCAsyncStruct;
+//     }
+// }
+// Dictionary* SpriteFrameCache::disposeMetadata(const char * pszPlist, string& texturePath)
+// {
+//     if (m_pLoadedFileNames->find(pszPlist) == m_pLoadedFileNames->end())
+//     {
+//         std::string fullPath = CCFileUtils::sharedFileUtils()->fullPathForFilename(pszPlist);
+//         CCDictionary* dict = CCDictionary::createWithContentsOfFileThreadSafe(fullPath.c_str());
+        
+//         CCDictionary* metadataDict = (CCDictionary*)dict->objectForKey("metadata");
+//         if (metadataDict)
+//         {
+//             // try to read  texture file name from meta data
+//             texturePath = metadataDict->valueForKey("textureFileName")->getCString();
+//         }
+        
+//         if (! texturePath.empty())
+//         {
+//             // build texture path relative to plist file
+//             texturePath = CCFileUtils::sharedFileUtils()->fullPathFromRelativeFile(texturePath.c_str(), pszPlist);
+//         }
+//         else
+//         {
+//             // build texture path by replacing file extension
+//             texturePath = pszPlist;
+            
+//             // remove .xxx
+//             size_t startPos = texturePath.find_last_of(".");
+//             texturePath = texturePath.erase(startPos);
+            
+//             // append .png
+//             texturePath = texturePath.append(".png");
+            
+//             CCLOG("cocos2d: CCSpriteFrameCache: Trying to use file %s as texture", texturePath.c_str());
+//         }
+//         // 2014-07-18 zrong Need release the dict after user it.
+//         //dict->release();
+//         return dict;
+//     }
+//     return nullptr;
+// }
+// void SpriteFrameCache::addSpriteFramesWithFile(const char *pszPlist)
+// {
+//     CCAssert(pszPlist, "plist filename should not be NULL");
+//     string texturePath("");
+//     CCDictionary* dict = disposeMetadata(pszPlist, texturePath);
+//     if(dict)
+//     {
+//         CCTexture2D *pTexture = CCTextureCache::sharedTextureCache()->addImage(texturePath.c_str());
+        
+//         if (pTexture)
+//         {
+//             addSpriteFramesWithDictionary(dict, pTexture);
+//             m_pLoadedFileNames->insert(pszPlist);
+//         }
+//         else
+//         {
+//             CCLOG("cocos2d: CCSpriteFrameCache: Couldn't load texture");
+//         }
+//         dict->release();
+//     }
+// }
 
 SpriteFrameCache* SpriteFrameCache::getInstance()
 {
     if (!_sharedSpriteFrameCache)
     {
         _sharedSpriteFrameCache = new SpriteFrameCache();
+        AXLOGD("SpriteFrameCache::getInstance new _sharedSpriteFrameCache:{}",fmt::ptr(_sharedSpriteFrameCache));
         _sharedSpriteFrameCache->init();
     }
 
@@ -66,15 +261,22 @@ void SpriteFrameCache::destroyInstance()
 
 bool SpriteFrameCache::init()
 {
+    AXLOGD("SpriteFrameCache::init reserve 20");
     _spriteFrames.reserve(20);
     clear();
 
     registerSpriteSheetLoader(std::make_shared<PlistSpriteSheetLoader>());
-
+    AXLOGD("SpriteFrameCache::init registerSpriteSheetLoader");
     return true;
 }
 
-SpriteFrameCache::~SpriteFrameCache() {}
+SpriteFrameCache::~SpriteFrameCache() {
+    if(!s_pSFCAsyncStructQueue)
+    {
+        delete s_pSFCAsyncStructQueue;
+        s_pSFCAsyncStructQueue = nullptr;
+    }
+}
 
 void SpriteFrameCache::addSpriteFramesWithFile(std::string_view spriteSheetFileName,
                                                std::string_view textureFileName,
@@ -83,6 +285,7 @@ void SpriteFrameCache::addSpriteFramesWithFile(std::string_view spriteSheetFileN
     auto* loader = getSpriteSheetLoader(spriteSheetFormat);
     if (loader)
     {
+        AXLOGD("SpriteFrameCache::addSpriteFramesWithFile call loader->load spriteSheetFileName:{} textureFileName:{}",spriteSheetFileName, textureFileName);
         loader->load(spriteSheetFileName, textureFileName, *this);
     }
 }
@@ -94,6 +297,7 @@ void SpriteFrameCache::addSpriteFramesWithFile(std::string_view spriteSheetFileN
     auto* loader = getSpriteSheetLoader(spriteSheetFormat);
     if (loader)
     {
+        AXLOGD("SpriteFrameCache::addSpriteFramesWithFile call loader->load spriteSheetFileName:{} ",spriteSheetFileName);
         loader->load(spriteSheetFileName, texture, *this);
     }
 }
@@ -103,6 +307,7 @@ void SpriteFrameCache::addSpriteFramesWithFile(std::string_view spriteSheetFileN
     auto* loader = getSpriteSheetLoader(spriteSheetFormat);
     if (loader)
     {
+        AXLOGD("SpriteFrameCache::addSpriteFramesWithFile call loader->load spriteSheetFileName:{} ",spriteSheetFileName);
         loader->load(spriteSheetFileName, *this);
     }
 }
@@ -114,6 +319,7 @@ void SpriteFrameCache::addSpriteFramesWithFileContent(const Data& content,
     auto* loader = getSpriteSheetLoader(spriteSheetFormat);
     if (loader)
     {
+        AXLOGD("SpriteFrameCache::addSpriteFramesWithFileContent call loader->load ");
         loader->load(content, texture, *this);
     }
 }
@@ -126,17 +332,19 @@ bool SpriteFrameCache::isSpriteFramesWithFileLoaded(std::string_view plist) cons
 void SpriteFrameCache::addSpriteFrame(SpriteFrame* frame, std::string_view frameName)
 {
     AXASSERT(frame, "frame should not be nil");
-
+    AXLOGD("SpriteFrameCache::addSpriteFrame frameName:{}",frameName);
     const std::string name = "by#addSpriteFrame()";
     auto&& itr             = _spriteSheets.find(name);
     if (itr != _spriteSheets.end())
     {
+        AXLOGD("SpriteFrameCache::addSpriteFrame insertFrame frameName:{}",frameName);
         insertFrame(itr->second, frameName, frame);
     }
     else
     {
         auto spriteSheet  = std::make_shared<SpriteSheet>();
         spriteSheet->path = name;
+        AXLOGD("SpriteFrameCache::addSpriteFrame insertFrame  frameName:{}   name:{}",frameName,name);
         insertFrame(spriteSheet, frameName, frame);
     }
 }
@@ -404,6 +612,7 @@ SpriteFrame* SpriteFrameCache::findFrame(std::string_view frame)
 
 std::string_view SpriteFrameCache::getSpriteFrameName(SpriteFrame* frame)
 {
+    
     for (auto& it : _spriteFrames)
     {
         if (it.second == frame)

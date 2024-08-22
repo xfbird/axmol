@@ -89,7 +89,7 @@ class PolygonInfo;
  @since v0.9
  @js cc.spriteFrameCache
  */
-class AX_DLL SpriteFrameCache
+class AX_DLL SpriteFrameCache: public Object
 {
 public:
     /** Returns the shared instance of the Sprite Frame cache.
@@ -173,6 +173,18 @@ public:
      * @param frame A certain sprite frame.
      * @param frameName The name of the sprite frame.
      */
+    void addSpriteFramesWithFileAsync(std::string_view spriteSheetFileName,
+                                               std::string_view textureFileName,
+                                               uint32_t spriteSheetFormat,
+                                            //    int handler
+                                                std::function<void(Texture2D*)> callback
+                                               );
+    void addSpriteFramesWithFileAsyncImpl(std::string_view spriteSheetFileName,
+                                               std::string_view textureFileName,
+                                               uint32_t spriteSheetFormat,
+                                               std::function<void(Texture2D*)> callback                                            
+                                         );
+
     void addSpriteFrame(SpriteFrame* frame, std::string_view frameName);
 
     /** Check if multiple Sprite Frames from a plist file have been loaded.
@@ -306,12 +318,11 @@ protected:
         auto it = _spriteSheets.find(spriteSheetFileName);
         return it == _spriteSheets.end() ? false : it->second->full;
     }
-
 private:
+    void addTextureAsyncCallBack(Texture2D* tex);
     StringMap<SpriteFrame*> _spriteFrames;
     hlookup::string_map<std::shared_ptr<SpriteSheet>> _spriteSheets;
     hlookup::string_map<std::shared_ptr<SpriteSheet>> _spriteFrameToSpriteSheetMap;
-
     std::map<uint32_t, std::shared_ptr<ISpriteSheetLoader>> _spriteSheetLoaders;
 };
 

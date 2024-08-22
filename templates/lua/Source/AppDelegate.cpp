@@ -99,13 +99,45 @@ bool AppDelegate::applicationDidFinishLaunching()
     lua_State* L = engine->getLuaStack()->getLuaState();
     lua_module_register(L);
     LuaStack* stack = engine->getLuaStack();
+
+    auto fui = FileUtils::getInstance();
+    // 1. 获取默认资源根路径，并在其后面加上 "cache/"
+    std::string resourceRootPath = fui->getDefaultResourceRootPath();
+    resourceRootPath += "cache/";
+    AXLOGD("设置当前写入 路径: {}",resourceRootPath);
+    // 2. 设置当前写入目录
+    fui->setWritablePath(resourceRootPath);
+
+    // 3. 获取当前的搜索路径列表
+    // const std::vector<std::string>& cursearchdirs = fui->getSearchPaths();
+    // 4. 清空搜索路径列表
+    // cursearchdirs.clear();
+    std::string writablePath = fui->getWritablePath();
+    AXLOGD("读出写入 路径: {}",writablePath);
+    std::vector<std::string> newSearchDirs=fui->getSearchPaths();
+    newSearchDirs.clear();
+    // newSearchDirs();
+    // 5. 获取当前可写路径，并在其后面加上 "mod_launcher"，然后将其添加到新的搜索路径列表
+    writablePath += "mod_launcher";
+    AXLOGD("设置 可写目录添加 mod_launcher: {} 加入到搜索目录",writablePath);
+    newSearchDirs.push_back(writablePath);
+
+    // 6. 将 "mod_launcher" 目录添加到新的搜索路径列表
+    // AXLOGD("设置 可写目录添加 mod_launcher: {} 加入到搜索目录",writablePath);
+    newSearchDirs.push_back("mod_launcher");
+    newSearchDirs.push_back("mod_launcher/stab/");
+
+    // 7. 设置新的搜索顺序
+    fui->setSearchPaths(newSearchDirs);
+
     // register custom function
     // LuaStack* stack = engine->getLuaStack();
     // register_custom_function(stack->getLuaState());
-
-    stack->addSearchPath("src");
-    FileUtils::getInstance()->addSearchPath("res");
-    if (engine->executeString("require 'main'"))
+    // auto lSearchResolutions=fui->getSearchResolutionsOrder();
+    // stack->addSearchPath("src");
+    engine->addSearchPath("scripts");
+    // FileUtils::getInstance()->addSearchPath("res");
+    if (engine->executeScriptFile("scripts/main.lua"))
     {
         return false;
     }
