@@ -136,9 +136,10 @@ inline void printLogT(_FmtType&& fmt, LogItem& item, _Types&&... args)
     if (item.level() >= getLogLevel())
         outputLog(LogItem::vformat(std::forward<_FmtType>(fmt), item, std::forward<_Types>(args)...), "axmol");
 }
+// __FILE__, __LINE__, SPDLOG_FUNCTION
 
-#define AXLOG_WITH_LEVEL(level, fmtOrMsg, ...) \
-    ax::printLogT(FMT_COMPILE("{}" fmtOrMsg "\n"), ax::preprocessLog(ax::LogItem{level}), ##__VA_ARGS__)
+#define AXLOG_WITH_LEVEL(level,fmtOrMsg, ...) \
+    ax::printLogT(FMT_COMPILE("{}-{}@{}|" fmtOrMsg "\n"), ax::preprocessLog(ax::LogItem{level}),__FILE__, __LINE__, ##__VA_ARGS__)
 
 #if defined(_AX_DEBUG) && _AX_DEBUG > 0
 #    define AXLOGV(fmtOrMsg, ...) AXLOG_WITH_LEVEL(ax::LogLevel::Verbose, fmtOrMsg, ##__VA_ARGS__)

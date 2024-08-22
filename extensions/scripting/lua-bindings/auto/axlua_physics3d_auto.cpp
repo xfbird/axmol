@@ -635,7 +635,7 @@ int lua_ax_physics3d_Physics3DObject_setUserData(lua_State* tolua_S)
     {
         void* arg0;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        //#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
         if(!ok)
         {
@@ -690,7 +690,7 @@ int lua_ax_physics3d_Physics3DObject_getUserData(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = cobj->getUserData();
-        #pragma warning NO CONVERSION FROM NATIVE FOR void*;
+        //#pragma warning NO CONVERSION FROM NATIVE FOR void*;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.Physics3DObject:getUserData",argc, 0);
@@ -881,7 +881,7 @@ int lua_ax_physics3d_Physics3DObject_getCollisionCallback(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = cobj->getCollisionCallback();
-        #pragma warning NO CONVERSION FROM NATIVE FOR std::function;
+        //#pragma warning NO CONVERSION FROM NATIVE FOR std::function;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.Physics3DObject:getCollisionCallback",argc, 0);
@@ -3351,7 +3351,7 @@ int lua_ax_physics3d_Physics3DRigidBody_init(lua_State* tolua_S)
     {
         ax::Physics3DRigidBodyDes* arg0;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR Physics3DRigidBodyDes*
+        //#pragma warning NO CONVERSION TO NATIVE FOR Physics3DRigidBodyDes*
 		ok = false;
         if(!ok)
         {
@@ -5407,7 +5407,7 @@ int lua_ax_physics3d_Physics3DConstraint_setUserData(lua_State* tolua_S)
     {
         void* arg0;
 
-        #pragma warning NO CONVERSION TO NATIVE FOR void*
+        //#pragma warning NO CONVERSION TO NATIVE FOR void*
 		ok = false;
         if(!ok)
         {
@@ -5462,7 +5462,7 @@ int lua_ax_physics3d_Physics3DConstraint_getUserData(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = cobj->getUserData();
-        #pragma warning NO CONVERSION FROM NATIVE FOR void*;
+        //#pragma warning NO CONVERSION FROM NATIVE FOR void*;
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.Physics3DConstraint:getUserData",argc, 0);

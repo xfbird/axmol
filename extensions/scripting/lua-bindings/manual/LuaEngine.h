@@ -174,6 +174,10 @@ public:
                              const char* pEventName,
                              Object* pEventSource                 = NULL,
                              const char* pEventSourceClassName = NULL);
+    // int executeEvent(int nHandler, 
+                     // const char* pEventName, 
+                     // CCObject* pEventSource /* = NULL*/, 
+                     // const char* pEventSourceClassName /* = NULL*/)
     /**
      * Handle the assert message.
      *

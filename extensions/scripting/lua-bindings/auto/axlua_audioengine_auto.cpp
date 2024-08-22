@@ -183,7 +183,7 @@ int lua_ax_audioengine_AudioEngine_play2d(lua_State* tolua_S)
             ok &= luaval_to_std_string_view(tolua_S, 2,&arg0, "ax.AudioEngine:play2d");
             if (!ok) { break; }
             ax::AudioPlayerSettings arg1;
-            #pragma warning NO CONVERSION TO NATIVE FOR AudioPlayerSettings
+            //#pragma warning NO CONVERSION TO NATIVE FOR AudioPlayerSettings
 		ok = false;
             if (!ok) { break; }
             int ret = ax::AudioEngine::play2d(arg0, arg1);
@@ -200,7 +200,7 @@ int lua_ax_audioengine_AudioEngine_play2d(lua_State* tolua_S)
             ok &= luaval_to_std_string_view(tolua_S, 2,&arg0, "ax.AudioEngine:play2d");
             if (!ok) { break; }
             ax::AudioPlayerSettings arg1;
-            #pragma warning NO CONVERSION TO NATIVE FOR AudioPlayerSettings
+            //#pragma warning NO CONVERSION TO NATIVE FOR AudioPlayerSettings
 		ok = false;
             if (!ok) { break; }
             const ax::AudioProfile* arg2;
