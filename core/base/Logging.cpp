@@ -67,7 +67,7 @@ AX_API void setLogOutput(ILogOutput* output)
     s_logOutput = output;
 }
 
-AX_API LogItem& preprocessLog(LogItem&& item,const char* fname,size_t fline)
+AX_API LogItem& preprocessLog(LogItem&& item,const char* fname,int fline)
 {
     if (s_logFmtFlags != LogFmtFlag::Null)
     {
@@ -173,9 +173,8 @@ AX_API LogItem& preprocessLog(LogItem&& item,const char* fname,size_t fline)
             prefix_size += fmt::format_to_n(wptr + prefix_size, buffer_size - prefix_size,"[{:.20}]", fname_view).size;
         };
         // 检查是否需要添加行号到日志前缀
-        if (bitmask::any(s_logFmtFlags, LogFmtFlag::SourceFl)) {
-            prefix_size += fmt::format_to_n(wptr + prefix_size, buffer_size - prefix_size,
-                                            "[{:6d}]", static_cast<unsigned int>(fline)).size;
+        if (bitmask::any(s_logFmtFlags, LogFmtFlag::SourceFl)&& fline >=0) {
+            prefix_size += fmt::format_to_n(wptr + prefix_size, buffer_size - prefix_size,"[{:5d}]", fline).size;
         };
     }
     return item;
