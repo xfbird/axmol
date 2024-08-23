@@ -26,6 +26,8 @@
 #include "AppDelegate.h"
 #include "MainScene.h"
 #include "yasio/singleton.hpp"
+#include "lua-bindings/manual/LuaEngine.h"
+#include "lua-bindings/manual/lua_module_register.h"
 
 #define USE_AUDIO_ENGINE 1
 
@@ -44,7 +46,7 @@ public:
         _filePath = fu->getWritablePath() + "game.log";
         _fs       = fu->openFileStream(_filePath, ax::IFileStream::Mode::APPEND);
 
-        ax::setLogFmtFlag(ax::LogFmtFlag::Level | ax::LogFmtFlag::TimeStamp | ax::LogFmtFlag::Colored);
+        ax::setLogFmtFlag(ax::LogFmtFlag::Level | ax::LogFmtFlag::TimeStamp | ax::LogFmtFlag::Colored |ax::LogFmtFlag::SourceFn|ax::LogFmtFlag::SourceFl);
         AXLOGW("further log message will write to {}", _filePath);
         ax::setLogOutput(this);
     }
@@ -67,7 +69,8 @@ private:
 };
 static ax::Size designResolutionSize = ax::Size(1280, 720);
 
-AppDelegate::AppDelegate() {
+AppDelegate::AppDelegate()
+{
     yasio::singleton<SampleLogOutput>::instance();    
 }
 
