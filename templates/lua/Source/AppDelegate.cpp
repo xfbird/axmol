@@ -45,7 +45,7 @@ public:
         _filePath = fu->getWritablePath() + "game.log";
         _fs       = fu->openFileStream(_filePath, ax::IFileStream::Mode::APPEND);
 
-        ax::setLogFmtFlag(ax::LogFmtFlag::Level | ax::LogFmtFlag::TimeStamp | ax::LogFmtFlag::Colored);
+        ax::setLogFmtFlag(ax::LogFmtFlag::Level | ax::LogFmtFlag::TimeStamp | ax::LogFmtFlag::Colored |ax::LogFmtFlag::SourceFn|ax::LogFmtFlag::SourceFl);
         AXLOGW("further log message will write to {}", _filePath);
         ax::setLogOutput(this);
     }

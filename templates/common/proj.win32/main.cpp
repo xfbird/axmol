@@ -29,6 +29,7 @@
 
 // Uncomment to enable win32 console
 #define USE_WIN32_CONSOLE
+#define _AX_DEBUG 1
 
 USING_NS_AX;
 
