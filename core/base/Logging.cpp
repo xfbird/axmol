@@ -24,7 +24,7 @@
  ****************************************************************************/
 
 #include "base/Logging.h"
-
+#include <algorithm> // 包含 std::min 和 std::max 函数
 #include "yasio/utils.hpp"
 #include "fmt/color.h"
 
@@ -67,18 +67,18 @@ AX_API void setLogOutput(ILogOutput* output)
     s_logOutput = output;
 }
 
-AX_API LogItem& preprocessLog(LogItem&& item)
+AX_API LogItem& preprocessLog(LogItem&& item,const char* fname,size_t fline)
 {
     if (s_logFmtFlags != LogFmtFlag::Null)
     {
-#if defined(_WIN32)
-#    define xmol_getpid()       (uintptr_t)::GetCurrentProcessId()
-#    define xmol_gettid()       (uintptr_t)::GetCurrentThreadId()
-#    define localtime_r(utc, t) ::localtime_s(t, utc)
-#else
-#    define xmol_getpid() (uintptr_t)::getpid()
-#    define xmol_gettid() (uintptr_t)::pthread_self()
-#endif
+        #if defined(_WIN32)
+        #    define xmol_getpid()       (uintptr_t)::GetCurrentProcessId()
+        #    define xmol_gettid()       (uintptr_t)::GetCurrentThreadId()
+        #    define localtime_r(utc, t) ::localtime_s(t, utc)
+        #else
+        #    define xmol_getpid() (uintptr_t)::getpid()
+        #    define xmol_gettid() (uintptr_t)::pthread_self()
+        #endif
         auto wptr              = item.prefix_buffer_;
         const auto buffer_size = sizeof(item.prefix_buffer_);
         auto& prefix_size      = item.prefix_size_;
@@ -87,54 +87,54 @@ AX_API LogItem& preprocessLog(LogItem&& item)
             std::string_view levelName;
             switch (item.level_)
             {
-            case LogLevel::Trace:
-                levelName = "V/"sv;
-                break;
-            case LogLevel::Debug:
-                levelName = "D/"sv;
-                break;
-            case LogLevel::Info:
-                levelName = "I/"sv;
-                break;
-            case LogLevel::Warn:
-                levelName = "W/"sv;
-                break;
-            case LogLevel::Error:
-                levelName = "E/"sv;
-                break;
-            default:
-                levelName = "?/"sv;
+                case LogLevel::Trace:
+                    levelName = "V/"sv;
+                    break;
+                case LogLevel::Debug:
+                    levelName = "D/"sv;
+                    break;
+                case LogLevel::Info:
+                    levelName = "I/"sv;
+                    break;
+                case LogLevel::Warn:
+                    levelName = "W/"sv;
+                    break;
+                case LogLevel::Error:
+                    levelName = "E/"sv;
+                    break;
+                default:
+                    levelName = "?/"sv;
             }
 
-#if !defined(__APPLE__) && !defined(__ANDROID__)
-            if (bitmask::any(s_logFmtFlags, LogFmtFlag::Colored))
-            {
-                constexpr auto colorCodeOfLevel = [](LogLevel level) -> std::string_view {
-                    switch (level)
-                    {
-                    case LogLevel::Verbose:
-                        return "\x1b[37m"sv;
-                    case LogLevel::Debug:
-                        return "\x1b[36m"sv;
-                    case LogLevel::Info:
-                        return "\x1b[92m"sv;
-                    case LogLevel::Warn:
-                        return "\x1b[33m"sv;
-                    case LogLevel::Error:
-                        return "\x1b[31m"sv;
-                    default:
-                        return std::string_view{};
-                    }
-                };
-
-                auto colorCode = colorCodeOfLevel(item.level_);
-                if (!colorCode.empty())
+            #if !defined(__APPLE__) && !defined(__ANDROID__)
+                if (bitmask::any(s_logFmtFlags, LogFmtFlag::Colored))
                 {
-                    item.writePrefix(colorCode);
-                    item.has_style_ = true;
+                    constexpr auto colorCodeOfLevel = [](LogLevel level) -> std::string_view {
+                        switch (level)
+                        {
+                        case LogLevel::Verbose:
+                            return "\x1b[37m"sv;
+                        case LogLevel::Debug:
+                            return "\x1b[36m"sv;
+                        case LogLevel::Info:
+                            return "\x1b[92m"sv;
+                        case LogLevel::Warn:
+                            return "\x1b[33m"sv;
+                        case LogLevel::Error:
+                            return "\x1b[31m"sv;
+                        default:
+                            return std::string_view{};
+                        }
+                    };
+
+                    auto colorCode = colorCodeOfLevel(item.level_);
+                    if (!colorCode.empty())
+                    {
+                        item.writePrefix(colorCode);
+                        item.has_style_ = true;
+                    }
                 }
-            }
-#endif
+            #endif
             item.writePrefix(levelName);
         }
         if (bitmask::any(s_logFmtFlags, LogFmtFlag::TimeStamp))
@@ -155,6 +155,28 @@ AX_API LogItem& preprocessLog(LogItem&& item)
         if (bitmask::any(s_logFmtFlags, LogFmtFlag::ThreadId))
             prefix_size +=
                 fmt::format_to_n(wptr + prefix_size, buffer_size - prefix_size, "[TID:{:x}]", xmol_gettid()).size;
+        // 检查是否需要添加文件名到日志前缀
+        if (bitmask::any(s_logFmtFlags, LogFmtFlag::SourceFn) && fname != nullptr) {
+            // 计算文件名字符串的长度
+            size_t fname_len = strlen(fname);
+            // 截取文件名的最后20个字符，如果长度不足20，则在前面补空格
+            size_t nlen=20;
+            if (fname_len<20) {
+                nlen=fname_len;
+            }
+            std::string fname_view(fname + fname_len - nlen,nlen);
+            while (fname_view.length() < 20) 
+                {
+                    fname_view = " "+fname_view; // 在前面补空格
+                }
+            // 格式化文件名并添加到日志前缀
+            prefix_size += fmt::format_to_n(wptr + prefix_size, buffer_size - prefix_size,"[{:.20}]", fname_view).size;
+        };
+        // 检查是否需要添加行号到日志前缀
+        if (bitmask::any(s_logFmtFlags, LogFmtFlag::SourceFl)) {
+            prefix_size += fmt::format_to_n(wptr + prefix_size, buffer_size - prefix_size,
+                                            "[{:6d}]", static_cast<unsigned int>(fline)).size;
+        };
     }
     return item;
 }
@@ -239,7 +261,7 @@ AX_API void print(const char* format, ...)
     va_end(args);
 
     if (!message.empty())
-        outputLog(LogItem::vformat(FMT_COMPILE("{}{}\n"), preprocessLog(LogItem{LogLevel::Silent}), message),
+        outputLog(LogItem::vformat(FMT_COMPILE("{}{}\n"), preprocessLog(LogItem{LogLevel::Silent},__FILE__,__LINE__), message),
                   "axmol debug info");
 }
 
