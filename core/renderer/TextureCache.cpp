@@ -219,14 +219,14 @@ void TextureCache::addImageAsync(std::string_view path,
     {
         Director::getInstance()->getScheduler()->schedule(AX_SCHEDULE_SELECTOR(TextureCache::addImageAsyncCallBack),
                                                           this, 0, false);
-        AXLOGD("TextureCache::addImageAsync _asyncRefCount 为0 执行调度");
+        AXLOGD("TextureCache::addImageAsync _asyncRefCount 为0 执行调度注册");
     }
 
     ++_asyncRefCount;
 
     // generate async struct
     AsyncStruct* data = new AsyncStruct(fullpath, callback, callbackKey);
-    AXLOGD("TextureCache::addImageAsync 创建异步结构");
+    AXLOGD("TextureCache::addImageAsync 创建异步结构 加入到队列");
     // add async struct into queue
     _asyncStructQueue.emplace_back(data);
     std::unique_lock<std::mutex> ul(_requestMutex);
