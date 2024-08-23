@@ -10,9 +10,6 @@
 #include "lua-bindings/manual/base/axlua_base_manual.hpp"
 #include "lua-bindings/manual/LuaValue.h"
 #include "lua-bindings/manual/LuaEngine.h"
-
-
-
 #include "base/Logging.h"
 
 int lua_ax_base_Object_retain(lua_State* tolua_S)
@@ -68389,7 +68386,7 @@ int lua_ax_base_SpriteFrameCache_addSpriteFramesWithFileAsync(lua_State* tolua_S
     #endif
 
     self = static_cast<SpriteFrameCache*>(tolua_tousertype(tolua_S, 1, 0));
-    AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFileAsync self:{} ",fmt::ptr(self));
+    // AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFileAsync self:{} ",fmt::ptr(self));
     #if _AX_DEBUG >= 1
         if (nullptr == self)
         {
@@ -68398,7 +68395,7 @@ int lua_ax_base_SpriteFrameCache_addSpriteFramesWithFileAsync(lua_State* tolua_S
         }
     #endif
     argc = lua_gettop(tolua_S) - 1;
-    AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFileAsync argc:{} ",argc);
+    // AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFileAsync argc:{} ",argc);
     if (argc >= 4) // We expect at least 4 arguments: spriteSheetFileName, textureFileName, spriteSheetFormat, and the callback function
     {
         #if _AX_DEBUG >= 1
@@ -68420,7 +68417,7 @@ int lua_ax_base_SpriteFrameCache_addSpriteFramesWithFileAsync(lua_State* tolua_S
                                            textureFileName,
                                            spriteSheetFormat,
                                            [=](Texture2D* tex) {
-                                               AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFileAsync 进入回调");
+                                               AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFileAsync 匿名函数 进入回调");
                                                auto stack = LuaEngine::getInstance()->getLuaStack();
                                                int ID = (tex) ? (int)tex->_ID : -1;
                                                int* luaID = (tex) ? &tex->_luaID : nullptr;
@@ -68430,7 +68427,7 @@ int lua_ax_base_SpriteFrameCache_addSpriteFramesWithFileAsync(lua_State* tolua_S
                                                AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFileAsync 调用lua 函数处理 后处理");
                                                stack->removeScriptHandler(handler);
                                            });
-        AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFileAsync 异步调用 回归");
+        AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFileAsync 调用完成 返回");
         return 0;
     }
 
@@ -68915,7 +68912,7 @@ int lua_ax_base_SpriteFrameCache_getSpriteFrameByName(lua_State* tolua_S)
     #endif
 
     cobj = (ax::SpriteFrameCache*)tolua_tousertype(tolua_S,1,0);
-    AXLOGD("lua_ax_base_SpriteFrameCache_getSpriteFrameByName cobj:{} ",fmt::ptr(cobj));
+    // AXLOGD("lua_ax_base_SpriteFrameCache_getSpriteFrameByName cobj:{} ",fmt::ptr(cobj));
     #if _AX_DEBUG >= 1
         if (!cobj) 
         {
@@ -68925,7 +68922,7 @@ int lua_ax_base_SpriteFrameCache_getSpriteFrameByName(lua_State* tolua_S)
     #endif
 
     argc = lua_gettop(tolua_S)-1;
-    AXLOGD("lua_ax_base_SpriteFrameCache_getSpriteFrameByName argc:{} ",argc);
+    // AXLOGD("lua_ax_base_SpriteFrameCache_getSpriteFrameByName argc:{} ",argc);
     if (argc == 1) 
     {
         std::string_view arg0;
@@ -68936,9 +68933,9 @@ int lua_ax_base_SpriteFrameCache_getSpriteFrameByName(lua_State* tolua_S)
             tolua_error(tolua_S,"invalid arguments in function 'lua_ax_base_SpriteFrameCache_getSpriteFrameByName'", nullptr);
             return 0;
         }
-        AXLOGD("lua_ax_base_SpriteFrameCache_getSpriteFrameByName arg0:{} ",arg0);
+        // AXLOGD("lua_ax_base_SpriteFrameCache_getSpriteFrameByName arg0:{} ",arg0);
         auto&& ret = cobj->getSpriteFrameByName(arg0);
-        AXLOGD("lua_ax_base_SpriteFrameCache_getSpriteFrameByName ret:{} 结果转换为 ax.SpriteFrame 返回 ",fmt::ptr(ret));
+        // AXLOGD("lua_ax_base_SpriteFrameCache_getSpriteFrameByName ret:{} 结果转换为 ax.SpriteFrame 返回 ",fmt::ptr(ret));
         object_to_luaval<ax::SpriteFrame>(tolua_S, "ax.SpriteFrame",(ax::SpriteFrame*)ret);
         return 1;
     }
@@ -69322,7 +69319,7 @@ int lua_ax_base_SpriteFrameCache_getInstance(lua_State* tolua_S)
     #endif
 
     argc = lua_gettop(tolua_S) - 1;
-    AXLOGD("lua_ax_base_SpriteFrameCache_getInstance argc:{} ",argc);
+    // AXLOGD("lua_ax_base_SpriteFrameCache_getInstance argc:{} ",argc);
     if (argc == 0)
     {
         if(!ok)
@@ -69331,7 +69328,7 @@ int lua_ax_base_SpriteFrameCache_getInstance(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = ax::SpriteFrameCache::getInstance();
-        AXLOGD("lua_ax_base_SpriteFrameCache_getInstance ret:{} ",fmt::ptr(ret));
+        // AXLOGD("lua_ax_base_SpriteFrameCache_getInstance ret:{} ",fmt::ptr(ret));
         object_to_luaval<ax::SpriteFrameCache>(tolua_S, "ax.SpriteFrameCache",(ax::SpriteFrameCache*)ret);
         return 1;
     }
