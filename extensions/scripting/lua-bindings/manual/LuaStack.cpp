@@ -169,28 +169,30 @@ int axlua_log_with_level_Line(lua_State* L)
 {
     int argc                = lua_gettop(L);
     const int max_fmt_count = 32;
-    if (argc >= 3)
+    if (argc >= 4)
     {
         luaL_checkstring(L, 1);
-        auto lines_msg = axlua_tostr(L, 1);
-        luaL_checkinteger(L, 2);
-        int level = lua_tointeger(L, 2);
-        luaL_checkstring(L, 3);
-
-        auto formated_msg = axlua_tostr(L, 3);
+        std::string lines_fmsg = axlua_tostr(L, 1);
+        int lines_lmsg = lua_tointeger(L, 2);
+        luaL_checkinteger(L, 3);
+        int level = lua_tointeger(L, 3);
+        luaL_checkstring(L, 4);
+        auto formated_msg = axlua_tostr(L, 4);
         // AXLOGD("axlua_log_with_level_Line lines_msg:{}  level:{}  formated_msg:{}",lines_msg,level,formated_msg);
         char fmt_pos_buf[8];
-        const int fmtc = (std::min)((argc - 3), max_fmt_count);
+        const int fmtc = (std::min)((argc - 4), max_fmt_count);
         for (int fmti = 0; fmti < fmtc; ++fmti)
         {
             auto pos     = axlua_format_pos(fmt_pos_buf, sizeof(fmt_pos_buf), fmti);
-            auto cur_val = axlua_tosv(L, fmti + 4);
+            auto cur_val = axlua_tosv(L, fmti + 5);
 
             axlua_replace_hint(formated_msg, "{}"sv, cur_val, true);
             axlua_replace_hint(formated_msg, pos, cur_val, false);
             // AXLOGD("axlua_log_with_level_Line formated_msg:{}  pos:{}  cur_val:{}",formated_msg,pos,cur_val);
-        }
-        AXLOG_WITH_LEVEL(static_cast<ax::LogLevel>(level), "[L][{}]{}", lines_msg, formated_msg);
+        };
+        
+        AXLOG_WITH_LEVELLua(static_cast<ax::LogLevel>(level), "[LE]{}",lines_fmsg.c_str(),lines_lmsg,formated_msg);
+        // AXLOG_WITH_LEVELLua(static_cast<ax::LogLevel>(level), FMT_COMPILE("[L]{}"), lines_fmsg.c_str(), lines_lmsg);
     }
     return 0;
 }
