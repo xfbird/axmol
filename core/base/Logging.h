@@ -60,7 +60,7 @@ AX_ENABLE_BITMASK_OPS(LogFmtFlag);
 class LogItem
 {
     // friend AX_API LogItem& preprocessLog(LogItem&& logItem);
-    friend AX_API LogItem& preprocessLog(LogItem&& item,const char* fname,size_t fline);
+    friend AX_API LogItem& preprocessLog(LogItem&& item,const char* fname,int fline);
     friend AX_API void writeLog(LogItem& item, const char* tag);
 
 public:
@@ -127,76 +127,29 @@ AX_API void setLogFmtFlag(LogFmtFlag flags);
 AX_API void setLogOutput(ILogOutput* output);
 
 /* @brief internal use */
-AX_API LogItem& preprocessLog(LogItem&& logItem,const char* fname=nullptr,size_t fline=0);
+AX_API LogItem& preprocessLog(LogItem&& logItem,const char* fname=nullptr,int fline=-1);
 
 /* @brief internal use */
 AX_API void outputLog(LogItem& item, const char* tag);
 AX_API void writeLog(LogItem& item, const char* tag);
 
-// inline std::string _line_get_lstr(const std::string& str,size_t dsize=20) {
-//     std::string result;
-//     // 取得字符串的长度
-//     size_t length = str.length();
-//     // 如果字符串长度小于20，则在result中补足空格
-//     if (length < dsize) {
-//         result.resize(dsize, ' '); // 左边补空格到20个字符长度
-//     }
-//     // 从字符串的倒数第20个字符开始截取，如果不足20个字符，则取全部
-//     size_t start_pos = std::max(static_cast<size_t>(0), length - dsize);
-//     result = str.substr(start_pos, dsize);
-//     // 如果原始字符串长度小于20，将result前面补足空格
-//     if (length < dsize) {
-//         result.insert(0, 20 - length, ' ');
-//     }
-//     return result;
-// }
-// AX_API char* _line_get_lstr(const char sffilen[], int sfline, const char* tag,size_t dsize=20) {
-//     // 计算文件名长度
-//     size_t sffilen_len = strlen(sffilen);
-//     // 确定需要截取的字符串长度
-//     size_t extract_len = sffilen_len < dsize ? sffilen_len : dsize;
-    
-//     // 创建结果字符串，预留足够的空间
-//     std::string result;
-//     result.reserve(dsize + 12 + strlen(tag) + 1); // 20个字符的空间 + 行号的字符串长度 + 标签 + 终止符
 
-//     // 截取文件名并补空格
-//     result = std::string(sffilen + sffilen_len - extract_len, extract_len);
-//     while (result.length() < dsize) {
-//         result = " " + result; // 在左边补空格
-//     }
-
-//     // 将行号转换为字符串并添加到结果中
-//     result += std::to_string(sfline);
-
-//     // 添加标签
-//     result += tag;
-
-//     // 将std::string转换为char*并返回
-//     char* result_cstr = new char[result.length() + 1];
-//     strcpy(result_cstr, result.c_str());
-//     return result_cstr;
-// }
-
-
+// inline void printLogT(const char* sffilen,int sfline,_FmtType&& fmt, LogItem& item, _Types&&... args)
 template <typename _FmtType, typename... _Types>
 inline void printLogT(_FmtType&& fmt, LogItem& item, _Types&&... args)
-// inline void printLogT(const char* sffilen,int sfline,_FmtType&& fmt, LogItem& item, _Types&&... args)
 {
-    // const char* tag=_line_get_lstr(sffilen,sfline,"axmol");
     if (item.level() >= getLogLevel())
         outputLog(LogItem::vformat(std::forward<_FmtType>(fmt), item, std::forward<_Types>(args)...),"axmol");
-        // tag);
 }
-// __FILE__, __LINE__, SPDLOG_FUNCTION
+
 // ax::printLogT(FMT_COMPILE("{}-{}@{}|" fmtOrMsg "\n"), ax::preprocessLog(ax::LogItem{level}),__FILE__, __LINE__, ##__VA_ARGS__)
 #define AXLOG_WITH_LEVEL(level,fmtOrMsg, ...) \
     ax::printLogT(FMT_COMPILE("{}" fmtOrMsg "\n"), ax::preprocessLog(ax::LogItem{level},__FILE__, __LINE__), ##__VA_ARGS__)
     // ax::printLogT(__FILE__, __LINE__,FMT_COMPILE("{}" fmtOrMsg "\n"),ax::preprocessLog(ax::LogItem{level}), ##__VA_ARGS__)
-    // ax::printLogT(__FILE__,__LINE__,FMT_COMPILE("{}-",fmtOrMsg "\n"), ax::preprocessLog(ax::LogItem{level}),##__VA_ARGS__)
 
-// FMT_COMPILE(s) FMT_STRING_IMPL(s, fmt::compiled_string, explicit)
-
+#define AXLOG_WITH_LEVELLua(level,fmtOrMsg,lFile,lline,...) \
+    ax::printLogT(FMT_COMPILE("{}" fmtOrMsg "\n"), ax::preprocessLog(ax::LogItem{level},lFile,lline), ##__VA_ARGS__)
+    // ax::printLogT(FMT_COMPILE("{}" fmtOrMsg "\n"), ax::preprocessLog(ax::LogItem{level},lFile,lline), ##__VA_ARGS__)
 
 #if defined(_AX_DEBUG) && _AX_DEBUG > 0
 #    define AXLOGV(fmtOrMsg, ...) AXLOG_WITH_LEVEL(ax::LogLevel::Verbose, fmtOrMsg, ##__VA_ARGS__)
