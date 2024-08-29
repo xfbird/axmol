@@ -175,17 +175,17 @@ void TileMapAtlas::updateAtlasValueAt(const Vec2& pos, const Color3B& value, int
     float itemWidthInPixels  = _itemWidth * AX_CONTENT_SCALE_FACTOR();
     float itemHeightInPixels = _itemHeight * AX_CONTENT_SCALE_FACTOR();
 
-#if AX_FIX_ARTIFACTS_BY_STRECHING_TEXEL
-    float left   = (2 * row * itemWidthInPixels + 1) / (2 * textureWide);
-    float right  = left + (itemWidthInPixels * 2 - 2) / (2 * textureWide);
-    float top    = (2 * col * itemHeightInPixels + 1) / (2 * textureHigh);
-    float bottom = top + (itemHeightInPixels * 2 - 2) / (2 * textureHigh);
-#else
-    float left   = (row * itemWidthInPixels) / textureWide;
-    float right  = left + itemWidthInPixels / textureWide;
-    float top    = (col * itemHeightInPixels) / textureHigh;
-    float bottom = top + itemHeightInPixels / textureHigh;
-#endif
+    #if AX_FIX_ARTIFACTS_BY_STRECHING_TEXEL
+        float left   = (2 * row * itemWidthInPixels + 1) / (2 * textureWide);
+        float right  = left + (itemWidthInPixels * 2 - 2) / (2 * textureWide);
+        float top    = (2 * col * itemHeightInPixels + 1) / (2 * textureHigh);
+        float bottom = top + (itemHeightInPixels * 2 - 2) / (2 * textureHigh);
+    #else
+        float left   = (row * itemWidthInPixels) / textureWide;
+        float right  = left + itemWidthInPixels / textureWide;
+        float top    = (col * itemHeightInPixels) / textureHigh;
+        float bottom = top + itemHeightInPixels / textureHigh;
+    #endif
 
     quad->tl.texCoords.u = left;
     quad->tl.texCoords.v = top;

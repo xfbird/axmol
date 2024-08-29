@@ -183,7 +183,7 @@ public:
      * @param   rotated     Whether or not the rect is rotated.
      * @return  An autoreleased sprite object.
      */
-    static Sprite* createWithTexture(Texture2D* texture, const Rect& rect, bool rotated = false);
+    static Sprite* createWithTexture(Texture2D* texture, const Rect& rect, bool rotated = false,bool fixArtifacts=false);
 
     /**
      * Creates a sprite with an sprite frame.
@@ -503,6 +503,9 @@ public:
     /** returns whether or not contentSize stretches the sprite's texture */
     bool isStretchEnabled() const;
 
+	void setFixArtifacts(bool enabled) { _fixArtifacts = enabled;};
+	bool isFixArtifacts() const { return _fixArtifacts;};
+
     //
     // Overrides
     //
@@ -735,7 +738,7 @@ protected:
     bool _autoUpdatePS   = true;
 
     bool _autoSizeEnabled = true;
-
+    bool _fixArtifacts;
 private:
     AX_DISALLOW_COPY_AND_ASSIGN(Sprite);
 };

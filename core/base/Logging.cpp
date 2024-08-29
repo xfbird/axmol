@@ -57,6 +57,15 @@ AX_API LogLevel getLogLevel()
     return s_logLevel;
 }
 
+// AX_API std::string stdstrUpcase(const std::string& str)
+// {
+// // std::string toUpperCase(const std::string& str) {
+//     std::string result = str; // 创建原始字符串的副本
+//     std::transform(result.begin(), result.end(), result.begin(),
+//                    [](unsigned char c) { return std::toupper(c); });
+//     return result;
+// }
+
 AX_API void setLogFmtFlag(LogFmtFlag flags)
 {
     s_logFmtFlags = flags;

@@ -55,6 +55,7 @@ Scene::Scene()
           Director::EVENT_PROJECTION_CHANGED,
           std::bind(&Scene::onProjectionChanged, this, std::placeholders::_1)))
 {
+    // AXLOGD("Scene() @ this:{:12X}",FMT_TOPOINT(this));
     _event->retain();
 
     _ignoreAnchorPointForPosition = true;
@@ -65,27 +66,28 @@ Scene::Scene()
 
 Scene::~Scene()
 {
-#if defined(AX_ENABLE_3D_PHYSICS) && AX_ENABLE_BULLET_INTEGRATION
-    AX_SAFE_RELEASE(_physics3DWorld);
-    AX_SAFE_RELEASE(_physics3dDebugCamera);
-#endif
-#if defined(AX_ENABLE_NAVMESH)
-    AX_SAFE_RELEASE(_navMesh);
-#endif
+    #if defined(AX_ENABLE_3D_PHYSICS) && AX_ENABLE_BULLET_INTEGRATION
+        AX_SAFE_RELEASE(_physics3DWorld);
+        AX_SAFE_RELEASE(_physics3dDebugCamera);
+    #endif
+    #if defined(AX_ENABLE_NAVMESH)
+        AX_SAFE_RELEASE(_navMesh);
+    #endif
     _director->getEventDispatcher()->removeEventListener(_event);
     AX_SAFE_RELEASE(_event);
 
-#if defined(AX_ENABLE_PHYSICS)
-    delete _physicsWorld;
-#endif
+    #if defined(AX_ENABLE_PHYSICS)
+        delete _physicsWorld;
+    #endif
 
-#if AX_ENABLE_GC_FOR_NATIVE_OBJECTS
-    auto sEngine = ScriptEngineManager::getInstance()->getScriptEngine();
-    if (sEngine)
-    {
-        sEngine->releaseAllChildrenRecursive(this);
-    }
-#endif  // AX_ENABLE_GC_FOR_NATIVE_OBJECTS
+    #if AX_ENABLE_GC_FOR_NATIVE_OBJECTS
+        auto sEngine = ScriptEngineManager::getInstance()->getScriptEngine();
+        if (sEngine)
+        {
+            sEngine->releaseAllChildrenRecursive(this);
+        }
+    #endif  // AX_ENABLE_GC_FOR_NATIVE_OBJECTS
+    // AXLOGD("~Scene() @ this:{:12X}",FMT_TOPOINT(this));
 }
 
 #if defined(AX_ENABLE_NAVMESH)

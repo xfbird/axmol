@@ -85,7 +85,7 @@ void PlistSpriteSheetLoader::load(std::string_view filePath, SpriteFrameCache& c
         // append .png
         texturePath = texturePath.append(".png");
 
-        AXLOGD("SpriteFrameCache: Trying to use file {} as texture", texturePath);
+        // AXLOGD("SpriteFrameCache: Trying to use file {} as texture", texturePath);
     }
     addSpriteFramesWithDictionary(dict, texturePath, filePath, cache);
 }
@@ -167,7 +167,7 @@ void PlistSpriteSheetLoader::reload(std::string_view filePath, SpriteFrameCache&
     }
     else
     {
-        AXLOGD("SpriteFrameCache: Couldn't load texture");
+        AXLOGW("SpriteFrameCache: Couldn't load texture");
     }
 }
 
@@ -225,6 +225,7 @@ void PlistSpriteSheetLoader::addSpriteFramesWithDictionary(ValueMap& dictionary,
         auto& frameDict      = iter.second.asValueMap();
         auto spriteFrameName = iter.first;
         auto* spriteFrame    = cache.findFrame(spriteFrameName);
+        // AXLOGD("addSpriteFramesWithDict spriteFrameName:{} findCache:{:12X}",spriteFrameName,FMT_TOPOINT(spriteFrame));
         if (spriteFrame)
         {
             continue;
@@ -332,7 +333,8 @@ void PlistSpriteSheetLoader::addSpriteFramesWithDictionary(ValueMap& dictionary,
         }
 
         // add sprite frame
-        cache.insertFrame(spriteSheet, spriteFrameName, spriteFrame);
+        cache.insertFrame(spriteSheet, spriteFrameName, spriteFrame);        
+        // AXLOGD("addSpriteFramesWithDict insertFrame spriteFrameName:{} spriteFrame:{:12X}",spriteFrameName,FMT_TOPOINT(spriteFrame));
         for (auto&& frameAlias : frameAliases)
         {
             cache.insertFrame(spriteSheet, frameAlias, spriteFrame);
