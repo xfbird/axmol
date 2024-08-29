@@ -61,11 +61,12 @@ Sprite* Sprite::createWithTexture(Texture2D* texture)
     return nullptr;
 }
 
-Sprite* Sprite::createWithTexture(Texture2D* texture, const Rect& rect, bool rotated)
+Sprite* Sprite::createWithTexture(Texture2D *texture, const Rect& rect, bool rotated, bool fixArtifacts)
 {
     Sprite* sprite = new Sprite();
     if (sprite->initWithTexture(texture, rect, rotated))
     {
+	    sprite->_fixArtifacts = fixArtifacts;
         sprite->autorelease();
         return sprite;
     }
@@ -343,11 +344,14 @@ bool Sprite::initWithImageData(const Data& imageData, std::string_view key)
 }
 
 Sprite::Sprite()
+: _fixArtifacts(false)
 {
-#if AX_SPRITE_DEBUG_DRAW
-    _debugDrawNode = DrawNode::create();
-    addChild(_debugDrawNode);
-#endif  // AX_SPRITE_DEBUG_DRAW
+    // AXLOGD("Sprite() @ this:{:12X}",FMT_TOPOINT(this));
+    #if AX_SPRITE_DEBUG_DRAW
+        _debugDrawNode = DrawNode::create();
+        addChild(_debugDrawNode);
+    #endif  // AX_SPRITE_DEBUG_DRAW
+    
 }
 
 Sprite::~Sprite()
@@ -356,6 +360,7 @@ Sprite::~Sprite()
     AX_SAFE_FREE(_trianglesIndex);
     AX_SAFE_RELEASE(_spriteFrame);
     AX_SAFE_RELEASE(_texture);
+    // AXLOGD("~Sprite() @ this:{:12X}",FMT_TOPOINT(this));
 }
 
 /*
@@ -822,6 +827,11 @@ void Sprite::setTextureCoords(const Rect& rectInPoints, V3F_C4B_T2F_Quad* outQua
 
     float rw = rectInPixels.size.width;
     float rh = rectInPixels.size.height;
+    float left=0.0;
+    float right=0.0;;
+    float top=0.0;
+    float bottom =0.0;
+
 
     // if the rect is rotated, it means that the frame is rotated 90 degrees (clockwise) and:
     //  - rectInpoints: origin will be the bottom-left of the frame (and not the top-right)
@@ -836,17 +846,26 @@ void Sprite::setTextureCoords(const Rect& rectInPoints, V3F_C4B_T2F_Quad* outQua
     if (_rectRotated)
         std::swap(rw, rh);
 
-#if AX_FIX_ARTIFACTS_BY_STRECHING_TEXEL
-    float left   = (2 * rectInPixels.origin.x + 1) / (2 * atlasWidth);
-    float right  = left + (rw * 2 - 2) / (2 * atlasWidth);
-    float top    = (2 * rectInPixels.origin.y + 1) / (2 * atlasHeight);
-    float bottom = top + (rh * 2 - 2) / (2 * atlasHeight);
-#else
-    float left   = rectInPixels.origin.x / atlasWidth;
-    float right  = (rectInPixels.origin.x + rw) / atlasWidth;
-    float top    = rectInPixels.origin.y / atlasHeight;
-    float bottom = (rectInPixels.origin.y + rh) / atlasHeight;
-#endif  // AX_FIX_ARTIFACTS_BY_STRECHING_TEXEL
+    #if AX_FIX_ARTIFACTS_BY_STRECHING_TEXEL
+        left   = (2 * rectInPixels.origin.x + 1) / (2 * atlasWidth);
+        right  = left + (rw * 2 - 2) / (2 * atlasWidth);
+        top    = (2 * rectInPixels.origin.y + 1) / (2 * atlasHeight);
+        bottom = top + (rh * 2 - 2) / (2 * atlasHeight);
+    #else
+        if (_fixArtifacts) {										//开关关闭的情况下，使用对象属性 决定是否要处理
+          left    = (2*rectInPixels.origin.x+1) / (2*atlasWidth);
+          right   = left+(rw*2-2) / (2*atlasWidth);
+          top     = (2*rectInPixels.origin.y+1) / (2*atlasHeight);
+          bottom  = top+(rh*2-2) / (2*atlasHeight);
+        } 
+        else 
+        {
+          left   = rectInPixels.origin.x / atlasWidth;
+          right  = (rectInPixels.origin.x + rw) / atlasWidth;
+          top    = rectInPixels.origin.y / atlasHeight;
+          bottom = (rectInPixels.origin.y + rh) / atlasHeight;
+        }
+    #endif  // AX_FIX_ARTIFACTS_BY_STRECHING_TEXEL
 
     if ((!_rectRotated && _flippedX) || (_rectRotated && _flippedY))
         std::swap(left, right);
