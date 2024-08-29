@@ -51,6 +51,7 @@ Object::Object()
     , _luaID(0)
 #endif
 {
+    AXLOGD("Object() @ this:{:12X}",FMT_TOPOINT(this));
 #if AX_ENABLE_SCRIPT_BINDING
     static unsigned int uObjectCount = 0;
     _ID                              = ++uObjectCount;
@@ -76,6 +77,7 @@ Object::~Object()
     if (_referenceCount != 0)
         untrackRef(this);
 #endif
+    AXLOGD("~Object() @ this:{:12X}",FMT_TOPOINT(this));
 }
 
 void Object::retain()

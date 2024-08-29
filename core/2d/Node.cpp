@@ -108,10 +108,10 @@ Node::Node()
     , _ignoreAnchorPointForPosition(false)
     , _reorderChildDirty(false)
     , _isTransitionFinished(false)
-#if AX_ENABLE_SCRIPT_BINDING
-    , _scriptHandler(0)
-    , _updateScriptHandler(0)
-#endif
+    #if AX_ENABLE_SCRIPT_BINDING
+        , _scriptHandler(0)
+        , _updateScriptHandler(0)
+    #endif
     , _componentContainer(nullptr)
     , _displayedOpacity(255)
     , _realOpacity(255)
@@ -125,11 +125,11 @@ Node::Node()
     , _onExitCallback(nullptr)
     , _onEnterTransitionDidFinishCallback(nullptr)
     , _onExitTransitionDidStartCallback(nullptr)
-#if defined(AX_ENABLE_PHYSICS)
-    , _physicsBody(nullptr)
-#endif
+    #if defined(AX_ENABLE_PHYSICS)
+        , _physicsBody(nullptr)
+    #endif
 {
-    // set default scheduler and actionManager
+    // AXLOGD("Node() @ this:{:12X}",FMT_TOPOINT(this));
     _director      = Director::getInstance();
     _actionManager = _director->getActionManager();
     _actionManager->retain();
@@ -137,7 +137,6 @@ Node::Node()
     _scheduler->retain();
     _eventDispatcher = _director->getEventDispatcher();
     _eventDispatcher->retain();
-
     _transform = _inverse = Mat4::IDENTITY;
 }
 
@@ -152,12 +151,13 @@ Node* Node::create()
     {
         AX_SAFE_DELETE(ret);
     }
+    // AXLOGD("Node::create() ret:{:12X}",FMT_TOPOINT(ret));
     return ret;
 }
 
 Node::~Node()
 {
-    AXLOGV("deallocing Node: {} - tag: {}", fmt::ptr(this), _tag);
+    // AXLOGV("deallocing Node: {:12X} - tag: {}",FMT_TOPOINT(this), _tag);
 
     AX_SAFE_DELETE(_childrenIndexer);
 
@@ -981,7 +981,7 @@ void Node::addChild(Node* child, int localZOrder, std::string_view name)
 {
     AXASSERT(child != nullptr, "Argument must be non-nil");
     AXASSERT(child->_parent == nullptr, "child already added. It can't be added again");
-
+    // AXLOGD("Node::addChild(Node* child, int localZOrder, std::string_view name) this:{:12X}   child:{:12X}  localZOrder:{}  name:{}",FMT_TOPOINT(this),FMT_TOPOINT(child),localZOrder,name);
     addChildHelper(child, localZOrder, INVALID_TAG, name, false);
 }
 
@@ -997,7 +997,7 @@ void Node::addChildHelper(Node* child, int localZOrder, int tag, std::string_vie
     (void)assertNotSelfChild;
 
     AXASSERT(assertNotSelfChild(), "A node cannot be the child of his own children");
-
+    // AXLOGD("Node::addChildHelper(Node* child, int localZOrder, int tag, std::string_view name, bool setTag) this:{:12X}   child:{:12X}  localZOrder:{} tag:{} name:{}",FMT_TOPOINT(this),FMT_TOPOINT(child),localZOrder,tag,name);
     if (_children.empty())
     {
         this->childrenAlloc();
@@ -1050,6 +1050,7 @@ void Node::addChildHelper(Node* child, int localZOrder, int tag, std::string_vie
 void Node::addChild(Node* child, int zOrder)
 {
     AXASSERT(child != nullptr, "Argument must be non-nil");
+    // AXLOGD("Node::addChild(Node* child, int zOrder) this:{:12X}   child:{:12X}  zOrder:{}",FMT_TOPOINT(this),FMT_TOPOINT(child),zOrder);
     this->addChild(child, zOrder, child->_name);
 }
 

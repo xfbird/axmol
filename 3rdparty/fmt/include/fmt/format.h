@@ -1825,6 +1825,7 @@ inline auto find_escape(const char* begin, const char* end)
  *     std::string s = fmt::format(FMT_STRING("{:d}"), "foo");
  */
 #define FMT_STRING(s) FMT_STRING_IMPL(s, fmt::detail::compile_string, )
+#define FMT_TOPOINT(s) reinterpret_cast<std::uintptr_t>(s)
 
 template <size_t width, typename Char, typename OutputIt>
 auto write_codepoint(OutputIt out, char prefix, uint32_t cp) -> OutputIt {
