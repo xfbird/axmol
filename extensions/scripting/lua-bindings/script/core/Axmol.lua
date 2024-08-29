@@ -301,7 +301,8 @@ function cc.c4f( _r,_g,_b,_a )
 end
 
 local function isFloatColor(c)
-    return (c.r <= 1 and c.g <= 1 and c.b <= 1) and (math.ceil(c.r) ~= c.r or math.ceil(c.g) ~= c.g or math.ceil(c.b) ~= c.b)
+    return (c.r <= 1 and c.g <= 1 and c.b <= 1) and 
+    (math.ceil(c.r) ~= c.r or math.ceil(c.g) ~= c.g or math.ceil(c.b) ~= c.b)
 end
 
 function cc.convertColor(input, typ)
