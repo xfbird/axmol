@@ -96,12 +96,12 @@ if device.platform == "windows" then
     device.pathSeparator = ";"
 end
 
-printInfo("# device.platform              = " .. device.platform)
-printInfo("# device.model                 = " .. device.model)
-printInfo("# device.language              = " .. device.language)
-printInfo("# device.writablePath          = " .. device.writablePath)
-printInfo("# device.directorySeparator    = " .. device.directorySeparator)
-printInfo("# device.pathSeparator         = " .. device.pathSeparator)
-printInfo("#")
+-- printInfo("# device.platform              = " .. device.platform)
+-- printInfo("# device.model                 = " .. device.model)
+-- printInfo("# device.language              = " .. device.language)
+-- printInfo("# device.writablePath          = " .. device.writablePath)
+-- printInfo("# device.directorySeparator    = " .. device.directorySeparator)
+-- printInfo("# device.pathSeparator         = " .. device.pathSeparator)
+-- printInfo("#")
 
 return device

@@ -56,8 +56,8 @@ function dump(value, description, nesting)
     local result = {}
 
     local traceback = string.split(debug.traceback("", 2), "\n")
-    print("dump from: " .. string.trim(traceback[3]))
-    -- AXLOGD("dump from: " .. string.trim(traceback[3]))
+    -- print("dump from: " .. string.trim(traceback[3]))
+    AXLOGD("dump from: " .. string.trim(traceback[3]))
 
     local function dump_(value, description, indent, nest, keylen)
         description = description or "<var>"
@@ -66,16 +66,16 @@ function dump(value, description, nesting)
             spc = string.rep(" ", keylen - string.len(dump_value_(description)))
         end
         if type(value) ~= "table" then
-            result[#result +1 ] = string.format("%s%s%s = %s", indent, dump_value_(description), spc, dump_value_(value))
+            result[#result + 1] = string.format("%s%s%s = %s", indent, dump_value_(description), spc, dump_value_(value))
         elseif lookupTable[tostring(value)] then
-            result[#result +1 ] = string.format("%s%s%s = *REF*", indent, dump_value_(description), spc)
+            result[#result + 1] = string.format("%s%s%s = *REF*", indent, dump_value_(description), spc)
         else
             lookupTable[tostring(value)] = true
             if nest > nesting then
-                result[#result +1 ] = string.format("%s%s = *MAX NESTING*", indent, dump_value_(description))
+                result[#result + 1] = string.format("%s%s = *MAX NESTING*", indent, dump_value_(description))
             else
-                result[#result +1 ] = string.format("%s%s = {", indent, dump_value_(description))
-                local indent2 = indent.."    "
+                result[#result + 1] = string.format("%s%s = {", indent, dump_value_(description))
+                local indent2 = indent .. "    "
                 local keys = {}
                 local keylen = 0
                 local values = {}
@@ -96,15 +96,15 @@ function dump(value, description, nesting)
                 for i, k in ipairs(keys) do
                     dump_(values[k], k, indent2, nest + 1, keylen)
                 end
-                result[#result +1] = string.format("%s}", indent)
+                result[#result + 1] = string.format("%s}", indent)
             end
         end
     end
     dump_(value, description, "- ", 1)
 
     for i, line in ipairs(result) do
-        print(line)
-        -- AXLOGD("{}",line)
+        -- print(line)
+        AXLOGD("{}",line)
     end
 end
 
@@ -112,91 +112,22 @@ function printf(fmt, ...)
     print(string.format(tostring(fmt), ...))
 end
 
-if not __G__TRACKBACK__ then 
-    __G__TRACKBACK__ = function(msg)
-        local msg = debug.traceback(msg, 3)
-        print(msg)
-        return msg
-    end
+function checknumber(value, base)
+    return tonumber(value, base) or 0
 end
 
-if not string.split then
-    function string.split(input, delimiter)
-        input = tostring(input)
-        delimiter = tostring(delimiter)
-        if (delimiter == '') then return false end
-        local pos, arr = 0, {}
-        -- for each divider found
-        for st, sp in function() return string.find(input, delimiter, pos, true) end do
-            table.insert(arr, string.sub(input, pos, st - 1))
-            pos = sp + 1
-        end
-        table.insert(arr, string.sub(input, pos))
-        return arr
-    end
+function checkint(value)
+    return math.round(checknumber(value))
 end
 
-if not string.ltrim then
-    function string.ltrim(input)
-        return string.gsub(input, "^[ \t\n\r]+", "")
-    end
+function checkbool(value)
+    return (value ~= nil and value ~= false)
 end
 
-if not string.rtrim then
-    function string.rtrim(input)
-        return string.gsub(input, "[ \t\n\r]+$", "")
-    end
+function checktable(value)
+    if type(value) ~= "table" then value = {} end
+    return value
 end
-if not string.trim then
-    function string.trim(input)
-        input = string.gsub(input, "^[ \t\n\r]+", "")
-        return string.gsub(input, "[ \t\n\r]+$", "")
-    end
-end
-
-if not checknumber then
-    function checknumber(value, base)
-        return tonumber(value, base) or 0
-    end
-end
-
-
-if not checkint then
-    function checkint(value)
-        return math.round(checknumber(value))
-    end
-end
-
-if not checkbool then
-    function checkbool(value)
-        return (value ~= nil and value ~= false)
-    end
-end
-
-if not checktable then
-    function checktable(value)
-        if type(value) ~= "table" then value = {} end
-        return value
-    end
-end
-
-
--- function checknumber(value, base)
---     return tonumber(value, base) or 0
--- end
-
--- function checkint(value)
---     return math.round(checknumber(value))
--- end
-
--- function checkbool(value)
---     return (value ~= nil and value ~= false)
--- end
-
--- function checktable(value)
---     if type(value) ~= "table" then value = {} end
---     return value
--- end
 
 function isset(hashtable, key)
     local t = type(hashtable)
@@ -316,7 +247,7 @@ function class(classname, ...)
         setmetatableindex(instance, cls)
         instance.class = cls
         if instance.ctor then
-            instance:ctor(...) --Â´Ã¦Ã”Ãš ctor Â¾ÃÂµÃ·Ã“ÃƒÃ–Â´ÃÃ ctor
+            instance:ctor(...) --´æÔÚ ctor ¾Íµ÷ÓÃÖ´ÐÐ ctor
         end
         -- print('cls.new return instance', instance)
         return instance
@@ -636,32 +567,32 @@ function string.text2html(input)
     return input
 end
 
--- function string.split(input, delimiter)
---     input = tostring(input)
---     delimiter = tostring(delimiter)
---     if (delimiter == '') then return false end
---     local pos, arr = 0, {}
---     -- for each divider found
---     for st, sp in function() return string.find(input, delimiter, pos, true) end do
---         table.insert(arr, string.sub(input, pos, st - 1))
---         pos = sp + 1
---     end
---     table.insert(arr, string.sub(input, pos))
---     return arr
--- end
+function string.split(input, delimiter)
+    input = tostring(input)
+    delimiter = tostring(delimiter)
+    if (delimiter == '') then return false end
+    local pos, arr = 0, {}
+    -- for each divider found
+    for st, sp in function() return string.find(input, delimiter, pos, true) end do
+        table.insert(arr, string.sub(input, pos, st - 1))
+        pos = sp + 1
+    end
+    table.insert(arr, string.sub(input, pos))
+    return arr
+end
 
--- function string.ltrim(input)
---     return string.gsub(input, "^[ \t\n\r]+", "")
--- end
+function string.ltrim(input)
+    return string.gsub(input, "^[ \t\n\r]+", "")
+end
 
--- function string.rtrim(input)
---     return string.gsub(input, "[ \t\n\r]+$", "")
--- end
+function string.rtrim(input)
+    return string.gsub(input, "[ \t\n\r]+$", "")
+end
 
--- function string.trim(input)
---     input = string.gsub(input, "^[ \t\n\r]+", "")
---     return string.gsub(input, "[ \t\n\r]+$", "")
--- end
+function string.trim(input)
+    input = string.gsub(input, "^[ \t\n\r]+", "")
+    return string.gsub(input, "[ \t\n\r]+$", "")
+end
 
 function string.ucfirst(input)
     return string.upper(string.sub(input, 1, 1)) .. string.sub(input, 2)
@@ -716,7 +647,14 @@ function string.formatnumberthousands(num)
     return formatted
 end
 
-
+-- The axmol new logging stubs, since v2.1.3
+local LogLevel = {
+    Trace = 0,
+    Debug = 1,
+    Info = 2,
+    Warn = 3,
+    Error = 4
+}
 
 -- local function GetStandFileAndLineStr(fn, line)
 --     -- return string.format("%20.20s", fn) .. "@" .. string.format("%5.5s", line)
@@ -756,130 +694,117 @@ end
 --         return ""
 --     end
 -- end
-if not AXLOGD then 
-    -- The axmol new logging stubs, since v2.1.3
-    local LogLevel = {
-        Trace = 0,
-        Debug = 1,
-        Info = 2,
-        Warn = 3,
-        Error = 4
-    }
-    local function GetTracebackFL(tb)
-        if tb then
-            local lineinfo = string.split(string.trim(tb[3]), ":")
-            if lineinfo then
-                if lineinfo[1] then
-                    local spath = string.split(string.trim(lineinfo[1]), "/")
-                    local sspinfo = ""
-                    local sssinfo = ""
-                    local sps = ""
-                    if spath then
-                        -- dump(spath)
-                        if #spath >= 2 then
-                            sspinfo = string.trim(spath[#spath - 1])
-                            sssinfo = string.trim(spath[#spath])
-                        else
-                            sspinfo = string.trim(spath[1])
-                            sssinfo = ""
-                        end
-                        sps = sspinfo .. "/" .. sssinfo
+local function GetTracebackFL(tb)
+    if tb then
+        local lineinfo = string.split(string.trim(tb[3]), ":")
+        if lineinfo then
+            if lineinfo[1] then
+                local spath = string.split(string.trim(lineinfo[1]), "/")
+                local sspinfo = ""
+                local sssinfo = ""
+                local sps = ""
+                if spath then
+                    -- dump(spath)
+                    if #spath >= 2 then
+                        sspinfo = string.trim(spath[#spath - 1])
+                        sssinfo = string.trim(spath[#spath])
                     else
-                        sps = ""
+                        sspinfo = string.trim(spath[1])
+                        sssinfo = ""
                     end
-                    return  sps,checknumber(string.trim(lineinfo[2]),10)
-                    -- GetStandFileAndLineStr(sps, string.trim(lineinfo[2]))
+                    sps = sspinfo .. "/" .. sssinfo
                 else
-                    return string.trim(lineinfo[1]),checknumber(string.trim(lineinfo[2]),10)
-                    -- GetStandFileAndLineStr(string.trim(lineinfo[1]), string.trim(lineinfo[2]))
+                    sps = ""
                 end
+                return  sps,checknumber(string.trim(lineinfo[2]),10)
+                -- GetStandFileAndLineStr(sps, string.trim(lineinfo[2]))
             else
-                return "",-1
+                return string.trim(lineinfo[1]),checknumber(string.trim(lineinfo[2]),10)
+                -- GetStandFileAndLineStr(string.trim(lineinfo[1]), string.trim(lineinfo[2]))
             end
         else
             return "",-1
         end
+    else
+        return "",-1
     end
-
-
-    function AXLOGT(...)
-        if DEBUG == 3 and (AXLOG_WITH_LEVELEx) then
-            -- local traceback = string.split(debug.traceback("", 2), "\n")
-            -- local lineinfo = string.split(string.trim(traceback[3]), ":")
-            -- AXLOG_WITH_LEVELEx(GetTracebackFL(string.split(debug.traceback("", 2), "\n")), LogLevel.Trace,
-            --     ...)
-            local fn,fl=GetTracebackFL(string.split(debug.traceback("", 2), "\n"))
-            AXLOG_WITH_LEVELEx(fn,fl,LogLevel.Trace,...)
-        else
-            AXLOG_WITH_LEVEL(LogLevel.Trace, ...)
-        end
-    end
-
-    function AXLOGD(...)
-        if DEBUG == 3 and (AXLOG_WITH_LEVELEx) then
-            -- local traceback = string.split(debug.traceback("", 2), "\n")
-            -- local lineinfo = string.split(string.trim(traceback[3]), ":")
-            local fn,fl=GetTracebackFL(string.split(debug.traceback("", 2), "\n"))
-            -- print(fn,"    ",fl,"    ",...);
-            AXLOG_WITH_LEVELEx(fn,fl,LogLevel.Debug,...)
-        else
-            AXLOG_WITH_LEVEL(LogLevel.Debug, ...)
-        end
-    end
-
-    function AXLOGI(...)
-        if DEBUG == 3 and (AXLOG_WITH_LEVELEx) then
-            -- local traceback = string.split(debug.traceback("", 2), "\n")
-            -- local lineinfo = string.split(string.trim(traceback[3]), ":")
-            -- if
-            -- AXLOG_WITH_LEVELEx(GetTracebackFL(string.split(debug.traceback("", 2), "\n")), LogLevel.Info, ...)
-            local fn,fl=GetTracebackFL(string.split(debug.traceback("", 2), "\n"))
-            AXLOG_WITH_LEVELEx(fn,fl,LogLevel.Info,...)
-        else
-            AXLOG_WITH_LEVEL(LogLevel.Info, ...)
-        end
-    end
-
-    function AXLOGW(...)
-        if DEBUG == 3 and (AXLOG_WITH_LEVELEx) then
-            -- local traceback = string.split(debug.traceback("", 2), "\n")
-            -- local lineinfo = string.split(string.trim(traceback[3]), ":")
-            -- AXLOG_WITH_LEVELEx(GetTracebackFL(string.split(debug.traceback("", 2), "\n")), LogLevel.Warn, ...)
-            local fn,fl=GetTracebackFL(string.split(debug.traceback("", 2), "\n"))
-            AXLOG_WITH_LEVELEx(fn,fl,LogLevel.Warn,...)
-        else
-            AXLOG_WITH_LEVEL(LogLevel.Warn, ...)
-        end
-    end
-
-    function AXLOGE(...)
-        if DEBUG == 3 and (AXLOG_WITH_LEVELEx) then
-            -- local traceback = string.split(debug.traceback("", 2), "\n")
-            -- local lineinfo = string.split(string.trim(traceback[3]), ":")
-            -- AXLOG_WITH_LEVELEx(GetTracebackFL(string.split(debug.traceback("", 2), "\n")), LogLevel.Error, ...)
-            local fn,fl=GetTracebackFL(string.split(debug.traceback("", 2), "\n"))
-            AXLOG_WITH_LEVELEx(fn,fl,LogLevel.Error,...)
-        else
-            AXLOG_WITH_LEVEL(LogLevel.Error, ...)
-        end
-    end
-
-
-    function toupptr(p)
-        return string.upper(tostring(p))
-    end
-
-    if print then
-        if DEBUG == 3 or DEBUG == 2 then
-            print = function(...)
-                return AXLOGD(...)
-            end
-        end
-    end
-
-    function tosf_ptr(vaddr)
-        return string.format("%x",tonumber(vaddr))
-    end    
-
 end
 
+function AXLOGT(...)
+    if DEBUG == 3 and (AXLOG_WITH_LEVELEx) then
+        -- local traceback = string.split(debug.traceback("", 2), "\n")
+        -- local lineinfo = string.split(string.trim(traceback[3]), ":")
+        -- AXLOG_WITH_LEVELEx(GetTracebackFL(string.split(debug.traceback("", 2), "\n")), LogLevel.Trace,
+        --     ...)
+        local fn,fl=GetTracebackFL(string.split(debug.traceback("", 2), "\n"))
+        AXLOG_WITH_LEVELEx(fn,fl,LogLevel.Trace,...)
+    else
+        AXLOG_WITH_LEVEL(LogLevel.Trace, ...)
+    end
+end
+
+function AXLOGD(...)
+    if DEBUG == 3 and (AXLOG_WITH_LEVELEx) then
+        -- local traceback = string.split(debug.traceback("", 2), "\n")
+        -- local lineinfo = string.split(string.trim(traceback[3]), ":")
+        local fn,fl=GetTracebackFL(string.split(debug.traceback("", 2), "\n"))
+        -- print(fn,"    ",fl,"    ",...);
+        AXLOG_WITH_LEVELEx(fn,fl,LogLevel.Debug,...)
+    else
+        AXLOG_WITH_LEVEL(LogLevel.Debug, ...)
+    end
+end
+
+function AXLOGI(...)
+    if DEBUG == 3 and (AXLOG_WITH_LEVELEx) then
+        -- local traceback = string.split(debug.traceback("", 2), "\n")
+        -- local lineinfo = string.split(string.trim(traceback[3]), ":")
+        -- if
+        -- AXLOG_WITH_LEVELEx(GetTracebackFL(string.split(debug.traceback("", 2), "\n")), LogLevel.Info, ...)
+        local fn,fl=GetTracebackFL(string.split(debug.traceback("", 2), "\n"))
+        AXLOG_WITH_LEVELEx(fn,fl,LogLevel.Info,...)
+    else
+        AXLOG_WITH_LEVEL(LogLevel.Info, ...)
+    end
+end
+
+function AXLOGW(...)
+    if DEBUG == 3 and (AXLOG_WITH_LEVELEx) then
+        -- local traceback = string.split(debug.traceback("", 2), "\n")
+        -- local lineinfo = string.split(string.trim(traceback[3]), ":")
+        -- AXLOG_WITH_LEVELEx(GetTracebackFL(string.split(debug.traceback("", 2), "\n")), LogLevel.Warn, ...)
+        local fn,fl=GetTracebackFL(string.split(debug.traceback("", 2), "\n"))
+        AXLOG_WITH_LEVELEx(fn,fl,LogLevel.Warn,...)
+    else
+        AXLOG_WITH_LEVEL(LogLevel.Warn, ...)
+    end
+end
+
+function AXLOGE(...)
+    if DEBUG == 3 and (AXLOG_WITH_LEVELEx) then
+        -- local traceback = string.split(debug.traceback("", 2), "\n")
+        -- local lineinfo = string.split(string.trim(traceback[3]), ":")
+        -- AXLOG_WITH_LEVELEx(GetTracebackFL(string.split(debug.traceback("", 2), "\n")), LogLevel.Error, ...)
+        local fn,fl=GetTracebackFL(string.split(debug.traceback("", 2), "\n"))
+        AXLOG_WITH_LEVELEx(fn,fl,LogLevel.Error,...)
+    else
+        AXLOG_WITH_LEVEL(LogLevel.Error, ...)
+    end
+end
+
+
+function toupptr(p)
+    return string.upper(tostring(p))
+end    
+
+-- if print then
+--     if DEBUG == 3 or DEBUG == 2 then
+--         print = function(...)
+--             return AXLOGD(...)
+--         end
+--     end
+-- end
+
+-- function tosf_ptr(vaddr)
+--     return string.format("%x",tonumber(vaddr))
+-- end    
