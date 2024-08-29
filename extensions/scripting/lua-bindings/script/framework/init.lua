@@ -33,20 +33,20 @@ device     = require("axmol.framework.device")
 display    = require("axmol.framework.display")
 transition = require("axmol.framework.transition")
 
-require("axmol.framework.extends.NodeEx")
-require("axmol.framework.extends.SpriteEx")
-require("axmol.framework.extends.LayerEx")
-require("axmol.framework.extends.MenuEx")
+require("axmol.framework.extends.NodeEx")   --扩展cc.Node
+require("axmol.framework.extends.SpriteEx") --扩展 cc.Sprite
+require("axmol.framework.extends.LayerEx")  --扩展cc.Layer
+require("axmol.framework.extends.MenuEx")   --扩展 cc.MenuItem
 
 if ccui then
-require("axmol.framework.extends.UIWidget")
-require("axmol.framework.extends.UICheckBox")
-require("axmol.framework.extends.UIEditBox")
-require("axmol.framework.extends.UIListView")
-require("axmol.framework.extends.UIPageView")
-require("axmol.framework.extends.UIScrollView")
-require("axmol.framework.extends.UISlider")
-require("axmol.framework.extends.UITextField")
+    require("axmol.framework.extends.UIWidget")   --扩展ccui.Widget
+    require("axmol.framework.extends.UICheckBox") --扩展 ccui.CheckBox
+    require("axmol.framework.extends.UIEditBox")
+    require("axmol.framework.extends.UIListView")
+    require("axmol.framework.extends.UIPageView")
+    require("axmol.framework.extends.UIScrollView")
+    require("axmol.framework.extends.UISlider")
+    require("axmol.framework.extends.UITextField")
 end
 
 require("axmol.framework.package_support")
@@ -76,6 +76,6 @@ function cc.disable_global()
     })
 end
 
-if AX_DISABLE_GLOBAL then
-    cc.disable_global()
-end
+-- if AX_DISABLE_GLOBAL then --不允许 直接使用 global 全局变量。需要通过 cc.exports.xxxx = value 方式来使用
+--     cc.disable_global()
+-- end
