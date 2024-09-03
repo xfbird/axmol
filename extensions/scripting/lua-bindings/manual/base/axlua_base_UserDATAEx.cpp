@@ -254,6 +254,24 @@ int lua_ax_base_UserDataEx_getStringForKey(lua_State* tolua_S)
                 return 1;
             }
         } while (0);
+        do
+        {
+            if (argc == 2)
+            {
+                std::string arg0;
+                std::string arg1;
+                ok &= luaval_to_std_string(tolua_S, 2, &arg0, "UserDataEx:getStringForKey");
+                ok &= luaval_to_std_string(tolua_S, 3, &arg1, "UserDataEx:getStringForKey");
+                if (!ok)
+                {
+                    break;
+                }
+                std::string ret = cobj->getStringForKey(arg0,arg1);
+                tolua_pushstring(tolua_S, ret.c_str());
+                return 1;
+            }
+        } while (0);
+
         ok = true;
         luaL_error(tolua_S, "%s 参数数量错误: %d, 应该期望 %d\n", "UserDataEx:getStringForKey", argc, 1);
         return 0;
@@ -671,19 +689,20 @@ int lua_ax_base_UserDataEx_new(lua_State* tolua_S)
 
     int argc = 0;
 
-    tolua_Error tolua_err;
-    //AXLOGD("lua_ax_base_UserDataEx_new  Check tolua_isusertable argc:{}",tolua_isusertable(tolua_S, 1, "ax.UserDataEx", 0, &tolua_err));
-    // #if _AX_DEBUG >= 1
-    //     tolua_Error tolua_err;
-    //     if (!tolua_isusertable(tolua_S, 1, "ax.UserDataEx", 0, &tolua_err))
-    //         goto tolua_lerror;
-    // #endif
+    
+    //  AXLOGD("lua_ax_base_UserDataEx_new  Check tolua_isusertable argc:{}",tolua_isusertable(tolua_S, 1, "ax.UserDataEx", 0, &tolua_err));
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+        // tolua_Error tolua_err;
+        if (!tolua_isusertable(tolua_S, 1, "ax.UserDataEx", 0, &tolua_err))
+            goto tolua_lerror;
+    #endif
     argc = lua_gettop(tolua_S) - 1;
-    //AXLOGD("lua_ax_base_UserDataEx_new  Check argc:{}",argc);
+    AXLOGD("lua_ax_base_UserDataEx_new  Check argc:{}",argc);
     if (argc == 1)
     {
         std::string skey= tolua_tostring(tolua_S, 2, "");
-        //AXLOGD("lua_ax_base_UserDataEx_new  Check tolua_isusertable skey:{}",skey);
+        AXLOGD("lua_ax_base_UserDataEx_new  tostring  skey:{}",skey);
         if (skey.empty())
         {
             tolua_pushstring(tolua_S, "无效的参数在函数 'lua_ax_base_UserDataEx_new': 字符串参数为空");
@@ -692,7 +711,7 @@ int lua_ax_base_UserDataEx_new(lua_State* tolua_S)
         }
 
         UserDataEx* tolua_ret = (UserDataEx*)UserDataEx::GetUserDataEx(skey);
-        //AXLOGD("lua_ax_base_UserDataEx_new  Check tolua_isusertable skey:{} ret:tolua_ret:{}",skey,fmt::ptr(tolua_ret));
+        AXLOGD("lua_ax_base_UserDataEx_new  skey:{} ret:tolua_ret:{}",skey,FMT_TOPOINT(tolua_ret));
         tolua_pushusertype(tolua_S, (void*)tolua_ret, "ax.UserDataEx");
         return 1;
     }

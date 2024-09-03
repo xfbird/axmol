@@ -167,6 +167,7 @@ int lua_register_ax_base_Object(lua_State* tolua_S)
     tolua_beginmodule(tolua_S,"Object");
         tolua_function(tolua_S,"retain",lua_ax_base_Object_retain);
         tolua_function(tolua_S,"release",lua_ax_base_Object_release);
+        tolua_function(tolua_S,"autorelease",lua_ax_base_Object_release);
         tolua_function(tolua_S,"getReferenceCount",lua_ax_base_Object_getReferenceCount);
     tolua_endmodule(tolua_S);
     auto typeName = typeid(ax::Object).name(); // rtti is literal storage
@@ -2550,13 +2551,13 @@ int lua_ax_base_Texture2D_setDefaultAlphaPixelFormat(lua_State* tolua_S)
     int argc = 0;
     bool ok  = true;
 
-#if _AX_DEBUG >= 1
-    tolua_Error tolua_err;
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
 
-#if _AX_DEBUG >= 1
-    if (!tolua_isusertable(tolua_S,1,"ax.Texture2D",0,&tolua_err)) goto tolua_lerror;
-#endif
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertable(tolua_S,1,"ax.Texture2D",0,&tolua_err)) goto tolua_lerror;
+    #endif
 
     argc = lua_gettop(tolua_S) - 1;
 
@@ -4279,13 +4280,13 @@ int lua_ax_base_Component_create(lua_State* tolua_S)
     int argc = 0;
     bool ok  = true;
 
-#if _AX_DEBUG >= 1
-    tolua_Error tolua_err;
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
 
-#if _AX_DEBUG >= 1
-    if (!tolua_isusertable(tolua_S,1,"ax.Component",0,&tolua_err)) goto tolua_lerror;
-#endif
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertable(tolua_S,1,"ax.Component",0,&tolua_err)) goto tolua_lerror;
+    #endif
 
     argc = lua_gettop(tolua_S) - 1;
 
@@ -6656,24 +6657,24 @@ int expush_table_instance(lua_State* L, int lo) {
 
 TOLUA_API void* kentolua_tousertype (lua_State* L, int narg, void* def)
 {
-    AXLOGD("tolua_tousertype (lua_State*:{:13X} narg:{:13X} def:{} ",FMT_TOPOINT(L),narg,FMT_TOPOINT(def));
+    // AXLOGD("tolua_tousertype (lua_State*:{:12X} narg:{:12X} def:{} ",FMT_TOPOINT(L),narg,FMT_TOPOINT(def));
     if (lua_gettop(L)<abs(narg)){
-        AXLOGD("tolua_tousertype (lua_State*:{:13X} narg:{} def:{:13X}  return",FMT_TOPOINT(L),narg,FMT_TOPOINT(def));
+        // AXLOGD("tolua_tousertype (lua_State*:{:12X} narg:{} def:{:12X}  return",FMT_TOPOINT(L),narg,FMT_TOPOINT(def));
         return def;
     }
     else
     {
         void* u;
         if (!lua_isuserdata(L, narg)) {
-            AXLOGD("tolua_tousertype no userdata ");
+            // AXLOGD("tolua_tousertype no userdata ");
             if (!expush_table_instance(L, narg)) return NULL;
-            AXLOGD("tolua_tousertype no userdata  is push_table_instance");
+            // AXLOGD("tolua_tousertype no userdata  is push_table_instance");
         };
         u = lua_touserdata(L,narg);
-        AXLOGD("tolua_tousertype  u:{:13X}",FMT_TOPOINT(u));
+        // AXLOGD("tolua_tousertype  u:{:12X}",FMT_TOPOINT(u));
 
         auto uu=(u==NULL) ? NULL : *((void**)u); /* nil represents NULL */
-        AXLOGD("tolua_tousertype  uu:{:13X}",FMT_TOPOINT(uu));
+        // AXLOGD("tolua_tousertype  uu:{:12X}",FMT_TOPOINT(uu));
         return uu;
         // return (u==NULL) ? NULL : *((void**)u); /* nil represents NULL */
     }
@@ -6695,10 +6696,10 @@ int lua_ax_base_Node_addChild(lua_State* tolua_S)
     // #endif
     auto ccoo = kentolua_tousertype(tolua_S,1,0);
 
-    AXLOGD("lua_ax_base_Node_addChild ccoo:{:13X}",FMT_TOPOINT(ccoo));
+    // AXLOGD("lua_ax_base_Node_addChild ccoo:{:12X}",FMT_TOPOINT(ccoo));
     cobj = (ax::Node*)ccoo;
     // kentolua_tousertype(tolua_S,1,0);
-    AXLOGD("lua_ax_base_Node_addChild cobj:{:13X}",FMT_TOPOINT(cobj));
+    // AXLOGD("lua_ax_base_Node_addChild cobj:{:12X}",FMT_TOPOINT(cobj));
     #if _AX_DEBUG >= 1
         if (!cobj)
         {
@@ -6708,7 +6709,7 @@ int lua_ax_base_Node_addChild(lua_State* tolua_S)
         }
     #endif
     argc = lua_gettop(tolua_S)-1;
-    AXLOGD("lua_ax_base_Node_addChild argc:{}",argc);
+    // AXLOGD("lua_ax_base_Node_addChild argc:{}",argc);
     do{
         if (argc == 2) {
             ax::Node* arg0;
@@ -6719,10 +6720,10 @@ int lua_ax_base_Node_addChild(lua_State* tolua_S)
             ok &= luaval_to_int32(tolua_S, 3,(int *)&arg1, "ax.Node:addChild");
 
             if (!ok) { break; }
-            AXLOGD("lua_ax_base_Node_addChild argc:2 ax::Node*:{:13X}  int:{}",FMT_TOPOINT(arg0),arg1);
+            // AXLOGD("lua_ax_base_Node_addChild argc:2 ax::Node*:{:12X}  int:{}",FMT_TOPOINT(arg0),arg1);
             cobj->addChild(arg0, arg1);
             lua_settop(tolua_S, 1);
-            AXLOGD("lua_ax_base_Node_addChild argc:2 ok");
+            // AXLOGD("lua_ax_base_Node_addChild argc:2 ok");
             return 1;
         }
     }while(0);
@@ -6733,10 +6734,10 @@ int lua_ax_base_Node_addChild(lua_State* tolua_S)
             ok &= luaval_to_object<ax::Node>(tolua_S, 2, "ax.Node",&arg0, "ax.Node:addChild");
 
             if (!ok) { break; }
-            AXLOGD("lua_ax_base_Node_addChild argc:1 ax::Node*:{:13X}",FMT_TOPOINT(arg0));
+            // AXLOGD("lua_ax_base_Node_addChild argc:1 ax::Node*:{:12X}",FMT_TOPOINT(arg0));
             cobj->addChild(arg0);
             lua_settop(tolua_S, 1);
-            AXLOGD("lua_ax_base_Node_addChild argc:1 ok");
+            // AXLOGD("lua_ax_base_Node_addChild argc:1 ok");
             return 1;
         }
     }while(0);
@@ -6755,10 +6756,10 @@ int lua_ax_base_Node_addChild(lua_State* tolua_S)
             ok &= luaval_to_int32(tolua_S, 4,(int *)&arg2, "ax.Node:addChild");
 
             if (!ok) { break; }
-            AXLOGD("lua_ax_base_Node_addChild argc:3.1 ax::Node*:{:13X} int:{} int:{}",FMT_TOPOINT(arg0),arg1,arg2);
+            // AXLOGD("lua_ax_base_Node_addChild argc:3.1 ax::Node*:{:12X} int:{} int:{}",FMT_TOPOINT(arg0),arg1,arg2);
             cobj->addChild(arg0, arg1, arg2);
             lua_settop(tolua_S, 1);
-            AXLOGD("lua_ax_base_Node_addChild argc:3.1 ok");
+            // AXLOGD("lua_ax_base_Node_addChild argc:3.1 ok");
             return 1;
         }
     }while(0);
@@ -6777,10 +6778,10 @@ int lua_ax_base_Node_addChild(lua_State* tolua_S)
             ok &= luaval_to_std_string_view(tolua_S, 4,&arg2, "ax.Node:addChild");
 
             if (!ok) { break; }
-            AXLOGD("lua_ax_base_Node_addChild argc:3.2 ax::Node*:{:13X} int:{} string:{}",FMT_TOPOINT(arg0),arg1,arg2);
+            // AXLOGD("lua_ax_base_Node_addChild argc:3.2 ax::Node*:{:12X} int:{} string:{}",FMT_TOPOINT(arg0),arg1,arg2);
             cobj->addChild(arg0, arg1, arg2);
             lua_settop(tolua_S, 1);
-            AXLOGD("lua_ax_base_Node_addChild argc:3.2 ok ");
+            // AXLOGD("lua_ax_base_Node_addChild argc:3.2 ok ");
             return 1;
         }
     }while(0);
@@ -11733,7 +11734,7 @@ int lua_ax_base_Node_create(lua_State* tolua_S)
     #endif
 
     argc = lua_gettop(tolua_S) - 1;
-    AXLOGD("lua_ax_base_Node_create argc:{}",argc);
+    // AXLOGD("lua_ax_base_Node_create argc:{}",argc);
     if (argc == 0)
     {
         if(!ok)
@@ -11742,7 +11743,7 @@ int lua_ax_base_Node_create(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = ax::Node::create();
-        AXLOGD("lua_ax_base_Node_create Node::create ret:{:13X}",FMT_TOPOINT(ret));
+        // AXLOGD("lua_ax_base_Node_create Node::create ret:{:12X}",FMT_TOPOINT(ret));
         object_to_luaval<ax::Node>(tolua_S, "ax.Node",(ax::Node*)ret);
         return 1;
     }
@@ -11799,7 +11800,7 @@ int lua_ax_base_Node_constructor(lua_State* tolua_S)
     #endif
 
     argc = lua_gettop(tolua_S)-1;
-    AXLOGD("lua_ax_base_Node_constructor argc:{}",argc);
+    // AXLOGD("lua_ax_base_Node_constructor argc:{}",argc);
     if (argc == 0) 
     {
         if(!ok)
@@ -11808,11 +11809,11 @@ int lua_ax_base_Node_constructor(lua_State* tolua_S)
             return 0;
         }
         cobj = new ax::Node();
-        AXLOGD("lua_ax_base_Node_constructor cobj:{:13X}",FMT_TOPOINT(cobj));
+        // AXLOGD("lua_ax_base_Node_constructor cobj:{:12X}",FMT_TOPOINT(cobj));
         cobj->autorelease();
         int ID =  (int)cobj->_ID ;
         int* luaID =  &cobj->_luaID ;
-        AXLOGD("lua_ax_base_Node_constructor id:{}  luaID:{:13X}",ID,FMT_TOPOINT(luaID));
+        // AXLOGD("lua_ax_base_Node_constructor id:{}  luaID:{:12X}",ID,FMT_TOPOINT(luaID));
         toluafix_pushusertype_object(tolua_S, ID, luaID, (void*)cobj,"ax.Node");
         return 1;
     }
@@ -12516,8 +12517,8 @@ int lua_ax_base_Scene_create(lua_State* tolua_S)
     #endif
 
     argc = lua_gettop(tolua_S) - 1;
-    // (lua_State*:{:13X} narg:{:13X} FMT_TOPOINT(L),narg,FMT_TOPOINT(def)
-    AXLOGD("lua_ax_base_Scene_create argc:{} ",argc);
+    // (lua_State*:{:12X} narg:{:12X} FMT_TOPOINT(L),narg,FMT_TOPOINT(def)
+    // AXLOGD("lua_ax_base_Scene_create argc:{} ",argc);
     if (argc == 0)
     {
         if(!ok)
@@ -12526,7 +12527,7 @@ int lua_ax_base_Scene_create(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = ax::Scene::create();
-        AXLOGD("lua_ax_base_Scene_create ret:{:13X}",FMT_TOPOINT(ret));
+        // AXLOGD("lua_ax_base_Scene_create ret:{:12X}",FMT_TOPOINT(ret));
         object_to_luaval<ax::Scene>(tolua_S, "ax.Scene",(ax::Scene*)ret);
         return 1;
     }
@@ -12619,7 +12620,7 @@ int lua_ax_base_Scene_constructor(lua_State* tolua_S)
     #endif
 
     argc = lua_gettop(tolua_S)-1;
-    AXLOGD("lua_ax_base_Scene_constructor argc:{}",argc);
+    // AXLOGD("lua_ax_base_Scene_constructor argc:{}",argc);
     if (argc == 0) 
     {
         if(!ok)
@@ -12631,7 +12632,7 @@ int lua_ax_base_Scene_constructor(lua_State* tolua_S)
         cobj->autorelease();
         int ID =  (int)cobj->_ID ;
         int* luaID =  &cobj->_luaID ;
-        AXLOGD("lua_ax_base_Scene_constructor cobj:{:13X} ID:{}  luaID:{:13X}",FMT_TOPOINT(cobj),ID,FMT_TOPOINT(luaID));
+        // AXLOGD("lua_ax_base_Scene_constructor cobj:{:12X} ID:{}  luaID:{:12X}",FMT_TOPOINT(cobj),ID,FMT_TOPOINT(luaID));
         toluafix_pushusertype_object(tolua_S, ID, luaID, (void*)cobj,"ax.Scene");
         return 1;
     }
@@ -58872,19 +58873,19 @@ int lua_ax_base_Sprite_setSpriteFrame(lua_State* tolua_S)
             return 0;
         }
     #endif
-    AXLOGD("lua_ax_base_Sprite_setSpriteFrame cobj:{:13X}",FMT_TOPOINT(cobj));
+    // AXLOGD("lua_ax_base_Sprite_setSpriteFrame cobj:{:12X}",FMT_TOPOINT(cobj));
     argc = lua_gettop(tolua_S)-1;
-    AXLOGD("lua_ax_base_Sprite_setSpriteFrame argc:{}",argc);
+    // AXLOGD("lua_ax_base_Sprite_setSpriteFrame argc:{}",argc);
     do{
         if (argc == 1) {
             ax::SpriteFrame* arg0;
             ok &= luaval_to_object<ax::SpriteFrame>(tolua_S, 2, "ax.SpriteFrame",&arg0, "ax.Sprite:setSpriteFrame");
 
             if (!ok) { break; }
-            AXLOGD("lua_ax_base_Sprite_setSpriteFrame SpriteFrame arg0:{:13X}",FMT_TOPOINT(arg0));
+            // AXLOGD("lua_ax_base_Sprite_setSpriteFrame SpriteFrame arg0:{:12X}",FMT_TOPOINT(arg0));
             cobj->setSpriteFrame(arg0);
             lua_settop(tolua_S, 1);
-            AXLOGD("lua_ax_base_Sprite_setSpriteFrame SpriteFrame return ");
+            // AXLOGD("lua_ax_base_Sprite_setSpriteFrame SpriteFrame return ");
             return 1;
         }
     }while(0);
@@ -58895,10 +58896,10 @@ int lua_ax_base_Sprite_setSpriteFrame(lua_State* tolua_S)
             ok &= luaval_to_std_string_view(tolua_S, 2,&arg0, "ax.Sprite:setSpriteFrame");
 
             if (!ok) { break; }
-            AXLOGD("lua_ax_base_Sprite_setSpriteFrame str arg0:{}",arg0);
+            // AXLOGD("lua_ax_base_Sprite_setSpriteFrame str arg0:{}",arg0);
             cobj->setSpriteFrame(arg0);
             lua_settop(tolua_S, 1);
-            AXLOGD("lua_ax_base_Sprite_setSpriteFrame str arg0:{} return",arg0);
+            // AXLOGD("lua_ax_base_Sprite_setSpriteFrame str arg0:{} return",arg0);
             return 1;
         }
     }while(0);
@@ -60734,8 +60735,7 @@ int lua_ax_base_Sprite_constructor(lua_State* tolua_S)
 
 
     argc = lua_gettop(tolua_S)-1;
-    // AXLOGD("lua_ax_base_Sprite_constructor argc:{}",FMT_TOPOINT(cobj));
-    AXLOGD("lua_ax_base_Sprite_constructor argc:{}",argc);
+    // AXLOGD("lua_ax_base_Sprite_constructor argc:{}",argc);
     if (argc == 0) 
     {
         if(!ok)
@@ -60745,7 +60745,7 @@ int lua_ax_base_Sprite_constructor(lua_State* tolua_S)
         }
         cobj = new ax::Sprite();
         cobj->autorelease();
-        AXLOGD("lua_ax_base_Sprite_constructor cobj:{:13X}",FMT_TOPOINT(cobj));
+        // AXLOGD("lua_ax_base_Sprite_constructor cobj:{:12X}",FMT_TOPOINT(cobj));
         int ID =  (int)cobj->_ID ;
         int* luaID =  &cobj->_luaID ;
         toluafix_pushusertype_object(tolua_S, ID, luaID, (void*)cobj,"ax.Sprite");
@@ -68419,7 +68419,7 @@ int lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile(lua_State* tolua_S)
         if (!tolua_isusertype(tolua_S,1,"ax.SpriteFrameCache",0,&tolua_err)) goto tolua_lerror;
     #endif
     cobj = (ax::SpriteFrameCache*)tolua_tousertype(tolua_S,1,0);
-    // AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile cobj:{:13X} ",FMT_TOPOINT(cobj));
+    // AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile cobj:{:12X} ",FMT_TOPOINT(cobj));
     #if _AX_DEBUG >= 1
         if (!cobj)
         {
@@ -68511,7 +68511,7 @@ int lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile(lua_State* tolua_S)
             ok &= luaval_to_object<ax::Texture2D>(tolua_S, 3, "ax.Texture2D",&arg1, "ax.SpriteFrameCache:addSpriteFramesWithFile");
 
             if (!ok) { break; }
-            // AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile ST arg0:{} arg1:{:13X}",arg0,FMT_TOPOINT(arg1));
+            // AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile ST arg0:{} arg1:{:12X}",arg0,FMT_TOPOINT(arg1));
             cobj->addSpriteFramesWithFile(arg0, arg1);
             lua_settop(tolua_S, 1);
             // AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile ST return");
@@ -68533,7 +68533,7 @@ int lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile(lua_State* tolua_S)
             ok &= luaval_to_uint32(tolua_S, 4,&arg2, "ax.SpriteFrameCache:addSpriteFramesWithFile");
 
             if (!ok) { break; }
-            // AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile STN arg0:{} arg1:{:13X} arg2:{}",arg0,FMT_TOPOINT(arg1),arg2);
+            // AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile STN arg0:{} arg1:{:12X} arg2:{}",arg0,FMT_TOPOINT(arg1),arg2);
             cobj->addSpriteFramesWithFile(arg0, arg1, arg2);
             lua_settop(tolua_S, 1);
             // AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile STN return",);
@@ -68568,7 +68568,7 @@ int lua_ax_base_SpriteFrameCache_addSpriteFramesWithFileAsync(lua_State* tolua_S
     #endif
 
     self = static_cast<SpriteFrameCache*>(tolua_tousertype(tolua_S, 1, 0));
-    // AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFileAsync self:{:13X} ",FMT_TOPOINT(self));
+    // AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFramesWithFileAsync self:{:12X} ",FMT_TOPOINT(self));
     #if _AX_DEBUG >= 1
         if (nullptr == self)
         {
@@ -68640,7 +68640,7 @@ int lua_ax_base_SpriteFrameCache_addSpriteFrame(lua_State* tolua_S)
     #endif
 
     cobj = (ax::SpriteFrameCache*)tolua_tousertype(tolua_S,1,0);
-    // AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFrame cobj:{:13X} ",FMT_TOPOINT(cobj));
+    // AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFrame cobj:{:12X} ",FMT_TOPOINT(cobj));
     #if _AX_DEBUG >= 1
         if (!cobj) 
         {
@@ -68663,7 +68663,7 @@ int lua_ax_base_SpriteFrameCache_addSpriteFrame(lua_State* tolua_S)
             tolua_error(tolua_S,"invalid arguments in function 'lua_ax_base_SpriteFrameCache_addSpriteFrame'", nullptr);
             return 0;
         }
-        // AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFrame arg0:{:13X} arg1:{}",FMT_TOPOINT(arg0),arg1);
+        // AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFrame arg0:{:12X} arg1:{}",FMT_TOPOINT(arg0),arg1);
         cobj->addSpriteFrame(arg0, arg1);
         lua_settop(tolua_S, 1);
         // AXLOGD("lua_ax_base_SpriteFrameCache_addSpriteFrame return");
@@ -68695,7 +68695,7 @@ int lua_ax_base_SpriteFrameCache_isSpriteFramesWithFileLoaded(lua_State* tolua_S
     #endif
 
     cobj = (ax::SpriteFrameCache*)tolua_tousertype(tolua_S,1,0);
-    // AXLOGD("lua_ax_base_SpriteFrameCache_isSpriteFramesWithFileLoaded cobj:{:13X} ",FMT_TOPOINT(cobj));
+    // AXLOGD("lua_ax_base_SpriteFrameCache_isSpriteFramesWithFileLoaded cobj:{:12X} ",FMT_TOPOINT(cobj));
     #if _AX_DEBUG >= 1
         if (!cobj) 
         {
@@ -68747,7 +68747,7 @@ int lua_ax_base_SpriteFrameCache_removeSpriteFrames(lua_State* tolua_S)
     #endif
 
     cobj = (ax::SpriteFrameCache*)tolua_tousertype(tolua_S,1,0);
-    // AXLOGD("lua_ax_base_SpriteFrameCache_removeSpriteFrames cobj:{:13X} ",FMT_TOPOINT(cobj));
+    // AXLOGD("lua_ax_base_SpriteFrameCache_removeSpriteFrames cobj:{:12X} ",FMT_TOPOINT(cobj));
     #if _AX_DEBUG >= 1
         if (!cobj) 
         {
@@ -68795,7 +68795,7 @@ int lua_ax_base_SpriteFrameCache_removeUnusedSpriteFrames(lua_State* tolua_S)
     #endif
 
     cobj = (ax::SpriteFrameCache*)tolua_tousertype(tolua_S,1,0);
-    AXLOGD("lua_ax_base_SpriteFrameCache_removeUnusedSpriteFrames cobj:{:13X} ",FMT_TOPOINT(cobj));  
+    // AXLOGD("lua_ax_base_SpriteFrameCache_removeUnusedSpriteFrames cobj:{:12X} ",FMT_TOPOINT(cobj));  
     #if _AX_DEBUG >= 1
         if (!cobj) 
         {
@@ -68814,7 +68814,7 @@ int lua_ax_base_SpriteFrameCache_removeUnusedSpriteFrames(lua_State* tolua_S)
         }
         cobj->removeUnusedSpriteFrames();
         lua_settop(tolua_S, 1);
-        AXLOGD("lua_ax_base_SpriteFrameCache_removeUnusedSpriteFrames return ");  
+        // AXLOGD("lua_ax_base_SpriteFrameCache_removeUnusedSpriteFrames return ");  
         return 1;
     }
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.SpriteFrameCache:removeUnusedSpriteFrames",argc, 0);
@@ -68843,7 +68843,7 @@ int lua_ax_base_SpriteFrameCache_removeUnusedSpriteSheets(lua_State* tolua_S)
     #endif
 
     cobj = (ax::SpriteFrameCache*)tolua_tousertype(tolua_S,1,0);
-    // AXLOGD("lua_ax_base_SpriteFrameCache_removeUnusedSpriteSheets cobj:{:13X} ",FMT_TOPOINT(cobj));
+    // AXLOGD("lua_ax_base_SpriteFrameCache_removeUnusedSpriteSheets cobj:{:12X} ",FMT_TOPOINT(cobj));
     #if _AX_DEBUG >= 1
         if (!cobj) 
         {
@@ -68891,7 +68891,7 @@ int lua_ax_base_SpriteFrameCache_removeSpriteFrameByName(lua_State* tolua_S)
     #endif
 
     cobj = (ax::SpriteFrameCache*)tolua_tousertype(tolua_S,1,0);
-    // AXLOGD("lua_ax_base_SpriteFrameCache_removeSpriteFrameByName cobj:{:13X} ",FMT_TOPOINT(cobj));
+    // AXLOGD("lua_ax_base_SpriteFrameCache_removeSpriteFrameByName cobj:{:12X} ",FMT_TOPOINT(cobj));
     #if _AX_DEBUG >= 1
         if (!cobj) 
         {
@@ -68941,7 +68941,7 @@ int lua_ax_base_SpriteFrameCache_removeSpriteFramesFromFile(lua_State* tolua_S)
     #endif
 
     cobj = (ax::SpriteFrameCache*)tolua_tousertype(tolua_S,1,0);
-    // AXLOGD("lua_ax_base_SpriteFrameCache_removeSpriteFramesFromFile cobj:{:13X} ",FMT_TOPOINT(cobj));
+    // AXLOGD("lua_ax_base_SpriteFrameCache_removeSpriteFramesFromFile cobj:{:12X} ",FMT_TOPOINT(cobj));
     #if _AX_DEBUG >= 1
         if (!cobj) 
         {
@@ -69094,7 +69094,7 @@ int lua_ax_base_SpriteFrameCache_getSpriteFrameByName(lua_State* tolua_S)
     #endif
 
     cobj = (ax::SpriteFrameCache*)tolua_tousertype(tolua_S,1,0);
-    // AXLOGD("lua_ax_base_SpriteFrameCache_getSpriteFrameByName cobj:{:13X} ",FMT_TOPOINT(cobj));
+    // AXLOGD("lua_ax_base_SpriteFrameCache_getSpriteFrameByName cobj:{:12X} ",FMT_TOPOINT(cobj));
     #if _AX_DEBUG >= 1
         if (!cobj) 
         {
@@ -69117,7 +69117,7 @@ int lua_ax_base_SpriteFrameCache_getSpriteFrameByName(lua_State* tolua_S)
         }
         // AXLOGD("lua_ax_base_SpriteFrameCache_getSpriteFrameByName arg0:{} ",arg0);
         auto&& ret = cobj->getSpriteFrameByName(arg0);
-        // AXLOGD("lua_ax_base_SpriteFrameCache_getSpriteFrameByName ret:{:13X} 结果转换为 ax.SpriteFrame 返回 ",FMT_TOPOINT(ret));
+        // AXLOGD("lua_ax_base_SpriteFrameCache_getSpriteFrameByName ret:{:12X} 结果转换为 ax.SpriteFrame 返回 ",FMT_TOPOINT(ret));
         object_to_luaval<ax::SpriteFrame>(tolua_S, "ax.SpriteFrame",(ax::SpriteFrame*)ret);
         return 1;
     }
@@ -69510,7 +69510,7 @@ int lua_ax_base_SpriteFrameCache_getInstance(lua_State* tolua_S)
             return 0;
         }
         auto&& ret = ax::SpriteFrameCache::getInstance();
-        // AXLOGD("lua_ax_base_SpriteFrameCache_getInstance ret:{:13X} ",FMT_TOPOINT(ret));
+        // AXLOGD("lua_ax_base_SpriteFrameCache_getInstance ret:{:12X} ",FMT_TOPOINT(ret));
         object_to_luaval<ax::SpriteFrameCache>(tolua_S, "ax.SpriteFrameCache",(ax::SpriteFrameCache*)ret);
         return 1;
     }
@@ -69572,7 +69572,7 @@ int lua_register_ax_base_SpriteFrameCache(lua_State* tolua_S)
         tolua_function(tolua_S,"init",lua_ax_base_SpriteFrameCache_init);
         tolua_function(tolua_S,"addSpriteFrames",lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile);
         
-        // tolua_function(tolua_S,"addSpriteFramesWithFile",lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile);
+        tolua_function(tolua_S,"addSpriteFramesWithFile",lua_ax_base_SpriteFrameCache_addSpriteFramesWithFile);
         tolua_function(tolua_S,"addSpriteFramesWithFileAsync",lua_ax_base_SpriteFrameCache_addSpriteFramesWithFileAsync);        
         tolua_function(tolua_S,"addSpriteFrame",lua_ax_base_SpriteFrameCache_addSpriteFrame);
         tolua_function(tolua_S,"isSpriteFramesWithFileLoaded",lua_ax_base_SpriteFrameCache_isSpriteFramesWithFileLoaded);
