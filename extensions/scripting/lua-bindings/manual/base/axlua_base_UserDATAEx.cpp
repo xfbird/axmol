@@ -471,6 +471,25 @@ int lua_ax_base_UserDataEx_getIntegerForKey(lua_State* tolua_S)
                 return 1;
             }
         } while (0);
+        do
+        {
+            if (argc == 2)
+            {
+                std::string arg0;
+                int arg1;
+                ok &= luaval_to_std_string(tolua_S, 2, &arg0, "UserDataEx:getIntegerForKey");
+                ok &= luaval_to_int32(tolua_S, 3, &arg1, "UserDataEx:setIntegerForKey");
+                //ok &= luaval_to_number(tolua_S, 3, &arg1, "UserDataEx:getIntegerForKey");
+                if (!ok)
+                {
+                    break;
+                }
+                int64_t ret = cobj->getInt64ForKey(arg0,arg1);
+                tolua_pushnumber(tolua_S, (lua_Number)ret);
+                return 1;
+            }
+        } while (0);
+
         ok = true;
         luaL_error(tolua_S, "%s 参数数量错误: %d, 应该期望 %d\n", "UserDataEx:getIntegerForKey", argc, 1);
         return 0;

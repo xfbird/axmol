@@ -61,7 +61,7 @@ AX_ENABLE_BITMASK_OPS(LogFmtFlag);
 class LogItem
 {
     // friend AX_API LogItem& preprocessLog(LogItem&& logItem);
-    friend AX_API LogItem& preprocessLog(LogItem&& item,const char* fname,int fline,int mod);
+    friend AX_API LogItem& preprocessLog(LogItem&& item,const char* fname,int fline,const char* callinfo, int mod);
     friend AX_API void writeLog(LogItem& item, const char* tag);
 
 public:
@@ -128,7 +128,7 @@ AX_API void setLogFmtFlag(LogFmtFlag flags);
 AX_API void setLogOutput(ILogOutput* output);
 
 /* @brief internal use */
-AX_API LogItem& preprocessLog(LogItem&& logItem,const char* fname=nullptr,int fline=-1,int mod=0);
+AX_API LogItem& preprocessLog(LogItem&& logItem,const char* fname=nullptr,int fline=-1,const char* callinfo=nullptr,int mod=0);
 
 /* @brief internal use */
 AX_API void outputLog(LogItem& item, const char* tag);
@@ -142,14 +142,19 @@ inline void printLogT(_FmtType&& fmt, LogItem& item, _Types&&... args)
     if (item.level() >= getLogLevel())
         outputLog(LogItem::vformat(std::forward<_FmtType>(fmt), item, std::forward<_Types>(args)...),"axmol");
 }
+// inline void printLogLuaT(_FmtType&& fmt, LogItem& item,  _Types&&... args)
+// {
+//     if (item.level() >= getLogLevel())
+//         outputLog(LogItem::vformat(std::forward<_FmtType>(fmt), item, std::forward<_Types>(args)...),"axmol");
+// }
 
 // ax::printLogT(FMT_COMPILE("{}-{}@{}|" fmtOrMsg "\n"), ax::preprocessLog(ax::LogItem{level}),__FILE__, __LINE__, ##__VA_ARGS__)
 #define AXLOG_WITH_LEVEL(level,fmtOrMsg, ...) \
-    ax::printLogT(FMT_COMPILE("{}" fmtOrMsg "\n"), ax::preprocessLog(ax::LogItem{level},__FILE__, __LINE__,0), ##__VA_ARGS__)
+    ax::printLogT(FMT_COMPILE("{}" fmtOrMsg "\n"), ax::preprocessLog(ax::LogItem{level},__FILE__, __LINE__,nullptr,0), ##__VA_ARGS__)
     // ax::printLogT(__FILE__, __LINE__,FMT_COMPILE("{}" fmtOrMsg "\n"),ax::preprocessLog(ax::LogItem{level}), ##__VA_ARGS__)
 
-#define AXLOG_WITH_LEVELLua(level,fmtOrMsg,lFile,lline,...) \
-    ax::printLogT(FMT_COMPILE("{}" fmtOrMsg "\n"), ax::preprocessLog(ax::LogItem{level},lFile,lline,1), ##__VA_ARGS__)
+#define AXLOG_WITH_LEVELLua(level,fmtOrMsg,lFile,lline,callinfo,...) \
+    ax::printLogT(FMT_COMPILE("{}" fmtOrMsg "\n"), ax::preprocessLog(ax::LogItem{level},lFile,lline,callinfo,1), ##__VA_ARGS__)
     // ax::printLogT(FMT_COMPILE("{}" fmtOrMsg "\n"), ax::preprocessLog(ax::LogItem{level},lFile,lline), ##__VA_ARGS__)
 
 #if defined(_AX_DEBUG) && _AX_DEBUG > 0

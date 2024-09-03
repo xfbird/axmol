@@ -65,9 +65,9 @@ public:
     double getDoubleForKey(std::string_view skey);
     float getFloatForKey(std::string_view skey);
     bool getBoolForKey(std::string_view skey);
-    int getIntegerForKey(std::string_view skey);
+    int getIntegerForKey(std::string_view skey,int def=0);
     unsigned int getUnsignedForKey(std::string_view skey);
-    int64_t getInt64ForKey(std::string_view skey);
+    int64_t getInt64ForKey(std::string_view skey,int64_t def=0);
     uint64_t getUnsignedInt64ForKey(std::string_view skey);
 
     unsigned char getByteForKey(std::string_view skey);    

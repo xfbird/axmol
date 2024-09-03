@@ -395,14 +395,15 @@ std::string UserDataEx::getStringForKey(std::string_view skey,std::string_view d
         auto valueEx = it->second;
         //AXLOGD("getDoubleForKey skey:{} asdouble:{}",sskey, valueEx.asDouble());
         return valueEx.asString();
-    } else {
+    } 
+    // else {
         // 如果不存在，可以通过其他方式处理
         // 例如抛出异常、返回默认值或插入新值
         AXLOGD("getDoubleForKey skey:{}  写入默认值:{}",sskey,defstr);
         setStringForKey(skey,defstr);
         return std::string(defstr);
-    }
-  return getValueEx(sskey).asString();
+    // }
+//   return getValueEx(sskey).asString();
 }
 
 bool UserDataEx::deleteForKey(std::string_view skey){
@@ -413,18 +414,43 @@ bool UserDataEx::deleteForKey(std::string_view skey){
     return result > 0;
     // return getValueEx(skey).asString();
 };
-int UserDataEx::getIntegerForKey(std::string_view skey) {
+int UserDataEx::getIntegerForKey(std::string_view skey,int def) {
   //AXLOGD("getIntegerForKey skey:{} this:{}",skey,fmt::ptr(this));
-  return getValueEx(skey).asInt();
+  //return getValueEx(skey).asInt();
+  std::string sskey(skey);  
+  //AXLOGD("getStringForKey skey:{} this:{}",sskey,fmt::ptr(this));
+  auto it = _values.find(sskey);
+  if (it != _values.end()) {
+    // 如果存在，it 指向该元素
+    auto valueEx = it->second;
+    //AXLOGD("getDoubleForKey skey:{} asdouble:{}",sskey, valueEx.asDouble());
+    return valueEx.asInt32();
+  };
+//    else {
+    // 如果不存在，可以通过其他方式处理
+    // 例如抛出异常、返回默认值或插入新值
+    // AXLOGD("getDoubleForKey skey:{}  写入默认值:{}",sskey,defstr);
+    setIntegerForKey(skey,def);
+    return def;
+//   }
+    //return getValueEx(sskey).asString();
 }
 
 unsigned int UserDataEx::getUnsignedForKey(std::string_view skey) {
   //AXLOGD("getUnsignedForKey skey:{} this:{}",skey,fmt::ptr(this));
   return getValueEx(skey).asUInt();
 }
-int64_t UserDataEx::getInt64ForKey(std::string_view skey) {
-  //AXLOGD("getInt64ForKey skey:{} this:{}",skey,fmt::ptr(this));  
-  return getValueEx(skey).asInt64();
+int64_t UserDataEx::getInt64ForKey(std::string_view skey,int64_t def) {
+  std::string sskey(skey);  
+  auto it = _values.find(sskey);
+  if (it != _values.end()) {
+    auto valueEx = it->second;
+    return valueEx.asInt64();
+  };
+    setInt64ForKey(skey,def);
+    return def;
+
+//   return getValueEx(skey).asInt64();
 }
 
 uint64_t UserDataEx::getUnsignedInt64ForKey(std::string_view skey) {
