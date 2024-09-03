@@ -42,8 +42,8 @@ UserDataEx::UserDataEx() :
 
 UserDataEx::UserDataEx(std::string_view sname) : UserDataEx() {
     if (!sname.empty()) {
-        _udname = sname;
-        //AXLOGD("UserDataEx sname:{} this:{}", sname, fmt::ptr(this));
+        _udname = std::string(sname);
+        AXLOGD("UserDataEx sname:{} this:{}", sname, fmt::ptr(this));
         getUserDatainfoFromDefault();
     }
 }
@@ -247,15 +247,16 @@ ValueEx& UserDataEx::getValueEx(std::string_view skey) {
   //AXLOGD("getValueEx skey:{}  this:{}  _values:{} ",sskey,fmt::ptr(this),fmt::ptr(&_values));
   auto it = _values.find(sskey);
   ////AXLOGD("getValueEx skey:{}  this:{}",skey,fmt::ptr(this));
-  if (it != _values.end()) {
-        //AXLOGD("Found value it:{}",fmt::ptr(static_cast<void*>(&it->second))); // 假设 ValueEx 有一个 get() 成员
-    } else {
-        //AXLOGD("No value found for key'");
-    }
+//   if (it != _values.end()) {
+//         //AXLOGD("Found value it:{}",fmt::ptr(static_cast<void*>(&it->second))); // 假设 ValueEx 有一个 get() 成员
+//     } else {
+//         //AXLOGD("No value found for key'");
+//     }
   if (it != _values.end()) {
     // //AXLOGD("getValueEx skey:{} it->second:{}",skey,fmt::ptr(it->second));
     return it->second;
   }
+//   return nil
   throw std::runtime_error("Key not found in UserDataEx.");
 }
 
@@ -385,9 +386,22 @@ bool UserDataEx::getBoolForKey(std::string_view skey) {
   return getValueEx(sskey).asBool();
 }
 
-std::string UserDataEx::getStringForKey(std::string_view skey) {
+std::string UserDataEx::getStringForKey(std::string_view skey,std::string_view defstr) {
   std::string sskey(skey);  
   //AXLOGD("getStringForKey skey:{} this:{}",sskey,fmt::ptr(this));
+    auto it = _values.find(sskey);
+    if (it != _values.end()) {
+        // 如果存在，it 指向该元素
+        auto valueEx = it->second;
+        //AXLOGD("getDoubleForKey skey:{} asdouble:{}",sskey, valueEx.asDouble());
+        return valueEx.asString();
+    } else {
+        // 如果不存在，可以通过其他方式处理
+        // 例如抛出异常、返回默认值或插入新值
+        AXLOGD("getDoubleForKey skey:{}  写入默认值:{}",sskey,defstr);
+        setStringForKey(skey,defstr);
+        return std::string(defstr);
+    }
   return getValueEx(sskey).asString();
 }
 
@@ -556,18 +570,19 @@ UserDataEx* UserDataEx::GetUserDataEx(std::string_view skey) {
   // Check if the UserDataEx instance already exists in the map
   std::string sskey(skey);    
   auto it = _dictionaryemap.find(sskey);
-    //AXLOGD("GetUserDataEx skey:{}  it:{}",skey,fmt::ptr(it));
+    AXLOGD("GetUserDataEx skey:{} ",skey);
   if (it != _dictionaryemap.end()) {
     //Return the existing instance
-    //AXLOGD("GetUserDataEx skey:{}  it-second.get:{}",skey,fmt::ptr(it->second.get()));
+    AXLOGD("GetUserDataEx skey:{} ",skey);
     return it->second.get();
   }
     //Attempt to create and insert a new UserDataEx instance atomically
   auto result = _dictionaryemap.emplace(sskey, std::make_unique<UserDataEx>(sskey));  //带 名字创建的时候，会自动从 持久化存储 获取历史信息
-    //AXLOGD("GetUserDataEx skey:{}  result:{}",skey,fmt::ptr(result));
+    AXLOGD("GetUserDataEx skey:{}",skey);
   if (result.second) {
-    //AXLOGD("GetUserDataEx skey:{}  result:{}",skey,fmt::ptr(result.first->second.get()));
-    return result.first->second.get();
+    AXLOGD("GetUserDataEx skey:{} ",skey);
+    // return result->second.get();
+     return result.first->second.get();
   }
   return nullptr;
 }
