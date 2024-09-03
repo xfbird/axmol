@@ -76,7 +76,7 @@ AX_API void setLogOutput(ILogOutput* output)
     s_logOutput = output;
 }
 
-AX_API LogItem& preprocessLog(LogItem&& item,const char* fname,int fline,int mod)
+AX_API LogItem& preprocessLog(LogItem&& item,const char* fname,int fline,const char* callinfo,int mod)
 {
     if (s_logFmtFlags != LogFmtFlag::Null)
     {
@@ -187,7 +187,7 @@ AX_API LogItem& preprocessLog(LogItem&& item,const char* fname,int fline,int mod
             // 计算文件名字符串的长度
             size_t fname_len = strlen(fname);
             // 截取文件名的最后25个字符，如果长度不足25，则在前面补空格
-            size_t nmax=25;
+            size_t nmax=20;
             size_t nlen=nmax;
             size_t nstart=0;
             if (fname_len<nlen) {       //如果 文件名长度 比 nlen 小 那么长度 按照 文件名长度 设置
@@ -207,7 +207,7 @@ AX_API LogItem& preprocessLog(LogItem&& item,const char* fname,int fline,int mod
                     fname_view = " "+fname_view; // 在前面补空格
                 }
             // 格式化文件名并添加到日志前缀
-            prefix_size += fmt::format_to_n(wptr + prefix_size, buffer_size - prefix_size,"[{:.25}]", fname_view).size;
+            prefix_size += fmt::format_to_n(wptr + prefix_size, buffer_size - prefix_size,"[{:.20}]", fname_view).size;
         };
         if (mod==0) {
             prefix_size += fmt::format_to_n(wptr + prefix_size, buffer_size - prefix_size,"{}","C").size;
@@ -216,8 +216,17 @@ AX_API LogItem& preprocessLog(LogItem&& item,const char* fname,int fline,int mod
         };
         // 检查是否需要添加行号到日志前缀
         if (bitmask::any(s_logFmtFlags, LogFmtFlag::SourceFl)&& fline >=0) {
-            prefix_size += fmt::format_to_n(wptr + prefix_size, buffer_size - prefix_size,"[{:5d}]", fline).size;
+            if (fline>10000) {
+              prefix_size += fmt::format_to_n(wptr + prefix_size, buffer_size - prefix_size,"{:5d}]", fline).size;
+            } else {
+              prefix_size += fmt::format_to_n(wptr + prefix_size, buffer_size - prefix_size,"[{:4d}]", fline).size;
+            }
+            
         };
+        if (callinfo != nullptr) {
+            prefix_size += fmt::format_to_n(wptr + prefix_size, buffer_size - prefix_size,"{}]", callinfo).size;
+        };
+
     }
     return item;
 }
@@ -302,7 +311,7 @@ AX_API void print(const char* format, ...)
     va_end(args);
 
     if (!message.empty())
-        outputLog(LogItem::vformat(FMT_COMPILE("{}{}\n"), preprocessLog(LogItem{LogLevel::Silent},__FILE__,__LINE__), message),
+        outputLog(LogItem::vformat(FMT_COMPILE("{}{}\n"), preprocessLog(LogItem{LogLevel::Silent},__FILE__,__LINE__,nullptr,0), message),
                   "axmol debug info");
 }
 
