@@ -86,8 +86,7 @@ int lua_print(lua_State* L)
 {
     std::string t;
     get_string_for_print(L, &t);
-    AXLOGD("[LP] {}", t);
-
+    AXLOGD("[P] {}", t);
     return 0;
 }
 
@@ -95,7 +94,7 @@ int lua_release_print(lua_State* L)
 {
     std::string t;
     get_string_for_print(L, &t);
-    AXLOG_WITH_LEVEL(ax::LogLevel::Silent, "[LR] {}", t);
+    AXLOG_WITH_LEVEL(ax::LogLevel::Silent, "[RP] {}", t);
 
     return 0;
 }
@@ -160,7 +159,7 @@ int axlua_log_with_level(lua_State* L)
             axlua_replace_hint(formated_msg, "{}"sv, cur_val, true);
             axlua_replace_hint(formated_msg, pos, cur_val, false);
         }
-        AXLOG_WITH_LEVEL(static_cast<ax::LogLevel>(level), "[L]{}", formated_msg);
+        AXLOG_WITH_LEVEL(static_cast<ax::LogLevel>(level), "{}", formated_msg);
     }
     return 0;
 }
@@ -191,7 +190,7 @@ int axlua_log_with_level_Line(lua_State* L)
             // AXLOGD("axlua_log_with_level_Line formated_msg:{}  pos:{}  cur_val:{}",formated_msg,pos,cur_val);
         };
         
-        AXLOG_WITH_LEVELLua(static_cast<ax::LogLevel>(level), "[LE]{}",lines_fmsg.c_str(),lines_lmsg,formated_msg);
+        AXLOG_WITH_LEVELLua(static_cast<ax::LogLevel>(level), "{}",lines_fmsg.c_str(),lines_lmsg,formated_msg);
         // AXLOG_WITH_LEVELLua(static_cast<ax::LogLevel>(level), FMT_COMPILE("[L]{}"), lines_fmsg.c_str(), lines_lmsg);
     }
     return 0;

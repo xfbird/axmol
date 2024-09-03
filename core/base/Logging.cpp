@@ -76,7 +76,7 @@ AX_API void setLogOutput(ILogOutput* output)
     s_logOutput = output;
 }
 
-AX_API LogItem& preprocessLog(LogItem&& item,const char* fname,int fline)
+AX_API LogItem& preprocessLog(LogItem&& item,const char* fname,int fline,int mod)
 {
     if (s_logFmtFlags != LogFmtFlag::Null)
     {
@@ -146,40 +146,73 @@ AX_API LogItem& preprocessLog(LogItem&& item,const char* fname,int fline)
             #endif
             item.writePrefix(levelName);
         }
-        if (bitmask::any(s_logFmtFlags, LogFmtFlag::TimeStamp))
+        if (bitmask::any(s_logFmtFlags, LogFmtFlag::TimeStamp) || bitmask::any(s_logFmtFlags, LogFmtFlag::Date))
         {
             struct tm ts = {0};
             auto tv_msec = yasio::clock<yasio::system_clock_t>();
             auto tv_sec  = static_cast<time_t>(tv_msec / std::milli::den);
             localtime_r(&tv_sec, &ts);
-            prefix_size += fmt::format_to_n(wptr + prefix_size, buffer_size - prefix_size,
+            bool istimes=bitmask::any(s_logFmtFlags, LogFmtFlag::TimeStamp);
+            bool isdate=bitmask::any(s_logFmtFlags, LogFmtFlag::Date);
+            if (istimes && isdate) { //年月日 时间都显示
+                prefix_size += fmt::format_to_n(wptr + prefix_size, buffer_size - prefix_size,
                                             "[{}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}.{:03d}]", ts.tm_year + 1900,
                                             ts.tm_mon + 1, ts.tm_mday, ts.tm_hour, ts.tm_min, ts.tm_sec,
-                                            static_cast<int>(tv_msec % std::milli::den))
-                               .size;
+                                            static_cast<int>(tv_msec % std::milli::den)).size;
+
+            } else {
+               if  (istimes) {  //仅显示时间
+                    prefix_size += fmt::format_to_n(wptr + prefix_size, buffer_size - prefix_size,
+                                            "[{:02d}:{:02d}:{:02d}.{:03d}]",ts.tm_hour, ts.tm_min, ts.tm_sec,
+                                            static_cast<int>(tv_msec % std::milli::den)).size;
+               } else
+               {
+                if  (isdate) {  //仅显示 日期
+                    prefix_size += fmt::format_to_n(wptr + prefix_size, buffer_size - prefix_size,
+                                            "[{}-{:02d}-{:02d}]",ts.tm_year + 1900,ts.tm_mon + 1, ts.tm_mday).size;
+                }
+               }
+
+
+            }
         }
         if (bitmask::any(s_logFmtFlags, LogFmtFlag::ProcessId))
             prefix_size +=
-                fmt::format_to_n(wptr + prefix_size, buffer_size - prefix_size, "[PID:{:x}]", xmol_getpid()).size;
+                fmt::format_to_n(wptr + prefix_size, buffer_size - prefix_size, "[P:{:x}]", xmol_getpid()).size;
         if (bitmask::any(s_logFmtFlags, LogFmtFlag::ThreadId))
             prefix_size +=
-                fmt::format_to_n(wptr + prefix_size, buffer_size - prefix_size, "[TID:{:x}]", xmol_gettid()).size;
+                fmt::format_to_n(wptr + prefix_size, buffer_size - prefix_size, "[T:{:x}]", xmol_gettid()).size;
         // 检查是否需要添加文件名到日志前缀
         if (bitmask::any(s_logFmtFlags, LogFmtFlag::SourceFn) && fname != nullptr) {
             // 计算文件名字符串的长度
             size_t fname_len = strlen(fname);
-            // 截取文件名的最后20个字符，如果长度不足20，则在前面补空格
-            size_t nlen=20;
-            if (fname_len<20) {
+            // 截取文件名的最后25个字符，如果长度不足25，则在前面补空格
+            size_t nmax=25;
+            size_t nlen=nmax;
+            size_t nstart=0;
+            if (fname_len<nlen) {       //如果 文件名长度 比 nlen 小 那么长度 按照 文件名长度 设置
                 nlen=fname_len;
-            }
-            std::string fname_view(fname + fname_len - nlen,nlen);
-            while (fname_view.length() < 20) 
+            } else{
+                if (fname_len - nlen>2) {
+                    nstart=fname_len - nlen-2;
+                }
+            }            
+            // std::string fname_view(fname + fname_len - nlen,nlen);
+            std::string fname_view(fname + nstart,nlen);
+            // if (fname_view.length()>nmax) {                           //如果超过 22 字符 删除 尾部 2个字符
+            //    fname_view.erase(fname_view.length() - 2); 
+            // }
+            while (fname_view.length() <nmax) 
                 {
                     fname_view = " "+fname_view; // 在前面补空格
                 }
             // 格式化文件名并添加到日志前缀
-            prefix_size += fmt::format_to_n(wptr + prefix_size, buffer_size - prefix_size,"[{:.20}]", fname_view).size;
+            prefix_size += fmt::format_to_n(wptr + prefix_size, buffer_size - prefix_size,"[{:.25}]", fname_view).size;
+        };
+        if (mod==0) {
+            prefix_size += fmt::format_to_n(wptr + prefix_size, buffer_size - prefix_size,"{}","C").size;
+        } else if (mod==1) {
+            prefix_size += fmt::format_to_n(wptr + prefix_size, buffer_size - prefix_size,"{}","L").size;
         };
         // 检查是否需要添加行号到日志前缀
         if (bitmask::any(s_logFmtFlags, LogFmtFlag::SourceFl)&& fline >=0) {

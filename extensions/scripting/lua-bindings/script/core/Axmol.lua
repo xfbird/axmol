@@ -1,5 +1,5 @@
 
-cc = cc or {}
+ax = ax or {}
 
 -- Native vec2_new use array[2] to store x,y w,h u,v performance is better
 -- p[1] alias: x w u width

@@ -71,7 +71,7 @@ public:
     uint64_t getUnsignedInt64ForKey(std::string_view skey);
 
     unsigned char getByteForKey(std::string_view skey);    
-    std::string getStringForKey(std::string_view skey);
+    std::string getStringForKey(std::string_view skey,std::string_view defstr="");
     bool deleteForKey(std::string_view skey);
     
     void setTypeValueForKey(std::string_view skey,std::string_view value,u_char ntype);
