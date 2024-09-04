@@ -54,7 +54,8 @@ enum class LogFmtFlag
     Date      = 1 << 5,
     SourceFn  = 1 << 6,                //源码文件名
     SourceFl  = 1 << 7,                //源码行号
-    Full      = Level | TimeStamp|Date | ProcessId | ThreadId | Colored|SourceFn|SourceFl,
+    WideName  = 1 << 8,                //文件名 长度扩展
+    Full      = Level | TimeStamp|Date | ProcessId | ThreadId | Colored|SourceFn|SourceFl|WideName,
 };
 AX_ENABLE_BITMASK_OPS(LogFmtFlag);
 
@@ -155,11 +156,17 @@ inline void printLogT(_FmtType&& fmt, LogItem& item, _Types&&... args)
 
 #define AXLOG_WITH_LEVELLua(level,fmtOrMsg,lFile,lline,callinfo,...) \
     ax::printLogT(FMT_COMPILE("{}" fmtOrMsg "\n"), ax::preprocessLog(ax::LogItem{level},lFile,lline,callinfo,1), ##__VA_ARGS__)
-    // ax::printLogT(FMT_COMPILE("{}" fmtOrMsg "\n"), ax::preprocessLog(ax::LogItem{level},lFile,lline), ##__VA_ARGS__)
+
+#define AXLOG_WITH_LEVELLuaP(level,fmtOrMsg, ...) \
+    ax::printLogT(FMT_COMPILE("{}" fmtOrMsg "\n"), ax::preprocessLog(ax::LogItem{level},"Lua_Print", 0,nullptr,2), ##__VA_ARGS__)
+
+#define AXLOG_WITH_LEVELLuaR(level,fmtOrMsg, ...) \
+    ax::printLogT(FMT_COMPILE("{}" fmtOrMsg "\n"), ax::preprocessLog(ax::LogItem{level},"Release_Print", 0,nullptr,3), ##__VA_ARGS__)
 
 #if defined(_AX_DEBUG) && _AX_DEBUG > 0
 #    define AXLOGV(fmtOrMsg, ...) AXLOG_WITH_LEVEL(ax::LogLevel::Verbose, fmtOrMsg, ##__VA_ARGS__)
 #    define AXLOGD(fmtOrMsg, ...) AXLOG_WITH_LEVEL(ax::LogLevel::Debug, fmtOrMsg, ##__VA_ARGS__)
+#    define AXLOGDP(fmtOrMsg, ...) AXLOG_WITH_LEVELLuaP(ax::LogLevel::Debug, fmtOrMsg, ##__VA_ARGS__)
 #else
 #    define AXLOGV(...) \
         do              \
@@ -169,6 +176,11 @@ inline void printLogT(_FmtType&& fmt, LogItem& item, _Types&&... args)
         do              \
         {               \
         } while (0)
+#    define AXLOGDP(...) \
+        do              \
+        {               \
+        } while (0)
+
 #endif
 
 #define AXLOGI(fmtOrMsg, ...) AXLOG_WITH_LEVEL(ax::LogLevel::Info, fmtOrMsg, ##__VA_ARGS__)
