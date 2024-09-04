@@ -86,7 +86,7 @@ int lua_print(lua_State* L)
 {
     std::string t;
     get_string_for_print(L, &t);
-    AXLOGD("[P] {}", t);
+    AXLOGDP("[P] {}", t);
     return 0;
 }
 
@@ -94,7 +94,7 @@ int lua_release_print(lua_State* L)
 {
     std::string t;
     get_string_for_print(L, &t);
-    AXLOG_WITH_LEVEL(ax::LogLevel::Silent, "[RP] {}", t);
+    AXLOG_WITH_LEVELLuaR(ax::LogLevel::Silent, "{}", t);
 
     return 0;
 }
