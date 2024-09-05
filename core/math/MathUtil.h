@@ -127,6 +127,5 @@ NS_AX_MATH_END
  end of base group
  @}
  */
-#define MATRIX_SIZE (sizeof(float) * 16)
 
 #endif
