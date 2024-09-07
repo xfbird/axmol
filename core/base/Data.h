@@ -70,7 +70,7 @@ public:
     Data(const Data& other);
 
     /**
-     * Copy constructor of Data.
+     * Move constructor of Data.
      */
     Data(Data&& other);
 
