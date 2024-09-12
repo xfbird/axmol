@@ -188,10 +188,10 @@ AX_API LogItem& preprocessLog(LogItem&& item,const char* fname,int fline,const c
             // 计算文件名字符串的长度
             size_t fname_len = strlen(fname);
             // 截取文件名的最后25个字符，如果长度不足25，则在前面补空格
-            size_t nmax=25;
+            size_t nmax=23;
             if (iswide) 
             {
-              nmax =35;
+              nmax =30;
             }
             size_t nlen=nmax;
             size_t nstart=0;

@@ -164,6 +164,47 @@ int axlua_log_with_level(lua_State* L)
     return 0;
 }
 
+int axlua_log_setlevel(lua_State* tolua_S)
+{
+    int argc = 0;
+    bool ok  = true;
+
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
+
+    argc = lua_gettop(tolua_S)-1;
+    AXLOGD("axlua_log_setlevel argc:{}",argc);
+    if (argc == 0) 
+    {
+        int arg0;
+
+        ok &= luaval_to_int32(tolua_S, 1,&arg0, "ax.setlevel");
+        if(!ok)
+        {
+            tolua_error(tolua_S,"invalid arguments in function 'axlua_log_setlevel'", nullptr);
+            return 0;
+        }
+        if ((arg0>=0) && (arg0<=int(LogLevel::Silent))){
+            AXLOGD("axlua_log_setlevel level:{}",arg0);
+            setLogLevel(LogLevel(arg0));
+            lua_settop(tolua_S, 1);
+            return 1;
+        }
+        tolua_error(tolua_S,"invalid level in function 'axlua_log_setlevel'", nullptr);
+        return 0;
+    }
+    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "axlua_log_setlevel",argc, 1);
+    return 0;
+
+    #if _AX_DEBUG >= 1
+        tolua_lerror:
+        tolua_error(tolua_S,"#ferror in function 'axlua_log_setlevel'.",&tolua_err);
+    #endif
+
+    return 0;
+}
+
 int axlua_log_with_level_Line(lua_State* L)
 {
     int argc                = lua_gettop(L);
@@ -245,6 +286,7 @@ bool LuaStack::init()
                                          {"release_print", lua_release_print},
                                          {"AXLOG_WITH_LEVEL", axlua_log_with_level},
                                          {"AXLOG_WITH_LEVELEx", axlua_log_with_level_Line},
+                                         {"AXLOG_SetLevel", axlua_log_setlevel},
                                          {"version", lua_version},
                                          {nullptr, nullptr}};
     luaL_register(_state, "_G", global_functions);
