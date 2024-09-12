@@ -38,7 +38,6 @@
  * @addtogroup base
  * @js NA
  * @lua NA
- * @DEPRECATED use axstd::byte_buffer directly
  */
 NS_AX_BEGIN
 
