@@ -37,7 +37,7 @@ NS_AX_BEGIN
 
 namespace StringUtils
 {
-
+//#ifndef AX_CORE_PROFILE
 std::string AX_DLL format(const char* format, ...)
 {
     va_list args;
@@ -115,7 +115,7 @@ std::string vformat(const char* format, va_list ap)
 
     return buf;
 }
-
+//#endif
 /*
  * @str:    the string to search through.
  * @c:        the character to not look for.

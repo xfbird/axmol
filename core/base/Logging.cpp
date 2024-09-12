@@ -229,7 +229,7 @@ AX_DLL void writeLog(LogItem& item, const char* tag)
 #    endif
 #endif
 }
-
+#ifndef AX_CORE_PROFILE
 AX_API void print(const char* format, ...)
 {
     va_list args;
