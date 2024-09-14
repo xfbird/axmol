@@ -77,22 +77,4 @@ DevToolsImpl* DevToolsImpl::getInstance()
 
 NS_AX_END
 
-extern "C"
-{
-    void axmol_director_pause()
-    {
-        ax::DevToolsImpl::getInstance()->pause();
-    }
-
-    void axmol_director_resume()
-    {
-        ax::DevToolsImpl::getInstance()->resume();
-    }
-
-    void axmol_director_step()
-    {
-        ax::DevToolsImpl::getInstance()->step();
-    }
-}
-
 #endif // AX_TARGET_PLATFORM == AX_PLATFORM_WASM
