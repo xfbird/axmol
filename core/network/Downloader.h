@@ -70,7 +70,7 @@ public:
         int64_t bytesReceived      = 0;
         int64_t totalBytesReceived = 0;
         // speed
-        double speedInBytes = 0;
+        int64_t speedInBytes = 0;
     } mutable progressInfo;
 
     DownloadTask();
