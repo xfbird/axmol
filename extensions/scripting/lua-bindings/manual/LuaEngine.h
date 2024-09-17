@@ -71,6 +71,8 @@ public:
      */
     virtual ~LuaEngine(void);
 
+    //static void DestroyInstance();
+
     /**
      * Get ccScriptType of LuaEngine used, it is always kScriptTypeLua.
      *
@@ -230,10 +232,10 @@ public:
                             void* data,
                             int numResults,
                             const std::function<void(lua_State*, int)>& func);
-
+    bool init(void);
 private:
     LuaEngine(void) : _stack(nullptr) {}
-    bool init(void);
+
     int handleNodeEvent(void* data);
     int handleMenuClickedEvent(void* data);
     int handleCallFuncActionEvent(void* data);
