@@ -22,6 +22,7 @@ set(lua_bindings_manual_headers
     manual/base/LuaScriptHandlerMgr.h
     manual/base/axlua_base_manual.hpp
     manual/base/axlua_base_UserDATAEx.hpp
+    manual/base/LuaBridgeControl.h
     manual/AxluaLoader.h
     manual/LuaValue.h
     manual/physics3d/axlua_physics3d_manual.h
@@ -46,6 +47,7 @@ set(lua_bindings_manual_files
     manual/base/LuaScriptHandlerMgr.cpp
     manual/base/axlua_base_manual.cpp
     manual/base/axlua_base_UserDATAEx.cpp
+    manual/base/LuaBridgeControl.cpp
     manual/physics/axlua_physics_manual.cpp
     manual/3d/axlua_3d_manual.cpp
     manual/cocostudio/CustomGUIReader.cpp

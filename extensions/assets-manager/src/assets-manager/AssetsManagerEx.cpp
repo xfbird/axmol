@@ -167,13 +167,17 @@ int AssetManagerEx_error_file_func(voidpf opaque, voidpf stream)
 
 // Implementation of AssetsManagerEx
 
-AssetsManagerEx::AssetsManagerEx(std::string_view manifestUrl, std::string_view storagePath) : _manifestUrl(manifestUrl)
+AssetsManagerEx::AssetsManagerEx(std::string_view manifestUrl,std::string_view storagePath,bool needinit)
+:_manifestUrl(manifestUrl)                 
 {
     // Init variables
+    AXLOGD("AssetsManagerEx manifestUrl:{} storagePath:{}",manifestUrl,storagePath);
     _eventDispatcher    = Director::getInstance()->getEventDispatcher();
     std::string pointer = fmt::format("{}", fmt::ptr(this));
     _eventName          = EventListenerAssetsManagerEx::LISTENER_ID + pointer;
     _fileUtils          = FileUtils::getInstance();
+    _totalDiffFileSize  = 0.0;
+    _InterruptFlag      = false;
 
     network::DownloaderHints hints = {static_cast<uint32_t>(_maxConcurrentTask), DEFAULT_CONNECTION_TIMEOUT, ".tmp"};
     _downloader                    = std::shared_ptr<network::Downloader>(new network::Downloader(hints));
@@ -186,12 +190,19 @@ AssetsManagerEx::AssetsManagerEx(std::string_view manifestUrl, std::string_view 
     _downloader->onFileTaskSuccess = [this](const network::DownloadTask& task) {
         this->onSuccess(task.requestURL, task.storagePath, task.identifier);
     };
+    AXLOGD("AssetsManagerEx setStoragePath:{}",storagePath);
     setStoragePath(storagePath);
-    _tempVersionPath   = _tempStoragePath + VERSION_FILENAME;
-    _cacheManifestPath = _storagePath + MANIFEST_FILENAME;
-    _tempManifestPath  = _tempStoragePath + TEMP_MANIFEST_FILENAME;
 
-    initManifests(manifestUrl);
+    _tempVersionPath   = _tempStoragePath + VERSION_FILENAME;
+    AXLOGD("AssetsManagerEx _tempVersionPath:{}",_tempVersionPath);
+    
+    _cacheManifestPath = _storagePath + MANIFEST_FILENAME;
+    AXLOGD("AssetsManagerEx _cacheManifestPath:{}",_cacheManifestPath);
+    _tempManifestPath  = _tempStoragePath + TEMP_MANIFEST_FILENAME;
+    AXLOGD("AssetsManagerEx _tempManifestPath:{}",_tempManifestPath);
+    if (needinit){
+        initManifests(manifestUrl);
+    }
 }
 
 AssetsManagerEx::~AssetsManagerEx()
@@ -208,20 +219,112 @@ AssetsManagerEx::~AssetsManagerEx()
 
 AssetsManagerEx* AssetsManagerEx::create(std::string_view manifestUrl, std::string_view storagePath)
 {
-    AssetsManagerEx* ret = new AssetsManagerEx(manifestUrl, storagePath);
+    AXLOGD("AssetsManagerEx::create manifestUrl:{} storagePath:{}",manifestUrl,storagePath);
+    AssetsManagerEx* ret = new AssetsManagerEx(manifestUrl, storagePath,true);    
     ret->autorelease();
     return ret;
 }
 
-void AssetsManagerEx::initManifests(std::string_view manifestUrl)
+// int a_localManifestPath, 
+//int a_storagePath, 
+//char a_ManualUpdat, 
+//int a_tempManifestName, 
+//char *a_tempDirName, 
+//int a_resUrl, 
+//int a_manifestUrl, 
+//int a_versionUrl
+
+AssetsManagerEx* AssetsManagerEx::create( std::string_view localManifestPath,
+                                    std::string_view storagePath,
+                                    bool manualUpdat,
+                                    std::string_view resUrl,
+                                    std::string_view manifestUrl,
+                                    std::string_view versionUrl)
 {
+    AXLOGD("AssetsManagerEx::create localManifestPath:{}",localManifestPath);
+    AXLOGD("AssetsManagerEx::create storagePath:{}",storagePath);
+    // AXLOGD("AssetsManagerEx::create resUrl:{}",resUrl);
+    // AXLOGD("AssetsManagerEx::create manifestUrl:{}",manifestUrl);
+    // AXLOGD("AssetsManagerEx::create versionUrl:{}",versionUrl);
+    //localManifestPath: mod_launcher_project.manifest 
+    //storagePath: D:/MW/axn/axxxcs/build/bin/axxxcs/Debug/Content/cache/mod_launcher/stab/ 
+    //resUrl:http://127.0.0.1:8082/launchers/yshj/mod_launcher/1/stab/ 
+    //manifestUrl:http://127.0.0.1:8082/launchers/yshj/mod_launcher/1/stab/mod_launcher_project.manifest 
+    //versionUrl:http://127.0.0.1:8082/launchers/yshj/mod_launcher/1/stab/mod_launcher_version.manifest
+    AXLOGD("AssetsManagerEx::create Call Base NoInitialize");
+    AssetsManagerEx* ret = new AssetsManagerEx(localManifestPath, storagePath,false);
+    AXLOGD("AssetsManagerEx::create Call Ext Initialize setManualUpdate manualUpdat:{}",manualUpdat);
+    ret->setManualUpdate(manualUpdat);              //设置 手动 模式
+    AXLOGD("AssetsManagerEx::create 基础构建完成  resUrl:{}",resUrl);
+    AXLOGD("AssetsManagerEx::create 基础构建完成  manifestUrl:{}",manifestUrl);
+    AXLOGD("AssetsManagerEx::create 基础构建完成  versionUrl:{}",versionUrl);
+    ret->exinitManifests(localManifestPath,resUrl,manifestUrl,versionUrl);
+    ret->autorelease();
+    return ret;
+}
+
+void AssetsManagerEx::initManifests(std::string_view localManifestPath)
+{
+    AXLOGD("initManifests manifestUrl:{}",localManifestPath);
     _inited = true;
     // Init and load local manifest
+    AXLOGD("initManifests _localManifest = new Manifest()");
     _localManifest = new Manifest();
-    loadLocalManifest(manifestUrl);
+
+    AXLOGD("initManifests loadLocalManifest");
+    loadLocalManifest(localManifestPath);
 
     // Init and load temporary manifest
-    _tempManifest = new Manifest();
+    // AXLOGD("initManifests create _tempManifest = new Manifest()  ");
+    _tempManifest = new Manifest();                                 //本地临时的。
+    AXLOGD("initManifests create _tempManifest = new Manifest()->parse({})",_tempManifestPath);
+    _tempManifest->parse(_tempManifestPath);
+    // Previous update is interrupted
+    if (_fileUtils->isFileExist(_tempManifestPath))
+    {
+        // Manifest parse failed, remove all temp files
+        AXLOGD("initManifests create isFileExist:{}",_tempManifestPath);
+        if (!_tempManifest->isLoaded())
+        {
+            _fileUtils->removeDirectory(_tempStoragePath);
+            AX_SAFE_RELEASE(_tempManifest);
+            _tempManifest = nullptr;
+            AXLOGD("initManifests   _tempManifest = nullptr");
+        }
+    }
+
+    // Init remote manifest for future usage
+    AXLOGD("initManifests   _remoteManifest = new Manifest()");
+    _remoteManifest = new Manifest();                               //创建一个远程的
+
+    if (!_inited)
+    {
+        AX_SAFE_RELEASE(_localManifest);
+        AX_SAFE_RELEASE(_tempManifest);
+        AX_SAFE_RELEASE(_remoteManifest);
+        _localManifest  = nullptr;
+        _tempManifest   = nullptr;
+        _remoteManifest = nullptr;
+        AXLOGD("initManifests  _localManifest  = nullptr; _tempManifest   = nullptr;_remoteManifest = nullptr;");        
+    }
+}
+
+void AssetsManagerEx::exinitManifests(std::string_view localManifestPath,std::string_view resUrl,std::string_view manifestUrl,std::string_view versionUrl)
+{
+    // initManifests(localManifestPath);
+    // AXLOGD("initManifests localManifestPath:{}",localManifestPath);
+    _inited = true;
+    // Init and load local manifest
+    AXLOGD("exinitManifests _localManifest = new Manifest()");
+    _localManifest = new Manifest();
+
+    AXLOGD("exinitManifests localManifestPath:{}",localManifestPath);
+    loadLocalManifest(localManifestPath);
+
+    // Init and load temporary manifest
+    AXLOGD("exinitManifests _tempManifest = new Manifest()");
+    _tempManifest = new Manifest();                                 //本地临时的。
+    AXLOGD("exinitManifests  _tempManifest->parse({})",_tempManifestPath);
     _tempManifest->parse(_tempManifestPath);
     // Previous update is interrupted
     if (_fileUtils->isFileExist(_tempManifestPath))
@@ -232,11 +335,21 @@ void AssetsManagerEx::initManifests(std::string_view manifestUrl)
             _fileUtils->removeDirectory(_tempStoragePath);
             AX_SAFE_RELEASE(_tempManifest);
             _tempManifest = nullptr;
+            AXLOGD("exinitManifests   _tempManifest = nullptr");
         }
     }
 
     // Init remote manifest for future usage
-    _remoteManifest = new Manifest();
+    AXLOGD("exinitManifests   _remoteManifest = new Manifest()");
+    _remoteManifest = new Manifest();                               //创建一个远程的
+    if (_remoteManifest) {
+        _remoteManifest->setManifestFileUrl(manifestUrl);
+        AXLOGD("exinitManifests   setManifestFileUrl:{}",manifestUrl);
+        _remoteManifest->setVersionFileUrl(versionUrl);
+        AXLOGD("exinitManifests   setVersionFileUrl:{}",versionUrl);
+        _remoteManifest->setpackageUrl(resUrl);
+        AXLOGD("exinitManifests   setpackageUrl:{}",resUrl);        
+    }
 
     if (!_inited)
     {
@@ -246,40 +359,46 @@ void AssetsManagerEx::initManifests(std::string_view manifestUrl)
         _localManifest  = nullptr;
         _tempManifest   = nullptr;
         _remoteManifest = nullptr;
+        AXLOGD("exinitManifests  _localManifest  = nullptr; _tempManifest   = nullptr;_remoteManifest = nullptr;");        
     }
 }
+
 
 void AssetsManagerEx::prepareLocalManifest()
 {
     // An alias to assets
-    _assets = &(_localManifest->getAssets());
-
+    AXLOGD("prepareLocalManifest");
+    _assets = &(_localManifest->getAssets());           //获得本地资产管理表
+    AXLOGD("_localManifest->prependSearchPaths()");
     // Add search paths
-    _localManifest->prependSearchPaths();
+    _localManifest->prependSearchPaths();               //准备 搜索路径
 }
 
-void AssetsManagerEx::loadLocalManifest(std::string_view /*manifestUrl*/)
+void AssetsManagerEx::loadLocalManifest(std::string_view manifestUrl /*manifestUrl*/)       //装载 本地的资产清单
 {
     Manifest* cachedManifest = nullptr;
+    // AXLOGD("loadLocalManifest  cachedManifest:nullptr _cacheManifestPath:{}",_cacheManifestPath);
     // Find the cached manifest file
-    if (_fileUtils->isFileExist(_cacheManifestPath))
+    if (_fileUtils->isFileExist(_cacheManifestPath))                           //缓存的资产
     {
-        cachedManifest = new Manifest();
-        cachedManifest->parse(_cacheManifestPath);
-        if (!cachedManifest->isLoaded())
+        cachedManifest = new Manifest();                                       //创建一个缓存资产 
+        AXLOGD("loadLocalManifest  _cacheManifestPath:{} isFileExist Create,cachedManifest->parse(_cacheManifestPath)",_cacheManifestPath);
+        cachedManifest->parse(_cacheManifestPath);                             //解析 缓存路径的配置文件 
+        if (!cachedManifest->isLoaded())                                       //未转入 就删除文件     
         {
             _fileUtils->removeFile(_cacheManifestPath);
+            AXLOGD("loadLocalManifest  remove _cacheManifestPath:{} cachedManifest = nullptr",_cacheManifestPath);
             AX_SAFE_RELEASE(cachedManifest);
             cachedManifest = nullptr;
         }
     }
 
     // Ensure no search path of cached manifest is used to load this manifest
-    std::vector<std::string> searchPaths = _fileUtils->getSearchPaths();
+    std::vector<std::string> searchPaths = _fileUtils->getSearchPaths();    //获得搜索路径
     if (cachedManifest)
     {
-        std::vector<std::string> cacheSearchPaths = cachedManifest->getSearchPaths();
-        std::vector<std::string> trimmedPaths     = searchPaths;
+        std::vector<std::string> cacheSearchPaths = cachedManifest->getSearchPaths(); //获得搜索路径  
+        std::vector<std::string> trimmedPaths     = searchPaths;                      //  
         for (const auto& path : cacheSearchPaths)
         {
             const auto pos = std::find(trimmedPaths.begin(), trimmedPaths.end(), path);
@@ -288,35 +407,44 @@ void AssetsManagerEx::loadLocalManifest(std::string_view /*manifestUrl*/)
                 trimmedPaths.erase(pos);
             }
         }
+        AXLOGD("loadLocalManifest cachedManifest  setSearchPaths ");
         _fileUtils->setSearchPaths(trimmedPaths);
     }
     // Load local manifest in app package
-    _localManifest->parse(_manifestUrl);
+    AXLOGD("loadLocalManifest _localManifest->parse({})",_manifestUrl);
+    _localManifest->parse(_manifestUrl);                        //本地 解析 资产文件
     if (cachedManifest)
     {
         // Restore search paths
-        _fileUtils->setSearchPaths(searchPaths);
+        _fileUtils->setSearchPaths(searchPaths);                //设置搜索目录
     }
-    if (_localManifest->isLoaded())
+    if (_localManifest->isLoaded())                             //本地 已经装入
     {
         // Compare with cached manifest to determine which one to use
         if (cachedManifest)
         {
-            bool localNewer = _localManifest->versionGreater(cachedManifest, _versionCompareHandle);
-            if (localNewer)
+            AXLOGD("loadLocalManifest CheckNewer _localManifest cachedManifest");
+            bool localNewer = _localManifest->versionGreater(cachedManifest, _versionCompareHandle);    //版本大于的 进行 处理
+            if (localNewer)                                                 //本地新，删除 目录。
             {
                 // Recreate storage, to empty the content
                 _fileUtils->removeDirectory(_storagePath);
-                _fileUtils->createDirectories(_storagePath);
+                _fileUtils->createDirectory(_storagePath);
+                AXLOGD("本地更新 loadLocalManifest isNewer removeDirectory({})",_storagePath);
+                AXLOGD("本地更新 loadLocalManifest isNewer createDirectory({})",_storagePath);
+                AXLOGD("本地更新 loadLocalManifest AX_SAFE_RELEASE(cachedManifest)",_storagePath);
                 AX_SAFE_RELEASE(cachedManifest);
             }
             else
             {
-                AX_SAFE_RELEASE(_localManifest);
-                _localManifest = cachedManifest;
+                AXLOGD("缓存更新 loadLocalManifest AX_SAFE_RELEASE(_localManifest)");
+                AX_SAFE_RELEASE(_localManifest);                            //释放 本地资产。
+                AXLOGD("缓存更新 loadLocalManifest cachedManifest->>_localManifest ,用缓存 作为本地 清单");
+                _localManifest = cachedManifest;                            //用缓存 作为本地资产
             }
         }
-        prepareLocalManifest();
+        AXLOGD("loadLocalManifest prepareLocalManifest");
+        prepareLocalManifest();                                             //准备本地资产。
     }
 
     // Fail to load local manifest
@@ -354,21 +482,25 @@ std::string AssetsManagerEx::get(std::string_view key) const
 
 const Manifest* AssetsManagerEx::getLocalManifest() const
 {
+    AXLOGD("getLocalManifest:{}",fmt::ptr(_localManifest));
     return _localManifest;
 }
 
 const Manifest* AssetsManagerEx::getRemoteManifest() const
 {
+    AXLOGD("getRemoteManifest:{}",fmt::ptr(_remoteManifest));
     return _remoteManifest;
 }
 
 std::string_view AssetsManagerEx::getStoragePath() const
 {
+    AXLOGD("getStoragePath:{}",_storagePath);
     return _storagePath;
 }
 
 void AssetsManagerEx::setStoragePath(std::string_view storagePath)
 {
+    AXLOGD("setStoragePath:{}",storagePath);
     _storagePath = storagePath;
     adjustPath(_storagePath);
     _fileUtils->createDirectories(_storagePath);
@@ -579,6 +711,8 @@ void AssetsManagerEx::dispatchUpdateEvent(EventAssetsManagerEx::EventCode code,
                                           int curle_code /* = CURLE_OK*/,
                                           int curlm_code /* = CURLM_OK*/)
 {
+    AXLOGD("dispatchUpdateEvent code:{} assetId:{} message:{} curle_code:{} curlm_code:{}",int(code),assetId,message,curle_code,curlm_code);
+    
     switch (code)
     {
     case EventAssetsManagerEx::EventCode::ERROR_UPDATING:
@@ -605,33 +739,44 @@ void AssetsManagerEx::dispatchUpdateEvent(EventAssetsManagerEx::EventCode code,
         break;
     }
 
-    EventAssetsManagerEx event(_eventName, this, code, _percent, _percentByFile, assetId, message, curle_code,
-                               curlm_code);
+    EventAssetsManagerEx event(_eventName, this, code, _percent, _percentByFile, assetId, message, curle_code,curlm_code);
+    AXLOGD("dispatchUpdateEvent _updateEntry:{} _percent:{}  _percentByFile:{}",
+           int(_updateEntry),_percent, _percentByFile);
     _eventDispatcher->dispatchEvent(&event);
 }
 
 AssetsManagerEx::State AssetsManagerEx::getState() const
 {
+    AXLOGD("getState :{}",int(_updateState));
     return _updateState;
 }
 
 void AssetsManagerEx::downloadVersion()
 {
+    AXLOGD("downloadVersion");
     if (_updateState > State::PREDOWNLOAD_VERSION)
         return;
 
-    std::string_view versionUrl = _localManifest->getVersionFileUrl();
+    std::string_view  versionUrl=_remoteManifest->getVersionFileUrl();
+    AXLOGD("downloadVersion _remoteManifest versionUrl:{}",versionUrl);
+    if (versionUrl.empty()){
+        versionUrl=_localManifest->getVersionFileUrl();
+        AXLOGD("downloadVersion _localManifest versionUrl:{}",versionUrl);
+    }
+
+    AXLOGD("downloadVersion  versionUrl:{}",versionUrl);
 
     if (!versionUrl.empty())
     {
         _updateState = State::DOWNLOADING_VERSION;
         // Download version file asynchronously
+        AXLOGD("createDownloadFileTask(versionUrl:{}, _tempVersionPath:{}, VERSION_ID:{})",versionUrl,_tempVersionPath,VERSION_ID);
         _downloader->createDownloadFileTask(versionUrl, _tempVersionPath, VERSION_ID);
     }
     // No version file found
     else
     {
-        AXLOGD("AssetsManagerEx : No version file found, step skipped\n");
+        AXLOGW("AssetsManagerEx : No version file found, step skipped\n");
         _updateState = State::PREDOWNLOAD_MANIFEST;
         downloadManifest();
     }
@@ -639,6 +784,7 @@ void AssetsManagerEx::downloadVersion()
 
 void AssetsManagerEx::parseVersion()
 {
+    AXLOGD("parseVersion");
     if (_updateState != State::VERSION_LOADED)
         return;
 
@@ -648,30 +794,35 @@ void AssetsManagerEx::parseVersion()
     {
         AXLOGD("AssetsManagerEx : Fail to parse version file, step skipped\n");
         _updateState = State::PREDOWNLOAD_MANIFEST;
+        AXLOGD("downloadManifest");
         downloadManifest();
     }
     else
     {
-        if (_localManifest->versionGreater(_remoteManifest, _versionCompareHandle))
+        if (_localManifest->versionGreater(_remoteManifest, _versionCompareHandle))     //本地和远程比较版本
         {
-            _updateState = State::UP_TO_DATE;
-            _fileUtils->removeDirectory(_tempStoragePath);
-            dispatchUpdateEvent(EventAssetsManagerEx::EventCode::ALREADY_UP_TO_DATE);
+            _updateState = State::UP_TO_DATE;                                           //本地 新
+            _fileUtils->removeDirectory(_tempStoragePath);                              //删除 临时目录
+            AXLOGD("callback ALREADY_UP_TO_DATE");
+            dispatchUpdateEvent(EventAssetsManagerEx::EventCode::ALREADY_UP_TO_DATE);   //通知
         }
         else
         {
-            _updateState = State::NEED_UPDATE;
+            _updateState = State::NEED_UPDATE;                                          //本地 比 远程 旧 需要更新
 
             // Wait to update so continue the process
-            if (_updateEntry == UpdateEntry::DO_UPDATE)
+            if (_updateEntry == UpdateEntry::DO_UPDATE)                                 //设置更新状态 需要更新
             {
                 // dispatch after checking update entry because event dispatching may modify the update entry
-                dispatchUpdateEvent(EventAssetsManagerEx::EventCode::NEW_VERSION_FOUND);
-                _updateState = State::PREDOWNLOAD_MANIFEST;
-                downloadManifest();
+                AXLOGD("callback NEW_VERSION_FOUND");
+                dispatchUpdateEvent(EventAssetsManagerEx::EventCode::NEW_VERSION_FOUND);    //通知
+                _updateState = State::PREDOWNLOAD_MANIFEST;                             //预下载资产
+                AXLOGD("State::PREDOWNLOAD_MANIFEST  downloadManifest ");
+                downloadManifest();                                                     //下载 资产
             }
             else
             {
+                AXLOGD("callback NEW_VERSION_FOUND");
                 dispatchUpdateEvent(EventAssetsManagerEx::EventCode::NEW_VERSION_FOUND);
             }
         }
@@ -680,63 +831,88 @@ void AssetsManagerEx::parseVersion()
 
 void AssetsManagerEx::downloadManifest()
 {
+    AXLOGD("downloadManifest");
     if (_updateState != State::PREDOWNLOAD_MANIFEST)
         return;
 
     std::string manifestUrl;
-    if (_remoteManifest->isVersionLoaded())
+    if (_remoteManifest->isVersionLoaded())                                             //远程版本 已经装载
     {
-        manifestUrl = _remoteManifest->getManifestFileUrl();
+        manifestUrl = _remoteManifest->getManifestFileUrl();                            //获得 资产url
+        AXLOGD("manifestUrl :{}",manifestUrl);
     }
     else
     {
-        manifestUrl = _localManifest->getManifestFileUrl();
+        manifestUrl = _localManifest->getManifestFileUrl();                             //使用本地的 远程 资产url
+        AXLOGD("manifestUrl :{}",manifestUrl);
     }
 
-    if (!manifestUrl.empty())
+    if (!manifestUrl.empty())                                                          //url有效          
     {
         _updateState = State::DOWNLOADING_MANIFEST;
         // Download version file asynchronously
-        _downloader->createDownloadFileTask(manifestUrl, _tempManifestPath, MANIFEST_ID);
+        AXLOGD("State::DOWNLOADING_MANIFEST  createDownloadFileTask(manifestUrl:{})",manifestUrl);
+        AXLOGD("State::DOWNLOADING_MANIFEST  createDownloadFileTask(_tempManifestPath:{})",_tempManifestPath);
+        AXLOGD("State::DOWNLOADING_MANIFEST  createDownloadFileTask(MANIFEST_ID:{})",MANIFEST_ID);
+        _downloader->createDownloadFileTask(manifestUrl, _tempManifestPath, MANIFEST_ID);   //建立下载任务
     }
     // No manifest file found
     else
     {
-        AXLOGD("AssetsManagerEx : No manifest file found, check update failed\n");
-        dispatchUpdateEvent(EventAssetsManagerEx::EventCode::ERROR_DOWNLOAD_MANIFEST);
+        AXLOGW("AssetsManagerEx : No manifest file found, check update failed\n");
+        AXLOGD("callback ERROR_DOWNLOAD_MANIFEST");
+        dispatchUpdateEvent(EventAssetsManagerEx::EventCode::ERROR_DOWNLOAD_MANIFEST);  //通知 错误。 
         _updateState = State::UNCHECKED;
+        AXLOGD("State::UNCHECKED");
     }
 }
 
 void AssetsManagerEx::parseManifest()
 {
+    AXLOGD("parseManifest");
     if (_updateState != State::MANIFEST_LOADED)
         return;
 
-    _remoteManifest->parse(_tempManifestPath);
+    _remoteManifest->parse(_tempManifestPath);                                          //远程 解析 临时 路径
+    AXLOGD("_remoteManifest :{}",_tempManifestPath);                                    //
 
-    if (!_remoteManifest->isLoaded())
+    if (!_remoteManifest->isLoaded())                                                   //如果远程 未加载
     {
-        AXLOGD("AssetsManagerEx : Error parsing manifest file, {}", _tempManifestPath);
-        dispatchUpdateEvent(EventAssetsManagerEx::EventCode::ERROR_PARSE_MANIFEST);
+        AXLOGW("AssetsManagerEx : Error parsing manifest file, {}", _tempManifestPath);
+        AXLOGD("callback ERROR_PARSE_MANIFEST");
+        dispatchUpdateEvent(EventAssetsManagerEx::EventCode::ERROR_PARSE_MANIFEST);     //出错通知
         _updateState = State::UNCHECKED;
+        AXLOGD("State::UNCHECKED");
     }
     else
     {
-        if (_localManifest->versionGreater(_remoteManifest, _versionCompareHandle))
+        if (_localManifest->versionGreater(_remoteManifest, _versionCompareHandle))     //本地 与远程比较版本
         {
-            _updateState = State::UP_TO_DATE;
-            _fileUtils->removeDirectory(_tempStoragePath);
-            dispatchUpdateEvent(EventAssetsManagerEx::EventCode::ALREADY_UP_TO_DATE);
+            _updateState = State::UP_TO_DATE;                                           //本地 新    
+            AXLOGD(" _updateState = State::UP_TO_DATE removeDirectory(_tempStoragePath)");
+            _fileUtils->removeDirectory(_tempStoragePath);                              //删除 临时目录
+            AXLOGD("callback ALREADY_UP_TO_DATE");
+            dispatchUpdateEvent(EventAssetsManagerEx::EventCode::ALREADY_UP_TO_DATE);   //通知 已经更新完成
         }
         else
         {
-            _updateState = State::NEED_UPDATE;
-            dispatchUpdateEvent(EventAssetsManagerEx::EventCode::NEW_VERSION_FOUND);
-
+            _updateState = State::NEED_UPDATE;                                          //需要 更新    
+            AXLOGD("_updateState 设置为 State::NEED_UPDATE");
             if (_updateEntry == UpdateEntry::DO_UPDATE)
             {
-                startUpdate();
+              AXLOGD("NEED_UPDATE DO_UPDATE _ManualUpdate:{}",_ManualUpdate);
+              if (!_ManualUpdate) {
+                AXLOGD("自动模式 EventCode::NEW_VERSION_FOUND startUpdate");
+                dispatchUpdateEvent(EventAssetsManagerEx::EventCode::NEW_VERSION_FOUND);//通知 存在新版本
+                startUpdate();                                                          //开始更新。
+              }else
+              {
+                AXLOGD("手动模式 计算更新的变更 calcUpdateDiff  ");
+                calcUpdateDiff();
+                AXLOGD("EventCode::NEW_VERSION_FOUND");
+                dispatchUpdateEvent(EventAssetsManagerEx::EventCode::NEW_VERSION_FOUND);//通知 存在新版本
+                AXLOGD("EventCode::NEW_VERSION_FOUND 通知完成");
+              }
             }
         }
     }
@@ -744,60 +920,81 @@ void AssetsManagerEx::parseManifest()
 
 void AssetsManagerEx::startUpdate()
 {
+    AXLOGD("AssetsManagerEx::startUpdate");
     if (_updateState != State::NEED_UPDATE)
         return;
 
-    _updateState = State::UPDATING;
+    _updateState = State::UPDATING;                                                   //进入更新状态 8
+    AXLOGD(" _updateState = State::UPDATING;");
     // Clean up before update
-    _failedUnits.clear();
-    _downloadUnits.clear();
-    _totalWaitToDownload = _totalToDownload = 0;
-    _nextSavePoint                          = 0;
-    _percent = _percentByFile = _sizeCollected = _totalSize = 0;
-    _downloadedSize.clear();
+    _failedUnits.clear();                                                             //失败单元表
+    _downloadUnits.clear();                                                           //下载单元表  
+    _totalWaitToDownload = _totalToDownload = 0;                                      //总等待 下载 总下载  
+    _nextSavePoint                          = 0;                                      //              
+    _percent = _percentByFile = _sizeCollected = _totalSize = 0;                      //百分比          
+    _totalDiffFileSize=0.0;                                                           //更新之前 清零                  
+    _downloadedSize.clear();                                                          //下载尺寸 清零  
     _totalEnabled = false;
 
     // Temporary manifest exists, resuming previous download
-    if (_tempManifest && _tempManifest->isLoaded() && _tempManifest->versionEquals(_remoteManifest))
+    if (_tempManifest) {
+        AXLOGD("_tempManifest->isLoaded() :{} _tempManifest->versionEquals(_remoteManifest)",int(_tempManifest->isLoaded()),int(_tempManifest->versionEquals(_remoteManifest)));
+    }
+    
+    if (_tempManifest && _tempManifest->isLoaded() && 
+        _tempManifest->versionEquals(_remoteManifest)) //临时目录 存在，并已经装载 与远程版本一致
     {
-        _tempManifest->saveToFile(_tempManifestPath);
-        _tempManifest->genResumeAssetsList(&_downloadUnits);
-        _totalWaitToDownload = _totalToDownload = (int)_downloadUnits.size();
-        this->batchDownload();
+        AXLOGD("_tempManifest->isLoaded() and _tempManifest->versionEquals(_remoteManifest) saveToFile(_tempManifestPath):{}",_tempManifestPath);
+        _tempManifest->saveToFile(_tempManifestPath);                                 //临时资产保存到 临时目录  
+        _tempManifest->genResumeAssetsList(&_downloadUnits);                          //生成 继续资产表  
+        _totalWaitToDownload = _totalToDownload = (int)_downloadUnits.size();         //
+
+        AXLOGD("batchDownload");
+        this->batchDownload();                                                        //执行批量下载  
 
         std::string msg = fmt::format(
             "Resuming from previous unfinished update, {} files remains to be finished.", _totalToDownload);
-        dispatchUpdateEvent(EventAssetsManagerEx::EventCode::UPDATE_PROGRESSION, "", msg);
+        AXLOGD("callback UPDATE_PROGRESSION :{}",msg);            
+        dispatchUpdateEvent(EventAssetsManagerEx::EventCode::UPDATE_PROGRESSION, "", msg);  //通知状态
     }
     else
     {
         // Temporary manifest exists, but can't be parsed or version doesn't equals remote manifest (out of date)
-        if (_tempManifest)
+        AXLOGD("_tempStoragePath  remove ");
+        if (_tempManifest)                                                                //          
         {
             // Remove all temp files
-            _fileUtils->removeDirectory(_tempStoragePath);
+
+            _fileUtils->removeDirectory(_tempStoragePath);                                //  
             AX_SAFE_RELEASE(_tempManifest);
             // Recreate temp storage path and save remote manifest
             _fileUtils->createDirectories(_tempStoragePath);
             _remoteManifest->saveToFile(_tempManifestPath);
+            AXLOGD("saveToFile(_tempManifestPath):{}",_tempManifestPath);
         }
 
         // Temporary manifest will be used to register the download states of each asset,
         // in this case, it equals remote manifest.
         _tempManifest = _remoteManifest;
+        AXLOGD("_tempManifest = _remoteManifest;");
 
         // Check difference between local manifest and remote manifest
+        AXLOGD("_localManifest->genDiff(_remoteManifest)");
         hlookup::string_map<Manifest::AssetDiff> diff_map = _localManifest->genDiff(_remoteManifest);
+
         if (diff_map.empty())
         {
-            updateSucceed();
+           AXLOGD("diff_map.empty() updateSucceed");
+           updateSucceed();
         }
         else
         {
             // Generate download units for all assets that need to be updated or added
             std::string_view packageUrl = _remoteManifest->getPackageUrl();
+            AXLOGD("packageUrl:{}",packageUrl);
             // Save current download manifest information for resuming
             _tempManifest->saveToFile(_tempManifestPath);
+            AXLOGD("saveToFile(_tempManifestPath):{}",_tempManifestPath);
             // Preprocessing local files in previous version and creating download folders
             for (auto it = diff_map.begin(); it != diff_map.end(); ++it)
             {
@@ -811,16 +1008,173 @@ void AssetsManagerEx::startUpdate()
                     unit.srcUrl += path;
                     unit.storagePath = _tempStoragePath + path;
                     unit.size        = diff.asset.size;
+                    _totalDiffFileSize+=unit.size;                                            //不同的 文件尺寸 记录  
+                    AXLOGD("DownloadUnit unit Add unit.srcUrl:{},unit.size:{} unit.customId:{}",unit.srcUrl,unit.size,unit.customId);
                     _downloadUnits.emplace(unit.customId, unit);
+                    AXLOGD("UNSTARTED: key:{} DownloadState::UNSTARTED",it->first);
                     _tempManifest->setAssetDownloadState(it->first, Manifest::DownloadState::UNSTARTED);
                 }
             }
+            
             _totalWaitToDownload = _totalToDownload = (int)_downloadUnits.size();
+            AXLOGD("callback UPDATE_PROGRESSION _totalWaitToDownload:{}",_totalWaitToDownload);
             this->batchDownload();
 
             std::string msg = fmt::format("Start to update {} files from remote package.", _totalToDownload);
+            AXLOGD("callback UPDATE_PROGRESSION :{}",msg);
             dispatchUpdateEvent(EventAssetsManagerEx::EventCode::UPDATE_PROGRESSION, "", msg);
         }
+    }
+}
+void AssetsManagerEx::startManualUpdate()
+{
+    AXLOGD("_updateEntry:{} _ManualUpdate:{}",int(_updateEntry),int(_ManualUpdate));
+    // if ((_updateEntry == UpdateEntry::DO_UPDATE) && (_ManualUpdate)) {
+    if ((_updateEntry == UpdateEntry::DO_UPDATE) && (_ManualUpdate)) {
+        std::string msg = fmt::format("Start to update {} files manually.", _totalToDownload);
+        AXLOGD("callback UPDATE_PROGRESSION :{}",msg);
+        dispatchUpdateEvent(EventAssetsManagerEx::EventCode::UPDATE_PROGRESSION, "", msg);
+        AXLOGD("call queueDowload");
+        queueDowload();
+    }
+}
+void AssetsManagerEx::calcUpdateDiff()
+{
+    
+    if (_updateState != State::NEED_UPDATE)
+    {
+        AXLOGD("calcUpdateDiff _updateState != State::NEED_UPDATE: _updateState:{} 直接退出",int(_updateState));
+        return;
+    }
+        
+
+    _updateState = State::UPDATING;                                                   //进入更新状态 8
+    AXLOGD("calcUpdateDiff _updateState = State::UPDATING");
+    // Clean up before update
+    AXLOGD("calcUpdateDiff _failedUnits.clear()");
+    _failedUnits.clear();                                                             //失败单元表
+    AXLOGD("calcUpdateDiff _downloadUnits.clear()");
+    _downloadUnits.clear();                                                           //下载单元表  
+    _totalWaitToDownload = _totalToDownload = 0;                                      //总等待 下载 总下载  
+    _nextSavePoint                          = 0;                                      //              
+    _percent = _percentByFile = _sizeCollected = _totalSize = 0;                      //百分比          
+    _totalDiffFileSize=0.0;                                                           //更新之前 清零                  
+    AXLOGD("calcUpdateDiff _downloadedSize.clear()");
+    _downloadedSize.clear();                                                          //下载尺寸 清零  
+    _totalEnabled = false;
+
+    bool tempManifestPathSave =false;
+    // Temporary manifest exists, resuming previous download
+    if (_tempManifest) {
+        AXLOGD("calcUpdateDiff _tempManifest->isLoaded() :{} _tempManifest->versionEquals(_remoteManifest) :{}",
+               int(_tempManifest->isLoaded()),int(_tempManifest->versionEquals(_remoteManifest)));
+    }
+    
+    if (_tempManifest && _tempManifest->isLoaded() && 
+        _tempManifest->versionEquals(_remoteManifest)) //临时目录 存在，并已经装载 与远程版本一致
+    {
+        AXLOGD("calcUpdateDiff    _tempManifest 已经装载  版本一致");
+        _tempManifest->saveToFile(_tempManifestPath);                                 //临时资产保存到 临时目录  
+        tempManifestPathSave=true;
+        _tempManifest->genResumeAssetsList(&_downloadUnits);                          //生成 继续资产表  
+        _totalWaitToDownload = _totalToDownload = (int)_downloadUnits.size();         //
+        AXLOGD("calcUpdateDiff 生成了 变化表  _totalWaitToDownload:{}",_totalWaitToDownload);
+    }
+    else
+    {
+        if (_tempManifest)                                                                //          
+        {
+            AXLOGD("calcUpdateDiff    _tempManifest 存在 删除 临时目录 删除 _tempManifest");
+            _fileUtils->removeDirectory(_tempStoragePath);                                //  
+            AX_SAFE_RELEASE(_tempManifest);
+            AXLOGD("calcUpdateDiff    重建 临时目录 ");
+            _fileUtils->createDirectory(_tempStoragePath);
+            // AXLOGD("calcUpdateDiff   _remoteManifest 把文件存储到 临时目录:{}",_tempManifestPath);
+            _remoteManifest->saveToFile(_tempManifestPath);
+            tempManifestPathSave=true;
+            AXLOGD("calcUpdateDiff _remoteManifest->saveToFile(_tempManifestPath):{} 完成",_tempManifestPath);
+        }
+
+        // Temporary manifest will be used to register the download states of each asset,
+        // in this case, it equals remote manifest.
+        _tempManifest = _remoteManifest;
+        AXLOGD("calcUpdateDiff _tempManifest = _remoteManifest;");
+
+        // Check difference between local manifest and remote manifest
+        AXLOGD("calcUpdateDiff _localManifest->genDiff(_remoteManifest)");
+        hlookup::string_map<Manifest::AssetDiff> diff_map = _localManifest->genDiff(_remoteManifest);
+
+        if (diff_map.empty())
+        {
+           AXLOGD("calcUpdateDiff diff_map.empty() updateSucceed");
+           updateSucceed();
+        }
+        else
+        {
+            // Generate download units for all assets that need to be updated or added
+            std::string_view packageUrl = _remoteManifest->getPackageUrl();
+            AXLOGD("calcUpdateDiff packageUrl:{}",packageUrl);
+            // Save current download manifest information for resuming
+            if (!tempManifestPathSave) {
+                _tempManifest->saveToFile(_tempManifestPath);
+                AXLOGD("calcUpdateDiff 需要保存 _tempManifest->saveToFile(_tempManifestPath):{}",_tempManifestPath);
+                tempManifestPathSave=true;
+            }
+            // Preprocessing local files in previous version and creating download folders
+            AXLOGD("calcUpdateDiff 遍历  diff_map ");
+            for (auto it = diff_map.begin(); it != diff_map.end(); ++it)
+            {
+                Manifest::AssetDiff diff = it->second;
+                if (diff.type != Manifest::DiffType::DELETED)
+                {
+                    auto& path = diff.asset.path;
+                    DownloadUnit unit;
+                    unit.customId = it->first;
+                    unit.srcUrl   = packageUrl;
+                    unit.srcUrl += path;
+                    unit.storagePath = _tempStoragePath + path;
+                    unit.size        = diff.asset.size;
+                    _totalDiffFileSize+=unit.size;                                            //不同的 文件尺寸 记录  
+                    AXLOGD("DownloadUnit calcUpdateDiff unit Add unit.srcUrl:{},unit.size:{} unit.customId:{}",unit.srcUrl,unit.size,unit.customId);
+                    _downloadUnits.emplace(unit.customId, unit);
+                    AXLOGD("calcUpdateDiff UNSTARTED: key:{} DownloadState::UNSTARTED",it->first);
+                    _tempManifest->setAssetDownloadState(it->first, Manifest::DownloadState::UNSTARTED);
+                    tempManifestPathSave=false;
+                }
+            }
+            
+            _totalWaitToDownload = _totalToDownload = (int)_downloadUnits.size();
+            AXLOGD("calcUpdateDiff callback UPDATE_PROGRESSION _totalWaitToDownload:{}",_totalWaitToDownload);
+            // this->batchDownload();
+            if (!tempManifestPathSave) {
+                _tempManifest->saveToFile(_tempManifestPath);
+                AXLOGD("calcUpdateDiff 需要保存 _tempManifest->saveToFile(_tempManifestPath):{}",_tempManifestPath);
+                // tempManifestPathSave=true;
+            }
+            // std::string msg = fmt::format("Start to update {} files from remote package.", _totalToDownload);
+            AXLOGD("calcUpdateDiff  have download");
+            // dispatchUpdateEvent(EventAssetsManagerEx::EventCode::UPDATE_PROGRESSION, "", msg);
+        }
+    };
+    _queue.clear();    
+    AXLOGD("calcUpdateDiff 清零 _queue 队列  遍历");
+    for (const auto& iter : _downloadUnits)
+    {
+        const DownloadUnit& unit = iter.second;
+        if (unit.size > 0)
+        {
+            _totalSize += unit.size;
+            _sizeCollected++;
+            _totalDiffFileSize=_totalDiffFileSize+ unit.size;   
+            _queue.emplace_back(iter.first);
+            AXLOGD("calcUpdateDiff customId:{} add _queue",unit.customId);
+        }
+    }
+    // All collected, enable total size
+    if (_sizeCollected == _totalToDownload)
+    {
+        _totalEnabled = true;
+        AXLOGD("calcUpdateDiff _totalEnabled true");
     }
 }
 
@@ -828,6 +1182,7 @@ void AssetsManagerEx::updateSucceed()
 {
     // Every thing is correctly downloaded, do the following
     // 1. rename temporary manifest to valid manifest
+    AXLOGD("updateSucceed");
     std::string tempFileName = TEMP_MANIFEST_FILENAME;
     std::string fileName     = MANIFEST_FILENAME;
     _fileUtils->renameFile(_tempStoragePath, tempFileName, fileName);
@@ -867,15 +1222,19 @@ void AssetsManagerEx::updateSucceed()
     _localManifest->setManifestRoot(_storagePath);
     _remoteManifest = nullptr;
     // 4. make local manifest take effect
+    AXLOGD("prepareLocalManifest");
     prepareLocalManifest();
     // 5. Set update state
     _updateState = State::UP_TO_DATE;
+    AXLOGD("State::UP_TO_DATE");
     // 6. Notify finished event
+    AXLOGD("callback UPDATE_FINISHED");
     dispatchUpdateEvent(EventAssetsManagerEx::EventCode::UPDATE_FINISHED);
 }
 
 void AssetsManagerEx::checkUpdate()
 {
+    AXLOGD("checkUpdate");
     if (_updateEntry != UpdateEntry::NONE)
     {
         AXLOGE("AssetsManagerEx::checkUpdate, updateEntry isn't NONE");
@@ -885,12 +1244,14 @@ void AssetsManagerEx::checkUpdate()
     if (!_inited)
     {
         AXLOGD("AssetsManagerEx : Manifests uninited.\n");
+        AXLOGD("callback ERROR_NO_LOCAL_MANIFEST");
         dispatchUpdateEvent(EventAssetsManagerEx::EventCode::ERROR_NO_LOCAL_MANIFEST);
         return;
     }
     if (!_localManifest->isLoaded())
     {
         AXLOGD("AssetsManagerEx : No local manifest file found error.\n");
+        AXLOGD("callback ERROR_NO_LOCAL_MANIFEST");
         dispatchUpdateEvent(EventAssetsManagerEx::EventCode::ERROR_NO_LOCAL_MANIFEST);
         return;
     }
@@ -902,17 +1263,20 @@ void AssetsManagerEx::checkUpdate()
     case State::UNCHECKED:
     case State::PREDOWNLOAD_VERSION:
     {
+        AXLOGD("downloadVersion");
         downloadVersion();
     }
     break;
     case State::UP_TO_DATE:
     {
+        AXLOGD("callback ALREADY_UP_TO_DATE");
         dispatchUpdateEvent(EventAssetsManagerEx::EventCode::ALREADY_UP_TO_DATE);
     }
     break;
     case State::FAIL_TO_UPDATE:
     case State::NEED_UPDATE:
     {
+        AXLOGD("callback NEW_VERSION_FOUND");
         dispatchUpdateEvent(EventAssetsManagerEx::EventCode::NEW_VERSION_FOUND);
     }
     break;
@@ -923,75 +1287,89 @@ void AssetsManagerEx::checkUpdate()
 
 void AssetsManagerEx::update()
 {
+    AXLOGD("AssetsManagerEx::update");
     if (_updateEntry != UpdateEntry::NONE)
     {
         AXLOGE("AssetsManagerEx::update, updateEntry isn't NONE");
         return;
     }
 
+    AXLOGD("AssetsManagerEx::update _updateEntry == UpdateEntry::NONE");
     if (!_inited)
     {
-        AXLOGD("AssetsManagerEx : Manifests uninited.\n");
+        AXLOGW("AssetsManagerEx : Manifests uninited.\n");
+        AXLOGD("callback  ERROR_NO_LOCAL_MANIFEST");
         dispatchUpdateEvent(EventAssetsManagerEx::EventCode::ERROR_NO_LOCAL_MANIFEST);
         return;
     }
+    AXLOGD("AssetsManagerEx::update _inited");
     if (!_localManifest->isLoaded())
     {
-        AXLOGD("AssetsManagerEx : No local manifest file found error.\n");
+        AXLOGW("AssetsManagerEx : No local manifest file found error.\n");
+        AXLOGD("callback  ERROR_NO_LOCAL_MANIFEST");
         dispatchUpdateEvent(EventAssetsManagerEx::EventCode::ERROR_NO_LOCAL_MANIFEST);
         return;
     }
 
     _updateEntry = UpdateEntry::DO_UPDATE;
-
+    AXLOGD("AssetsManagerEx::update UpdateEntry::DO_UPDATE;");
     switch (_updateState)
     {
-    case State::UNCHECKED:
-    {
-        _updateState = State::PREDOWNLOAD_VERSION;
-    }
-    case State::PREDOWNLOAD_VERSION:
-    {
-        downloadVersion();
-    }
-    break;
-    case State::VERSION_LOADED:
-    {
-        parseVersion();
-    }
-    break;
-    case State::PREDOWNLOAD_MANIFEST:
-    {
-        downloadManifest();
-    }
-    break;
-    case State::MANIFEST_LOADED:
-    {
-        parseManifest();
-    }
-    break;
-    case State::FAIL_TO_UPDATE:
-    case State::NEED_UPDATE:
-    {
-        // Manifest not loaded yet
-        if (!_remoteManifest->isLoaded())
-        {
-            _updateState = State::PREDOWNLOAD_MANIFEST;
-            downloadManifest();
-        }
-        else
-        {
-            startUpdate();
-        }
-    }
-    break;
-    case State::UP_TO_DATE:
-    case State::UPDATING:
-    case State::UNZIPPING:
-        _updateEntry = UpdateEntry::NONE;
-        break;
-    default:
-        break;
+            case State::UNCHECKED:
+                {
+                    _updateState = State::PREDOWNLOAD_VERSION;
+                    AXLOGD("AssetsManagerEx::update _updateState PREDOWNLOAD_VERSION "); 
+                }
+            case State::PREDOWNLOAD_VERSION:
+                {
+                    AXLOGD("AssetsManagerEx::update _updateState downloadVersion "); 
+                    downloadVersion();                
+                }
+            break;
+            case State::VERSION_LOADED:
+                {
+                    AXLOGD("AssetsManagerEx::update _updateState parseVersion "); 
+                    parseVersion();
+                    
+                }
+            break;
+            case State::PREDOWNLOAD_MANIFEST:
+                {
+                    AXLOGD("AssetsManagerEx::update _updateState downloadManifest "); 
+                    downloadManifest();
+                }
+            break;
+            case State::MANIFEST_LOADED:
+                {
+                    AXLOGD("AssetsManagerEx::update _updateState parseManifest "); 
+                    parseManifest();
+                }
+            break;
+            case State::FAIL_TO_UPDATE:
+            case State::NEED_UPDATE:
+                {
+                    // Manifest not loaded yet
+                    if (!_remoteManifest->isLoaded())
+                    {
+                        _updateState = State::PREDOWNLOAD_MANIFEST;
+                        AXLOGD("AssetsManagerEx::update _updateState PREDOWNLOAD_MANIFEST downloadManifest "); 
+                        downloadManifest();
+                    }
+                    else
+                    {
+                        AXLOGD("AssetsManagerEx::update _updateState startUpdate "); 
+                        startUpdate();
+                    }
+                }
+            break;
+            case State::UP_TO_DATE:
+            case State::UPDATING:
+            case State::UNZIPPING:
+                AXLOGD("AssetsManagerEx::update _updateState NONE "); 
+                _updateEntry = UpdateEntry::NONE;
+                break;
+            default:
+                break;
     }
 }
 
@@ -1041,6 +1419,7 @@ void AssetsManagerEx::fileError(std::string_view identifier,
                                 int errorCode,
                                 int errorCodeInternal)
 {
+    AXLOGD("fileError: identifier:{}  errorStr:{}  errorCode:{} errorCodeInternal:{}",identifier,errorStr,errorStr,errorCode,errorCodeInternal);
     auto unitIt = _downloadUnits.find(identifier);
     // Found unit and add it to failed units
     if (unitIt != _downloadUnits.end())
@@ -1052,6 +1431,7 @@ void AssetsManagerEx::fileError(std::string_view identifier,
     }
     dispatchUpdateEvent(EventAssetsManagerEx::EventCode::ERROR_UPDATING, identifier, errorStr, errorCode,
                         errorCodeInternal);
+    AXLOGD("fileError: key:{} DownloadState::UNSTARTED",identifier);
     _tempManifest->setAssetDownloadState(identifier, Manifest::DownloadState::UNSTARTED);
 
     _currConcurrentTask = MAX(0, _currConcurrentTask - 1);
@@ -1061,6 +1441,7 @@ void AssetsManagerEx::fileError(std::string_view identifier,
 void AssetsManagerEx::fileSuccess(std::string_view customId, std::string_view storagePath)
 {
     // Set download state to SUCCESSED
+    AXLOGD("fileSuccess: setAssetDownloadState customId:{}  storagePath:{} SUCCESSED",customId,storagePath);
     _tempManifest->setAssetDownloadState(customId, Manifest::DownloadState::SUCCESSED);
 
     auto unitIt = _failedUnits.find(customId);
@@ -1094,6 +1475,7 @@ void AssetsManagerEx::onError(const network::DownloadTask& task,
                               std::string_view errorStr)
 {
     // Skip version error occurred
+    AXLOGD("onError: errorCode:{}  errorCodeInternal:{}  errorStr:{}",errorCode,errorCodeInternal,errorStr);
     if (task.identifier == VERSION_ID)
     {
         AXLOGD("AssetsManagerEx : Fail to download version file, step skipped\n");
@@ -1112,8 +1494,9 @@ void AssetsManagerEx::onError(const network::DownloadTask& task,
     }
 }
 
-void AssetsManagerEx::onProgress(double total, double downloaded, std::string_view /*url*/, std::string_view customId)
+void AssetsManagerEx::onProgress(double total, double downloaded, std::string_view url, std::string_view customId)
 {
+    AXLOGD("onProgress: customId:{}  url:{}",customId,url);
     if (customId == VERSION_ID || customId == MANIFEST_ID)
     {
         _percent = 100 * downloaded / total;
@@ -1139,6 +1522,7 @@ void AssetsManagerEx::onProgress(double total, double downloaded, std::string_vi
         if (!found)
         {
             // Set download state to DOWNLOADING, this will run only once in the download process
+            AXLOGD("onProgress: customId:{}  url:{}  DownloadState::DOWNLOADING",customId,url);
             _tempManifest->setAssetDownloadState(customId, Manifest::DownloadState::DOWNLOADING);
             // Register the download size information
             _downloadedSize.emplace(customId, downloaded);
@@ -1147,6 +1531,7 @@ void AssetsManagerEx::onProgress(double total, double downloaded, std::string_vi
             {
                 _totalSize += total;
                 _sizeCollected++;
+                _totalDiffFileSize=_totalDiffFileSize+total;
                 // All collected, enable total size
                 if (_sizeCollected == _totalToDownload)
                 {
@@ -1169,8 +1554,9 @@ void AssetsManagerEx::onProgress(double total, double downloaded, std::string_vi
     }
 }
 
-void AssetsManagerEx::onSuccess(std::string_view /*srcUrl*/, std::string_view storagePath, std::string_view customId)
+void AssetsManagerEx::onSuccess(std::string_view srcUrl, std::string_view storagePath, std::string_view customId)
 {
+   AXLOGD("onSuccess: srcUrl:{}  storagePath:{}  customId:{}",srcUrl,storagePath,customId);
     if (customId == VERSION_ID)
     {
         _updateState = State::VERSION_LOADED;
@@ -1223,6 +1609,7 @@ void AssetsManagerEx::destroyDownloadedVersion()
 void AssetsManagerEx::batchDownload()
 {
     _queue.clear();
+    _totalDiffFileSize=0;
     for (const auto& iter : _downloadUnits)
     {
         const DownloadUnit& unit = iter.second;
@@ -1230,6 +1617,7 @@ void AssetsManagerEx::batchDownload()
         {
             _totalSize += unit.size;
             _sizeCollected++;
+            _totalDiffFileSize=_totalDiffFileSize+ unit.size;   
         }
 
         _queue.emplace_back(iter.first);
@@ -1245,30 +1633,35 @@ void AssetsManagerEx::batchDownload()
 
 void AssetsManagerEx::queueDowload()
 {
+    AXLOGD("queueDowload _totalWaitToDownload:{}",_totalWaitToDownload);
     if (_totalWaitToDownload == 0)
     {
         this->onDownloadUnitsFinished();
         return;
     }
+    AXLOGD("queueDowload _InterruptFlag:{}",_InterruptFlag);
+    if (!_InterruptFlag) {
+        AXLOGD("queueDowload _currConcurrentTask:{} _maxConcurrentTask:{}",_currConcurrentTask,_maxConcurrentTask);
+        while (_currConcurrentTask < _maxConcurrentTask && !_queue.empty())
+        {
+            std::string key = _queue.back();
+            _queue.pop_back();
 
-    while (_currConcurrentTask < _maxConcurrentTask && !_queue.empty())
-    {
-        std::string key = _queue.back();
-        _queue.pop_back();
-
-        _currConcurrentTask++;
-        DownloadUnit& unit = _downloadUnits[key];
-        _fileUtils->createDirectories(basename(unit.storagePath));
-        _downloader->createDownloadFileTask(unit.srcUrl, unit.storagePath, unit.customId);
-
-        _tempManifest->setAssetDownloadState(key, Manifest::DownloadState::DOWNLOADING);
+            _currConcurrentTask++;
+            DownloadUnit& unit = _downloadUnits[key];
+            _fileUtils->createDirectory(basename(unit.storagePath));
+            _downloader->createDownloadFileTask(unit.srcUrl, unit.storagePath, unit.customId);
+            AXLOGD("onProgress: key:{} DownloadState::DOWNLOADING",key);
+            _tempManifest->setAssetDownloadState(key, Manifest::DownloadState::DOWNLOADING);
+        }
+        if (_percentByFile / 100 > _nextSavePoint)
+        {
+            // Save current download manifest information for resuming
+            _tempManifest->saveToFile(_tempManifestPath);
+            _nextSavePoint += SAVE_POINT_INTERVAL;
+        }
     }
-    if (_percentByFile / 100 > _nextSavePoint)
-    {
-        // Save current download manifest information for resuming
-        _tempManifest->saveToFile(_tempManifestPath);
-        _nextSavePoint += SAVE_POINT_INTERVAL;
-    }
+
 }
 
 void AssetsManagerEx::onDownloadUnitsFinished()
