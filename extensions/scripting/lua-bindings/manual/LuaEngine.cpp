@@ -45,21 +45,33 @@ LuaEngine* LuaEngine::getInstance(void)
 {
     if (!_defaultEngine)
     {
+        AXLOGD("_defaultEngine need new");
         _defaultEngine = new LuaEngine();
+        AXLOGD("_defaultEngine need init");
         _defaultEngine->init();
+        AXLOGD("_defaultEngine init ok");
     }
     return _defaultEngine;
 }
 
+//void LuaEngine::DestroyInstance(){
+//    AX_SAFE_DELETE(_defaultEngine);
+//}
+
+
 LuaEngine::~LuaEngine(void)
 {
+    AXLOGD("LuaEngine _stack");
     AX_SAFE_RELEASE(_stack);
+    AXLOGD("_defaultEngine = nullptr");
     _defaultEngine = nullptr;
 }
 
 bool LuaEngine::init(void)
 {
+    
     _stack = LuaStack::create();
+    AXLOGD("LuaStack::create() _stack:{}",fmt::ptr(_stack));
     _stack->retain();
     return true;
 }
@@ -77,6 +89,7 @@ void LuaEngine::addLuaLoader(lua_CFunction func)
 void LuaEngine::removeScriptObjectByObject(Object* pObj)
 {
     _stack->removeScriptObjectByObject(pObj);
+    // AXLOGD("LuaEngine::removeScriptObjectByObject 调用 ScriptHandlerMgr::getInstance()->removeObjectAllHandlers(pObj)");
     ScriptHandlerMgr::getInstance()->removeObjectAllHandlers(pObj);
 }
 
@@ -94,6 +107,7 @@ int LuaEngine::executeString(const char* codes)
 
 int LuaEngine::executeScriptFile(const char* filename)
 {
+    AXLOGD("executeScriptFile {}",filename);
     int ret = _stack->executeScriptFile(filename);
     _stack->clean();
     return ret;
