@@ -73,10 +73,10 @@ public:
 
     enum DownloadState
     {
-        UNSTARTED,
-        DOWNLOADING,
-        SUCCESSED,
-        UNMARKED
+        UNSTARTED,                              //0 
+        DOWNLOADING,                            //1
+        SUCCESSED,                              //2
+        UNMARKED                                //3未标记
     };
 
     //! Asset object
@@ -203,6 +203,11 @@ protected:
 
     void setManifestRoot(std::string_view root) { _manifestRoot = root; };
 
+    void setpackageUrl(std::string_view url) { _packageUrl = url; };
+
+    void setManifestFileUrl(std::string_view url){_remoteManifestUrl=url;};
+    void setVersionFileUrl(std::string_view url){_remoteVersionUrl=url;};
+
 private:
     //! Indicate whether the version informations have been fully loaded
     bool _versionLoaded;
@@ -214,7 +219,7 @@ private:
     FileUtils* _fileUtils;
 
     //! The local manifest root
-    std::string _manifestRoot;
+    std::string _manifestRoot;                  //本地的 基础目录
 
     //! The remote package url
     std::string _packageUrl;
