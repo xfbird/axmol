@@ -8,6 +8,7 @@
 // #include "2d/Node.h"
 #include "lua-bindings/manual/LuaBasicConversions.h"
 #include "UserDataEx.h"
+#include "LuaBridgeControl.h"
 #include "base/Logging.h"
 #include "tolua++.h"
 
@@ -131,38 +132,38 @@ int lua_ax_base_UserDataEx_getDoubleForKey(lua_State* tolua_S)
             return 0;
         }
     #endif    
-        argc = lua_gettop(tolua_S) - 1;
-        //AXLOGD("lua_ax_base_UserDataEx_getDoubleForKey 2 argc:{}",argc);
-        do
+    argc = lua_gettop(tolua_S) - 1;
+    //AXLOGD("lua_ax_base_UserDataEx_getDoubleForKey 2 argc:{}",argc);
+    do
+    {
+        if (argc == 1)
         {
-            if (argc == 1)
+            std::string arg0;
+            ok &= luaval_to_std_string(tolua_S, 2, &arg0, "UserDataEx:getDoubleForKey");
+            //AXLOGD("lua_ax_base_UserDataEx_getDoubleForKey 3 arg0:{}   ok:{}",arg0,ok);
+            if (!ok)
             {
-                std::string arg0;
-                ok &= luaval_to_std_string(tolua_S, 2, &arg0, "UserDataEx:getDoubleForKey");
-                //AXLOGD("lua_ax_base_UserDataEx_getDoubleForKey 3 arg0:{}   ok:{}",arg0,ok);
-                if (!ok)
-                {
-                    break;
-                }
-                //AXLOGD("lua_ax_base_UserDataEx_getDoubleForKey 4 Exec cobj:{}  getDoubleForKey(arg0:{})",
-                //             fmt::ptr(cobj),arg0,ok);
-                double ret = cobj->getDoubleForKey(arg0);
-                //AXLOGD("lua_ax_base_UserDataEx_getDoubleForKey 5  ret:{}",ret);
-                
-                tolua_pushnumber(tolua_S, (lua_Number)ret);
-                //AXLOGD("lua_ax_base_UserDataEx_getDoubleForKey 6  end");
-                return 1;
+                break;
             }
-        } while (0);
-        ok = true;
-        luaL_error(tolua_S, "%s 参数数量错误: %d, 应该期望 %d\n", "UserDataEx:getDoubleForKey", argc, 1);
-        return 0;
+            //AXLOGD("lua_ax_base_UserDataEx_getDoubleForKey 4 Exec cobj:{}  getDoubleForKey(arg0:{})",
+            //             fmt::ptr(cobj),arg0,ok);
+            double ret = cobj->getDoubleForKey(arg0);
+            //AXLOGD("lua_ax_base_UserDataEx_getDoubleForKey 5  ret:{}",ret);
+            
+            tolua_pushnumber(tolua_S, (lua_Number)ret);
+            //AXLOGD("lua_ax_base_UserDataEx_getDoubleForKey 6  end");
+            return 1;
+        }
+    } while (0);
+    ok = true;
+    luaL_error(tolua_S, "%s 参数数量错误: %d, 应该期望 %d\n", "UserDataEx:getDoubleForKey", argc, 1);
+    // return 0;
 
     #if _AX_DEBUG >= 1
         tolua_lerror:
             tolua_error(tolua_S, "#ferror 在函数 'lua_ax_base_UserDataEx_getDoubleForKey'.", &tolua_err);
     #endif
-        return 0;
+    return 0;
 }
 
 int lua_ax_base_UserDataEx_setStringForKey(lua_State* tolua_S)
@@ -501,205 +502,205 @@ int lua_ax_base_UserDataEx_getIntegerForKey(lua_State* tolua_S)
     return 0;
 }
 
-int lua_ax_base_UserDataEx_setUnsignedForKey(lua_State* tolua_S)
-{
-    int argc         = 0;
-    ax::UserDataEx* cobj = nullptr;
-    bool ok          = true;
-    #if _AX_DEBUG >= 1
-        tolua_Error tolua_err;
-    #endif
+// int lua_ax_base_UserDataEx_setUnsignedForKey(lua_State* tolua_S)
+// {
+//     int argc         = 0;
+//     ax::UserDataEx* cobj = nullptr;
+//     bool ok          = true;
+//     #if _AX_DEBUG >= 1
+//         tolua_Error tolua_err;
+//     #endif
 
-    #if _AX_DEBUG >= 1
-        if (!tolua_isusertype(tolua_S, 1, "ax.UserDataEx", 0, &tolua_err))
-            goto tolua_lerror;
-    #endif
-        cobj = (ax::UserDataEx*)tolua_tousertype(tolua_S, 1, 0);
-    #if _AX_DEBUG >= 1
-        if (!cobj)
-        {
-            tolua_error(tolua_S, "无效的 'cobj' 在函数 'lua_ax_base_UserDataEx_setUnsignedForKey'", nullptr);
-            return 0;
-        }
-    #endif
-        argc = lua_gettop(tolua_S) - 1;
-        //AXLOGD("lua_ax_base_UserDataEx_setUnsignedForKey argc:{}",argc);
-        do
-        {
-            if (argc == 2)
-            {
-                std::string arg0;
-                long long arg1 = 0;
-                ok &= luaval_to_std_string(tolua_S, 2, &arg0, "UserDataEx:setUnsignedForKey");
-                ok &= luaval_to_long_long(tolua_S, 3, &arg1, "UserDataEx:setUnsignedForKey");
+//     #if _AX_DEBUG >= 1
+//         if (!tolua_isusertype(tolua_S, 1, "ax.UserDataEx", 0, &tolua_err))
+//             goto tolua_lerror;
+//     #endif
+//         cobj = (ax::UserDataEx*)tolua_tousertype(tolua_S, 1, 0);
+//     #if _AX_DEBUG >= 1
+//         if (!cobj)
+//         {
+//             tolua_error(tolua_S, "无效的 'cobj' 在函数 'lua_ax_base_UserDataEx_setUnsignedForKey'", nullptr);
+//             return 0;
+//         }
+//     #endif
+//         argc = lua_gettop(tolua_S) - 1;
+//         //AXLOGD("lua_ax_base_UserDataEx_setUnsignedForKey argc:{}",argc);
+//         do
+//         {
+//             if (argc == 2)
+//             {
+//                 std::string arg0;
+//                 long long arg1 = 0;
+//                 ok &= luaval_to_std_string(tolua_S, 2, &arg0, "UserDataEx:setUnsignedForKey");
+//                 ok &= luaval_to_long_long(tolua_S, 3, &arg1, "UserDataEx:setUnsignedForKey");
 
-                if (!ok)
-                {
-                    break;
-                }
-                cobj->setUnsignedInt64ForKey(arg0, arg1);
-                return 0;
-            }
-        } while (0);
-        ok = true;
-        luaL_error(tolua_S, "%s 参数数量错误: %d, 应该期望 %d\n", "UserDataEx:setUnsignedForKey", argc, 2);
-        return 0;
+//                 if (!ok)
+//                 {
+//                     break;
+//                 }
+//                 cobj->setUnsignedInt64ForKey(arg0, arg1);
+//                 return 0;
+//             }
+//         } while (0);
+//         ok = true;
+//         luaL_error(tolua_S, "%s 参数数量错误: %d, 应该期望 %d\n", "UserDataEx:setUnsignedForKey", argc, 2);
+//         return 0;
 
-    #if _AX_DEBUG >= 1
-    tolua_lerror:
-        tolua_error(tolua_S, "#ferror 在函数 'lua_ax_base_UserDataEx_setUnsignedForKey'.", &tolua_err);
-    #endif
-    return 0;
-}
-int lua_ax_base_UserDataEx_getUnsignedForKey(lua_State* tolua_S)
-{
-    int argc         = 0;
-    ax::UserDataEx* cobj = nullptr;
-    bool ok          = true;
-    #if _AX_DEBUG >= 1
-        tolua_Error tolua_err;
-    #endif
+//     #if _AX_DEBUG >= 1
+//     tolua_lerror:
+//         tolua_error(tolua_S, "#ferror 在函数 'lua_ax_base_UserDataEx_setUnsignedForKey'.", &tolua_err);
+//     #endif
+//     return 0;
+// }
+// int lua_ax_base_UserDataEx_getUnsignedForKey(lua_State* tolua_S)
+// {
+//     int argc         = 0;
+//     ax::UserDataEx* cobj = nullptr;
+//     bool ok          = true;
+//     #if _AX_DEBUG >= 1
+//         tolua_Error tolua_err;
+//     #endif
 
-    #if _AX_DEBUG >= 1
-        if (!tolua_isusertype(tolua_S, 1, "ax.UserDataEx", 0, &tolua_err))
-            goto tolua_lerror;
-    #endif
-        cobj = (ax::UserDataEx*)tolua_tousertype(tolua_S, 1, 0);
-    #if _AX_DEBUG >= 1
-        if (!cobj)
-        {
-            tolua_error(tolua_S, "无效的 'cobj' 在函数 'lua_ax_base_UserDataEx_getIntegerForKey'", nullptr);
-            return 0;
-        }
-    #endif
-        argc = lua_gettop(tolua_S) - 1;
-        //AXLOGD("lua_ax_base_UserDataEx_getUnsignedForKey argc:{}",argc);
-        do
-        {
-            if (argc == 1)
-            {
-                std::string arg0;
-                ok &= luaval_to_std_string(tolua_S, 2, &arg0, "UserDataEx:getUnsignedForKey");
-                if (!ok)
-                {
-                    break;
-                }
-                uint64_t ret = cobj->getUnsignedInt64ForKey(arg0);
-                tolua_pushnumber(tolua_S, (lua_Number)ret);
-                return 1;
-            }
-        } while (0);
-        ok = true;
-        luaL_error(tolua_S, "%s 参数数量错误: %d, 应该期望 %d\n", "UserDataEx:getUnsignedForKey", argc, 1);
-        return 0;
+//     #if _AX_DEBUG >= 1
+//         if (!tolua_isusertype(tolua_S, 1, "ax.UserDataEx", 0, &tolua_err))
+//             goto tolua_lerror;
+//     #endif
+//         cobj = (ax::UserDataEx*)tolua_tousertype(tolua_S, 1, 0);
+//     #if _AX_DEBUG >= 1
+//         if (!cobj)
+//         {
+//             tolua_error(tolua_S, "无效的 'cobj' 在函数 'lua_ax_base_UserDataEx_getIntegerForKey'", nullptr);
+//             return 0;
+//         }
+//     #endif
+//         argc = lua_gettop(tolua_S) - 1;
+//         //AXLOGD("lua_ax_base_UserDataEx_getUnsignedForKey argc:{}",argc);
+//         do
+//         {
+//             if (argc == 1)
+//             {
+//                 std::string arg0;
+//                 ok &= luaval_to_std_string(tolua_S, 2, &arg0, "UserDataEx:getUnsignedForKey");
+//                 if (!ok)
+//                 {
+//                     break;
+//                 }
+//                 uint64_t ret = cobj->getUnsignedInt64ForKey(arg0);
+//                 tolua_pushnumber(tolua_S, (lua_Number)ret);
+//                 return 1;
+//             }
+//         } while (0);
+//         ok = true;
+//         luaL_error(tolua_S, "%s 参数数量错误: %d, 应该期望 %d\n", "UserDataEx:getUnsignedForKey", argc, 1);
+//         return 0;
 
-    #if _AX_DEBUG >= 1
-    tolua_lerror:
-        tolua_error(tolua_S, "#ferror 在函数 'lua_ax_base_UserDataEx_getUnsignedForKey'.", &tolua_err);
-    #endif
-    return 0;
-}
+//     #if _AX_DEBUG >= 1
+//     tolua_lerror:
+//         tolua_error(tolua_S, "#ferror 在函数 'lua_ax_base_UserDataEx_getUnsignedForKey'.", &tolua_err);
+//     #endif
+//     return 0;
+// }
 
 
-int lua_ax_base_UserDataEx_setByteForKey(lua_State* tolua_S)
-{
-    int argc         = 0;
-    ax::UserDataEx* cobj = nullptr;
-    bool ok          = true;
-    #if _AX_DEBUG >= 1
-        tolua_Error tolua_err;
-    #endif
+// int lua_ax_base_UserDataEx_setByteForKey(lua_State* tolua_S)
+// {
+//     int argc         = 0;
+//     ax::UserDataEx* cobj = nullptr;
+//     bool ok          = true;
+//     #if _AX_DEBUG >= 1
+//         tolua_Error tolua_err;
+//     #endif
 
-    #if _AX_DEBUG >= 1
-        if (!tolua_isusertype(tolua_S, 1, "ax.UserDataEx", 0, &tolua_err))
-            goto tolua_lerror;
-    #endif
-        cobj = (ax::UserDataEx*)tolua_tousertype(tolua_S, 1, 0);
-    #if _AX_DEBUG >= 1
-        if (!cobj)
-        {
-            tolua_error(tolua_S, "无效的 'cobj' 在函数 'lua_ax_base_UserDataEx_setByteForKey'", nullptr);
-            return 0;
-        }
-    #endif
-        argc = lua_gettop(tolua_S) - 1;
-        //AXLOGD("lua_ax_base_UserDataEx_setByteForKey argc:{}",argc);
-        do
-        {
-            if (argc == 2)
-            {
-                std::string arg0;
-                long long arg1 = 0;
-                ok &= luaval_to_std_string(tolua_S, 2, &arg0, "UserDataEx:setByteForKey");
-                ok &= luaval_to_long_long(tolua_S, 3, &arg1, "UserDataEx:setByteForKey");
+//     #if _AX_DEBUG >= 1
+//         if (!tolua_isusertype(tolua_S, 1, "ax.UserDataEx", 0, &tolua_err))
+//             goto tolua_lerror;
+//     #endif
+//         cobj = (ax::UserDataEx*)tolua_tousertype(tolua_S, 1, 0);
+//     #if _AX_DEBUG >= 1
+//         if (!cobj)
+//         {
+//             tolua_error(tolua_S, "无效的 'cobj' 在函数 'lua_ax_base_UserDataEx_setByteForKey'", nullptr);
+//             return 0;
+//         }
+//     #endif
+//         argc = lua_gettop(tolua_S) - 1;
+//         //AXLOGD("lua_ax_base_UserDataEx_setByteForKey argc:{}",argc);
+//         do
+//         {
+//             if (argc == 2)
+//             {
+//                 std::string arg0;
+//                 long long arg1 = 0;
+//                 ok &= luaval_to_std_string(tolua_S, 2, &arg0, "UserDataEx:setByteForKey");
+//                 ok &= luaval_to_long_long(tolua_S, 3, &arg1, "UserDataEx:setByteForKey");
 
-                if (!ok)
-                {
-                    break;
-                }
-                cobj->setByteForKey(arg0,unsigned char(arg1));
-                return 0;
-            }
-        } while (0);
-        ok = true;
-        luaL_error(tolua_S, "%s 参数数量错误: %d, 应该期望 %d\n", "UserDataEx:setByteForKey", argc, 2);
-        return 0;
+//                 if (!ok)
+//                 {
+//                     break;
+//                 }
+//                 cobj->setByteForKey(arg0,unsigned char(arg1));
+//                 return 0;
+//             }
+//         } while (0);
+//         ok = true;
+//         luaL_error(tolua_S, "%s 参数数量错误: %d, 应该期望 %d\n", "UserDataEx:setByteForKey", argc, 2);
+//         return 0;
 
-    #if _AX_DEBUG >= 1
-    tolua_lerror:
-        tolua_error(tolua_S, "#ferror 在函数 'lua_ax_base_UserDataEx_setByteForKey'.", &tolua_err);
-    #endif
-    return 0;
-}
+//     #if _AX_DEBUG >= 1
+//     tolua_lerror:
+//         tolua_error(tolua_S, "#ferror 在函数 'lua_ax_base_UserDataEx_setByteForKey'.", &tolua_err);
+//     #endif
+//     return 0;
+// }
 
-int lua_ax_base_UserDataEx_getByteForKey(lua_State* tolua_S)
-{
-    int argc         = 0;
-    ax::UserDataEx* cobj = nullptr;
-    bool ok          = true;
-    #if _AX_DEBUG >= 1
-        tolua_Error tolua_err;
-    #endif
+// int lua_ax_base_UserDataEx_getByteForKey(lua_State* tolua_S)
+// {
+//     int argc         = 0;
+//     ax::UserDataEx* cobj = nullptr;
+//     bool ok          = true;
+//     #if _AX_DEBUG >= 1
+//         tolua_Error tolua_err;
+//     #endif
 
-    #if _AX_DEBUG >= 1
-        if (!tolua_isusertype(tolua_S, 1, "ax.UserDataEx", 0, &tolua_err))
-            goto tolua_lerror;
-    #endif
-        cobj = (ax::UserDataEx*)tolua_tousertype(tolua_S, 1, 0);
-    #if _AX_DEBUG >= 1
-        if (!cobj)
-        {
-            tolua_error(tolua_S, "无效的 'cobj' 在函数 'lua_ax_base_UserDataEx_getByteForKey'", nullptr);
-            return 0;
-        }
-    #endif
-        argc = lua_gettop(tolua_S) - 1;
-        //AXLOGD("lua_ax_base_UserDataEx_getByteForKey argc:{}",argc);
-        do
-        {
-            if (argc == 1)
-            {
-                std::string arg0;
-                ok &= luaval_to_std_string(tolua_S, 2, &arg0, "UserDataEx:getByteForKey");
-                if (!ok)
-                {
-                    break;
-                }
-                unsigned char ret = cobj->getByteForKey(arg0);
-                tolua_pushnumber(tolua_S, (lua_Number)ret);
-                return 1;
-            }
-        } while (0);
-        ok = true;
-        luaL_error(tolua_S, "%s 参数数量错误: %d, 应该期望 %d\n", "UserDataEx:getByteForKey", argc, 1);
-        return 0;
+//     #if _AX_DEBUG >= 1
+//         if (!tolua_isusertype(tolua_S, 1, "ax.UserDataEx", 0, &tolua_err))
+//             goto tolua_lerror;
+//     #endif
+//         cobj = (ax::UserDataEx*)tolua_tousertype(tolua_S, 1, 0);
+//     #if _AX_DEBUG >= 1
+//         if (!cobj)
+//         {
+//             tolua_error(tolua_S, "无效的 'cobj' 在函数 'lua_ax_base_UserDataEx_getByteForKey'", nullptr);
+//             return 0;
+//         }
+//     #endif
+//         argc = lua_gettop(tolua_S) - 1;
+//         //AXLOGD("lua_ax_base_UserDataEx_getByteForKey argc:{}",argc);
+//         do
+//         {
+//             if (argc == 1)
+//             {
+//                 std::string arg0;
+//                 ok &= luaval_to_std_string(tolua_S, 2, &arg0, "UserDataEx:getByteForKey");
+//                 if (!ok)
+//                 {
+//                     break;
+//                 }
+//                 unsigned char ret = cobj->getByteForKey(arg0);
+//                 tolua_pushnumber(tolua_S, (lua_Number)ret);
+//                 return 1;
+//             }
+//         } while (0);
+//         ok = true;
+//         luaL_error(tolua_S, "%s 参数数量错误: %d, 应该期望 %d\n", "UserDataEx:getByteForKey", argc, 1);
+//         return 0;
 
-    #if _AX_DEBUG >= 1
-    tolua_lerror:
-        tolua_error(tolua_S, "#ferror 在函数 'lua_ax_base_UserDataEx_getByteForKey'.", &tolua_err);
-    #endif
-    return 0;
-}
+//     #if _AX_DEBUG >= 1
+//     tolua_lerror:
+//         tolua_error(tolua_S, "#ferror 在函数 'lua_ax_base_UserDataEx_getByteForKey'.", &tolua_err);
+//     #endif
+//     return 0;
+// }
 
 int lua_ax_base_UserDataEx_new(lua_State* tolua_S)
 {
@@ -717,11 +718,11 @@ int lua_ax_base_UserDataEx_new(lua_State* tolua_S)
             goto tolua_lerror;
     #endif
     argc = lua_gettop(tolua_S) - 1;
-    AXLOGD("lua_ax_base_UserDataEx_new  Check argc:{}",argc);
+    // AXLOGD("lua_ax_base_UserDataEx_new  Check argc:{}",argc);
     if (argc == 1)
     {
         std::string skey= tolua_tostring(tolua_S, 2, "");
-        AXLOGD("lua_ax_base_UserDataEx_new  tostring  skey:{}",skey);
+        // AXLOGD("lua_ax_base_UserDataEx_new  tostring  skey:{}",skey);
         if (skey.empty())
         {
             tolua_pushstring(tolua_S, "无效的参数在函数 'lua_ax_base_UserDataEx_new': 字符串参数为空");
@@ -730,7 +731,7 @@ int lua_ax_base_UserDataEx_new(lua_State* tolua_S)
         }
 
         UserDataEx* tolua_ret = (UserDataEx*)UserDataEx::GetUserDataEx(skey);
-        AXLOGD("lua_ax_base_UserDataEx_new  skey:{} ret:tolua_ret:{}",skey,FMT_TOPOINT(tolua_ret));
+        // AXLOGD("lua_ax_base_UserDataEx_new  skey:{} ret:tolua_ret:{}",skey,FMT_TOPOINT(tolua_ret));
         tolua_pushusertype(tolua_S, (void*)tolua_ret, "ax.UserDataEx");
         return 1;
     }
@@ -1080,41 +1081,41 @@ int lua_ax_base_TileMapManager_new(lua_State* tolua_S) {
     #endif
 }
 // int lua_ax_base_TileMapManager_destroy(lua_State* tolua_S) {
-//     int argc = 0;
-//     bool ok = true;
+    //     int argc = 0;
+    //     bool ok = true;
 
-//     #if _AX_DEBUG >= 1
-//         tolua_Error tolua_err;
-//     #endif
+    //     #if _AX_DEBUG >= 1
+    //         tolua_Error tolua_err;
+    //     #endif
 
-//     #if _AX_DEBUG >= 1
-//         if (!tolua_isusertable(tolua_S, 1, "ax.TileMapManager", 0, &tolua_err)) goto tolua_lerror;
-//     #endif
+    //     #if _AX_DEBUG >= 1
+    //         if (!tolua_isusertable(tolua_S, 1, "ax.TileMapManager", 0, &tolua_err)) goto tolua_lerror;
+    //     #endif
 
-//     argc = lua_gettop(tolua_S) - 1;
+    //     argc = lua_gettop(tolua_S) - 1;
 
-//     if (argc == 1) {
-//         std::string skey;
-//         ok &= luaval_to_std_string(tolua_S, 2, &skey, "skey");
+    //     if (argc == 1) {
+    //         std::string skey;
+    //         ok &= luaval_to_std_string(tolua_S, 2, &skey, "skey");
 
-//         if (!ok) {
-//             tolua_error(tolua_S, "invalid arguments in function 'lua_ax_base_TileMapManager_destroy'", nullptr);
-//             return 0;
-//         }
+    //         if (!ok) {
+    //             tolua_error(tolua_S, "invalid arguments in function 'lua_ax_base_TileMapManager_destroy'", nullptr);
+    //             return 0;
+    //         }
 
-//         // 这里假设 TileMapManager 有一个静态方法 destroyInstance 来销毁单例
-//         TileMapManager::destroy();
-//         lua_settop(tolua_S, 1);
-//         return 1;
-//     }
-//     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d\n", "TileMapManager:destroyInstance", argc, 1);
-//     return 0;
+    //         // 这里假设 TileMapManager 有一个静态方法 destroyInstance 来销毁单例
+    //         TileMapManager::destroy();
+    //         lua_settop(tolua_S, 1);
+    //         return 1;
+    //     }
+    //     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d\n", "TileMapManager:destroyInstance", argc, 1);
+    //     return 0;
 
-//     #if _AX_DEBUG >= 1
-//     tolua_lerror:
-//         tolua_error(tolua_S, "#ferror in function 'lua_ax_base_TileMapManager_destroy'.", &tolua_err);
-//     #endif
-//     return 0;
+    //     #if _AX_DEBUG >= 1
+    //     tolua_lerror:
+    //         tolua_error(tolua_S, "#ferror in function 'lua_ax_base_TileMapManager_destroy'.", &tolua_err);
+    //     #endif
+    //     return 0;
 // }
 
 int lua_ax_base_TileMapManager_destroy(lua_State* tolua_S) {
@@ -2091,31 +2092,31 @@ int register_all_axlua_bindings_TileMapManager(lua_State* tolua_S)
     tolua_beginmodule(tolua_S, "TileMapManager");
     //------------------------------------------------------------------------------------
     //这些都是 类方法 //获得 一个 指定键名 的 字典对象
-    tolua_function(tolua_S, "create", lua_ax_base_TileMapManager_new);                      //创建 实例
-    // AXLOGD("register_all_axlua_bindings_TileMapManager");    
-    tolua_function(tolua_S,"destroy", lua_ax_base_TileMapManager_destroy);                  //释放 实例
-    // //------------------------------------------------------------------------------------
-    // //下面都是 实例方法
-    tolua_function(tolua_S, "GetBkImgIdx", lua_TileMapManager_GetBkImgIdx);
-    tolua_function(tolua_S, "GetMidImgIdx", lua_TileMapManager_GetMidImgIdx);
-    tolua_function(tolua_S, "GetFrImgIdx", lua_TileMapManager_GetFrImgIdx);
-    tolua_function(tolua_S, "GetDoorIndex", lua_TileMapManager_GetDoorIndex);
-    tolua_function(tolua_S, "GetDoorOffset", lua_TileMapManager_GetDoorOffset);
-    tolua_function(tolua_S, "isObstacle", lua_TileMapManager_isObstacle);
-    tolua_function(tolua_S, "GetAniFrame", lua_TileMapManager_GetAniFrame);
-    tolua_function(tolua_S, "GetAniTick", lua_TileMapManager_GetAniTick);
-    tolua_function(tolua_S, "GetTilesArea", lua_TileMapManager_GetTilesArea);
-    tolua_function(tolua_S, "GetSmTilesArea",lua_TileMapManager_GetSmTilesArea);
-    tolua_function(tolua_S, "GetObjArea", lua_TileMapManager_GetObjArea);
-    tolua_function(tolua_S, "GetMapDataRows", lua_TileMapManager_GetMapDataRows);
-    tolua_function(tolua_S, "GetMapDataCols", lua_TileMapManager_GetMapDataCols);
-    tolua_function(tolua_S, "GetLight", lua_TileMapManager_GetLight);
-    tolua_function(tolua_S, "SetDoorOffset", lua_TileMapManager_SetDoorOffset);
-    tolua_function(tolua_S, "SetObstacle", lua_TileMapManager_SetObstacle);
-    tolua_function(tolua_S, "LoadData", lua_TileMapManager_LoadData);
-    tolua_function(tolua_S, "GetTileInfoEx", lua_TileMapManager_GetTileInfoEx);
-    tolua_function(tolua_S, "GetTileInfo", lua_TileMapManager_GetTileInfo);
-    tolua_function(tolua_S, "GetVersion", lua_TileMapManager_GetVersion);
+        tolua_function(tolua_S, "create", lua_ax_base_TileMapManager_new);                      //创建 实例
+        // AXLOGD("register_all_axlua_bindings_TileMapManager");    
+        tolua_function(tolua_S,"destroy", lua_ax_base_TileMapManager_destroy);                  //释放 实例
+        // //------------------------------------------------------------------------------------
+        // //下面都是 实例方法
+        tolua_function(tolua_S, "GetBkImgIdx", lua_TileMapManager_GetBkImgIdx);
+        tolua_function(tolua_S, "GetMidImgIdx", lua_TileMapManager_GetMidImgIdx);
+        tolua_function(tolua_S, "GetFrImgIdx", lua_TileMapManager_GetFrImgIdx);
+        tolua_function(tolua_S, "GetDoorIndex", lua_TileMapManager_GetDoorIndex);
+        tolua_function(tolua_S, "GetDoorOffset", lua_TileMapManager_GetDoorOffset);
+        tolua_function(tolua_S, "isObstacle", lua_TileMapManager_isObstacle);
+        tolua_function(tolua_S, "GetAniFrame", lua_TileMapManager_GetAniFrame);
+        tolua_function(tolua_S, "GetAniTick", lua_TileMapManager_GetAniTick);
+        tolua_function(tolua_S, "GetTilesArea", lua_TileMapManager_GetTilesArea);
+        tolua_function(tolua_S, "GetSmTilesArea",lua_TileMapManager_GetSmTilesArea);
+        tolua_function(tolua_S, "GetObjArea", lua_TileMapManager_GetObjArea);
+        tolua_function(tolua_S, "GetMapDataRows", lua_TileMapManager_GetMapDataRows);
+        tolua_function(tolua_S, "GetMapDataCols", lua_TileMapManager_GetMapDataCols);
+        tolua_function(tolua_S, "GetLight", lua_TileMapManager_GetLight);
+        tolua_function(tolua_S, "SetDoorOffset", lua_TileMapManager_SetDoorOffset);
+        tolua_function(tolua_S, "SetObstacle", lua_TileMapManager_SetObstacle);
+        tolua_function(tolua_S, "LoadData", lua_TileMapManager_LoadData);
+        tolua_function(tolua_S, "GetTileInfoEx", lua_TileMapManager_GetTileInfoEx);
+        tolua_function(tolua_S, "GetTileInfo", lua_TileMapManager_GetTileInfo);
+        tolua_function(tolua_S, "GetVersion", lua_TileMapManager_GetVersion);
     // //AXLOGI(" bindings UserDATAEx End");
     tolua_endmodule(tolua_S);
     auto typeName = typeid(ax::TileMapManager).name(); // rtti is literal storage
@@ -2137,48 +2138,359 @@ int register_all_axlua_bindings_UserDATAEx(lua_State* tolua_S)
 
     tolua_beginmodule(tolua_S, "UserDataEx");
 
-    // Bind constructor and destructor
-    //------------------------------------------------------------------------------------
-    //这些都是 类方法 
-    //获得 一个 指定键名 的 字典对象
-    tolua_function(tolua_S, "new", lua_ax_base_UserDataEx_new);
-    //AXLOGI(" bindings UserDATAEx Add New");
-    //释放一个 指定键名 的 字典对象 该对象 的数据会立即持久化
-    tolua_function(tolua_S,"destroyInstance", lua_ax_base_UserDataEx_destroyInstance);
-    tolua_function(tolua_S,"setStorageName", lua_ax_base_UserDataEx_setStorageName);
-    tolua_function(tolua_S,"getStorageName", lua_ax_base_UserDataEx_getStorageName);
-    tolua_function(tolua_S,"Cleanup", lua_ax_base_UserDataEx_clearAll);
-    tolua_function(tolua_S,"setVersionPath", lua_ax_base_UserDataEx_setStorageName);
+        // Bind constructor and destructor
+        //------------------------------------------------------------------------------------
+        //这些都是 类方法 
+        //获得 一个 指定键名 的 字典对象
+        tolua_function(tolua_S, "new", lua_ax_base_UserDataEx_new);
+        //AXLOGI(" bindings UserDATAEx Add New");
+        //释放一个 指定键名 的 字典对象 该对象 的数据会立即持久化
+        tolua_function(tolua_S,"destroyInstance", lua_ax_base_UserDataEx_destroyInstance);
+        tolua_function(tolua_S,"setStorageName", lua_ax_base_UserDataEx_setStorageName);
+        tolua_function(tolua_S,"getStorageName", lua_ax_base_UserDataEx_getStorageName);
+        tolua_function(tolua_S,"Cleanup", lua_ax_base_UserDataEx_clearAll);
+        tolua_function(tolua_S,"setVersionPath", lua_ax_base_UserDataEx_setStorageName);
    
-    //三个 静态方法 
-	//	setStorageName	设置整体存储名称	todo
-	//	getStorageName	获得当前存储名称	todo
-    //------------------------------------------------------------------------------------
-    //下面都是 实例方法
-    //  setEncryptEnabled()					设置加密
-    tolua_function(tolua_S, "setDoubleForKey", lua_ax_base_UserDataEx_setDoubleForKey);
-    tolua_function(tolua_S, "setStringForKey", lua_ax_base_UserDataEx_setStringForKey);
-    tolua_function(tolua_S, "setBoolForKey", lua_ax_base_UserDataEx_setBoolForKey);
-    tolua_function(tolua_S, "setIntegerForKey", lua_ax_base_UserDataEx_setIntegerForKey);
-    tolua_function(tolua_S, "setUnsignedForKey", lua_ax_base_UserDataEx_setUnsignedForKey);
-    tolua_function(tolua_S, "setByteForKey", lua_ax_base_UserDataEx_setByteForKey);
-    // // Bind get methods
-    tolua_function(tolua_S, "getDoubleForKey", lua_ax_base_UserDataEx_getDoubleForKey);
-    tolua_function(tolua_S, "getStringForKey", lua_ax_base_UserDataEx_getStringForKey);
-    tolua_function(tolua_S, "getBoolForKey", lua_ax_base_UserDataEx_getBoolForKey);
-    tolua_function(tolua_S, "getIntegerForKey", lua_ax_base_UserDataEx_getIntegerForKey);
-    tolua_function(tolua_S, "getUnsignedForKey", lua_ax_base_UserDataEx_getUnsignedForKey);
-    tolua_function(tolua_S, "getByteForKey", lua_ax_base_UserDataEx_getByteForKey);
-    //删除 一个指定的 Key ，也就是 该键值 在一个字典内不存在。
-    tolua_function(tolua_S, "deleteForkey", lua_ax_base_UserDataEx_deleteForKey);
-    tolua_function(tolua_S, "setEncryptEnabled", lua_ax_base_UserDataEx_setEncryptEnabled);
-    tolua_function(tolua_S, "writeMapDataToFile", lua_ax_base_UserDataEx_saveData);
-    tolua_function(tolua_S, "saveData", lua_ax_base_UserDataEx_saveData); 
-    tolua_function(tolua_S, "setAutoSave", lua_ax_base_UserDataEx_setAutoSave); 
+        //三个 静态方法 
+        //	setStorageName	设置整体存储名称	todo
+        //	getStorageName	获得当前存储名称	todo
+        //------------------------------------------------------------------------------------
+        //下面都是 实例方法
+        //  setEncryptEnabled()					设置加密
+        tolua_function(tolua_S, "setDoubleForKey", lua_ax_base_UserDataEx_setDoubleForKey);
+        tolua_function(tolua_S, "setStringForKey", lua_ax_base_UserDataEx_setStringForKey);
+        tolua_function(tolua_S, "setBoolForKey", lua_ax_base_UserDataEx_setBoolForKey);
+        tolua_function(tolua_S, "setIntegerForKey", lua_ax_base_UserDataEx_setIntegerForKey);
+        // tolua_function(tolua_S, "setUnsignedForKey", lua_ax_base_UserDataEx_setUnsignedForKey);
+        // tolua_function(tolua_S, "setByteForKey", lua_ax_base_UserDataEx_setByteForKey);
+        // // Bind get methods
+        tolua_function(tolua_S, "getDoubleForKey", lua_ax_base_UserDataEx_getDoubleForKey);
+        tolua_function(tolua_S, "getStringForKey", lua_ax_base_UserDataEx_getStringForKey);
+        tolua_function(tolua_S, "getBoolForKey", lua_ax_base_UserDataEx_getBoolForKey);
+        tolua_function(tolua_S, "getIntegerForKey", lua_ax_base_UserDataEx_getIntegerForKey);
+        // tolua_function(tolua_S, "getUnsignedForKey", lua_ax_base_UserDataEx_getUnsignedForKey);
+        // tolua_function(tolua_S, "getByteForKey", lua_ax_base_UserDataEx_getByteForKey);
+        //删除 一个指定的 Key ，也就是 该键值 在一个字典内不存在。
+        tolua_function(tolua_S, "deleteForkey", lua_ax_base_UserDataEx_deleteForKey);
+        tolua_function(tolua_S, "setEncryptEnabled", lua_ax_base_UserDataEx_setEncryptEnabled);
+        tolua_function(tolua_S, "writeMapDataToFile", lua_ax_base_UserDataEx_saveData);
+        tolua_function(tolua_S, "saveData", lua_ax_base_UserDataEx_saveData); 
+        tolua_function(tolua_S, "setAutoSave", lua_ax_base_UserDataEx_setAutoSave); 
     //AXLOGI(" bindings UserDATAEx End");
     tolua_endmodule(tolua_S);
     auto typeName = typeid(ax::UserDataEx).name(); // rtti is literal storage
     g_luaType[reinterpret_cast<uintptr_t>(typeName)] = "ax.UserDataEx";
     g_typeCast[typeName] = "ax.UserDataEx";
+    return 1;
+}
+
+
+
+int lua_ax_LuaBridgeControl_new(lua_State* tolua_S) {
+    if (nullptr == tolua_S) {
+        return 0;
+    }
+
+    int argc = 0;
+
+    // 检查参数数量和类型
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+        if (!tolua_isusertable(tolua_S, 1, "ax.LuaBridgeControl", 0, &tolua_err)) {
+            goto tolua_lerror;
+        }
+    #endif
+    argc = lua_gettop(tolua_S) - 1;
+    AXLOGD("lua_ax_LuaBridgeControl_new argc:{}",argc);
+    if (argc == 0) {
+        // 获取单例对象
+        LuaBridgeControl* tolua_ret = (LuaBridgeControl*)LuaBridgeControl::GetInstance();
+        // 推送对象到 Lua 栈上
+        tolua_pushusertype(tolua_S, (void*)tolua_ret, "ax.LuaBridgeControl");
+        return 1;
+    } else {
+        luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d\n", "LuaBridgeControl:new", argc, 0);
+        return 0;
+    }
+
+    #if _AX_DEBUG >= 1
+    tolua_lerror:
+        tolua_error(tolua_S, "#ferror in function 'lua_ax_LuaBridgeControl_new'.", &tolua_err);
+        return 0;
+    #endif
+}
+
+int lua_ax_LuaBridgeControl_destroyInstance(lua_State* tolua_S) {
+    if (nullptr == tolua_S) {
+        return 0;
+    }
+
+    int argc = 0;
+    bool ok = true;
+
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
+
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertable(tolua_S, 1, "ax.LuaBridgeControl", 0, &tolua_err)) {
+            goto tolua_lerror;
+        }
+    #endif
+
+    argc = lua_gettop(tolua_S) - 1;
+
+    if (argc == 0) {
+        // 销毁单例对象
+        LuaBridgeControl::DestroyInstance();
+        lua_settop(tolua_S, 1); // 保留调用者传递的 self 参数
+        return 0; // 没有返回值
+    } else {
+        luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d\n", "LuaBridgeControl:destroyInstance", argc, 0);
+        return 0;
+    }
+
+    #if _AX_DEBUG >= 1
+    tolua_lerror:
+        tolua_error(tolua_S, "#ferror in function 'lua_ax_LuaBridgeControl_destroyInstance'.", &tolua_err);
+        return 0;
+    #endif
+}
+
+int lua_ax_LuaBridgeControl_GetInit3rdparty(lua_State* tolua_S) {
+    if (nullptr == tolua_S) {
+        return 0;
+    }
+
+    int argc = 0;
+    LuaBridgeControl* cobj = nullptr;
+    bool ok = true;
+
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
+
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertype(tolua_S, 1, "ax.LuaBridgeControl", 0, &tolua_err))
+            goto tolua_lerror;
+    #endif
+
+    cobj = (LuaBridgeControl*)tolua_tousertype(tolua_S, 1, 0);
+    if (!cobj) {
+        tolua_error(tolua_S, "无效的 'cobj' 在函数 'lua_ax_LuaBridgeControl_GetInit3rdparty'", nullptr);
+        return 0;
+    }
+
+    argc = lua_gettop(tolua_S) - 1;
+    if (argc == 0) {
+        // 调用成员函数
+        bool ret = cobj->GetInit3rdparty();
+        tolua_pushboolean(tolua_S, ret);
+        return 1;
+    } else {
+        luaL_error(tolua_S, "%s 参数数量错误: %d, 应该期望 %d\n", "LuaBridgeControl:GetInit3rdparty", argc, 0);
+        return 0;
+    }
+
+    #if _AX_DEBUG >= 1
+    tolua_lerror:
+        tolua_error(tolua_S, "#ferror 在函数 'lua_ax_LuaBridgeControl_GetInit3rdparty'.", &tolua_err);
+        return 0;
+    #endif
+}
+
+int lua_ax_LuaBridgeControl_SetInit3rdparty(lua_State* tolua_S) {
+    LuaBridgeControl* cobj = nullptr;
+    bool ok = true;
+    int argc = lua_gettop(tolua_S) - 1;
+
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+        if (!tolua_isusertype(tolua_S, 1, "ax.LuaBridgeControl", 0, &tolua_err))
+            goto tolua_lerror;
+    #endif
+
+    cobj = (LuaBridgeControl*)tolua_tousertype(tolua_S, 1, 0);
+    if (!cobj) {
+        tolua_error(tolua_S, "无效的 'cobj' 在函数 'lua_ax_LuaBridgeControl_SetInit3rdparty'", nullptr);
+        return 0;
+    }
+
+    if (argc == 1) {
+        bool init3rdparty = false;
+        ok &= luaval_to_boolean(tolua_S, 2, &init3rdparty, "LuaBridgeControl:SetInit3rdparty");
+
+        if (!ok) {
+            tolua_error(tolua_S, "无效的参数在函数 'lua_ax_LuaBridgeControl_SetInit3rdparty'", nullptr);
+            return 0;
+        }
+
+        cobj->SetInit3rdparty(init3rdparty);
+        lua_settop(tolua_S, 1);
+        return 1;
+    }
+
+    luaL_error(tolua_S, "%s 参数数量错误: %d, 应该期望 %d\n", "LuaBridgeControl:SetInit3rdparty", argc, 1);
+    return 0;
+
+    #if _AX_DEBUG >= 1
+    tolua_lerror:
+        tolua_error(tolua_S, "#ferror 在函数 'lua_ax_LuaBridgeControl_SetInit3rdparty'.", &tolua_err);
+    #endif
+    return 0;
+}
+
+int lua_ax_LuaBridgeControl_GetModulesSwitch(lua_State* tolua_S) {
+    int argc = 0;
+    LuaBridgeControl* cobj = nullptr;
+    bool ok = true;
+
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
+
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertype(tolua_S, 1, "ax.LuaBridgeControl", 0, &tolua_err))
+            goto tolua_lerror;
+    #endif
+
+    cobj = (LuaBridgeControl*)tolua_tousertype(tolua_S, 1, 0);
+    if (!cobj) {
+        tolua_error(tolua_S, "无效的 'cobj' 在函数 'lua_ax_LuaBridgeControl_GetModulesSwitch'", nullptr);
+        return 0;
+    }
+
+    argc = lua_gettop(tolua_S) - 1;
+    if (argc == 1) {
+        int index = 0;
+        ok &= luaval_to_int32(tolua_S, 2, &index, "LuaBridgeControl:GetModulesSwitch");
+
+        if (!ok) {
+            tolua_error(tolua_S, "无效的参数在函数 'lua_ax_LuaBridgeControl_GetModulesSwitch'", nullptr);
+            return 0;
+        }
+
+        int ret = cobj->GetModulesSwitch(index); // 假设 GetModulesSwitch 是非静态成员函数
+        tolua_pushnumber(tolua_S, ret); // 将返回值推送到 Lua 栈上
+        return 1;
+    }
+
+    luaL_error(tolua_S, "%s 参数数量错误: %d, 应该期望 %d\n", "LuaBridgeControl:GetModulesSwitch", argc, 1);
+    return 0;
+
+    #if _AX_DEBUG >= 1
+    tolua_lerror:
+        tolua_error(tolua_S, "#ferror 在函数 'lua_ax_LuaBridgeControl_GetModulesSwitch'.", &tolua_err);
+    #endif
+    return 0;
+}
+
+int lua_ax_LuaBridgeControl_SetModulesSwitch(lua_State* tolua_S) {
+    LuaBridgeControl* cobj = nullptr;
+    bool ok = true;
+    int argc = lua_gettop(tolua_S) - 1;
+
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+        if (!tolua_isusertype(tolua_S, 1, "ax.LuaBridgeControl", 0, &tolua_err))
+            goto tolua_lerror;
+    #endif
+
+    cobj = (LuaBridgeControl*)tolua_tousertype(tolua_S, 1, 0);
+    if (!cobj) {
+        tolua_error(tolua_S, "无效的 'cobj' 在函数 'lua_ax_LuaBridgeControl_SetModulesSwitch'", nullptr);
+        return 0;
+    }
+
+    if (argc == 2) {
+        int index = 0;
+        int value = 0;
+        ok &= luaval_to_int32(tolua_S, 2, &index, "LuaBridgeControl:SetModulesSwitch");
+        ok &= luaval_to_int32(tolua_S, 3, &value, "LuaBridgeControl:SetModulesSwitch");
+
+        if (!ok) {
+            tolua_error(tolua_S, "无效的参数在函数 'lua_ax_LuaBridgeControl_SetModulesSwitch'", nullptr);
+            return 0;
+        }
+
+        cobj->SetModulesSwitch(index, value);
+        lua_settop(tolua_S, 1);
+        return 1;
+    }
+
+    luaL_error(tolua_S, "%s 参数数量错误: %d, 应该期望 %d\n", "LuaBridgeControl:SetModulesSwitch", argc, 2);
+    return 0;
+
+    #if _AX_DEBUG >= 1
+    tolua_lerror:
+        tolua_error(tolua_S, "#ferror 在函数 'lua_ax_LuaBridgeControl_SetModulesSwitch'.", &tolua_err);
+    #endif
+    return 0;
+}
+int lua_ax_LuaBridgeControl_CreateNewState(lua_State* tolua_S) {
+    int argc = 0;
+    LuaBridgeControl* cobj = nullptr;
+    bool ok = true;
+
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
+
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertype(tolua_S, 1, "ax.LuaBridgeControl", 0, &tolua_err))
+            goto tolua_lerror;
+    #endif
+
+    cobj = (LuaBridgeControl*)tolua_tousertype(tolua_S, 1, 0);
+    #if _AX_DEBUG >= 1
+        if (!cobj) {
+            tolua_error(tolua_S, "无效的 'cobj' 在函数 'lua_ax_LuaBridgeControl_CreateNewState'", nullptr);
+            return 0;
+        }
+    #endif
+
+    argc = lua_gettop(tolua_S) - 1;
+
+    if (argc == 0) {
+        // Since CreateNewState doesn't take any parameters, we can directly call it.
+        cobj->CreateNewState();
+        lua_settop(tolua_S, 1); // Keep the self object on the stack.
+        return 0; // No values are returned, so we return 0.
+    }
+
+    luaL_error(tolua_S, "%s 参数数量错误: %d, 应该期望 %d\n", "LuaBridgeControl:CreateNewState", argc, 0);
+    return 0;
+
+    #if _AX_DEBUG >= 1
+    tolua_lerror:
+        tolua_error(tolua_S, "#ferror 在函数 'lua_ax_LuaBridgeControl_CreateNewState'.", &tolua_err);
+    #endif
+    return 0;
+}
+// Registration function to bind LuaBridgeControl class to Lua
+int register_all_axlua_bindings_LuaBridgeControl(lua_State* tolua_S)
+{
+    tolua_usertype(tolua_S, "ax.LuaBridgeControl");
+    AXLOGD(" bindings LuaBridgeControl Start ax.LuaBridgeControl");
+    tolua_cclass(tolua_S, "LuaBridgeControl", "ax.LuaBridgeControl", "ax.Object", nullptr);
+    tolua_beginmodule(tolua_S, "LuaBridgeControl");
+        tolua_function(tolua_S, "Inst",lua_ax_LuaBridgeControl_new);
+        tolua_function(tolua_S,"destroyInstance", lua_ax_LuaBridgeControl_destroyInstance);
+        //AXLOGI(" bindings LuaBridgeControl Add New")
+        //释放一个 指定键名 的 字典对象 该对象 的数据会立即持久化
+        //------------------------------------------------------------------------------------
+        //下面都是 实例方法
+        // -- CreateNewState
+        // -- IsInit3rdparty
+        tolua_function(tolua_S, "CreateNewState", lua_ax_LuaBridgeControl_CreateNewState);
+        tolua_function(tolua_S, "IsInit3rdparty", lua_ax_LuaBridgeControl_GetInit3rdparty);
+        tolua_function(tolua_S, "Set3rdpartyInited", lua_ax_LuaBridgeControl_SetInit3rdparty);
+        tolua_function(tolua_S, "GetModulesSwitch", lua_ax_LuaBridgeControl_GetModulesSwitch);
+        tolua_function(tolua_S, "SetModulesSwitch", lua_ax_LuaBridgeControl_SetModulesSwitch);
+    tolua_endmodule(tolua_S);
+    auto typeName = typeid(ax::LuaBridgeControl).name(); 
+    g_luaType[reinterpret_cast<uintptr_t>(typeName)] = "ax.LuaBridgeControl";
+    g_typeCast[typeName] = "ax.LuaBridgeControl";
+    AXLOGD(" bindings LuaBridgeControl Start ax.LuaBridgeControl ok");
     return 1;
 }

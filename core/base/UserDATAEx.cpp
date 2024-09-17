@@ -1,52 +1,47 @@
-//---------------------------------------------------------------------------
-// UserDataEx.cpp
 #include "base/UserDataEx.h"
-#include <sstream>
-#include <iostream>
-
 #include "openssl/aes.h"
 #include "openssl/modes.h"
 #include "openssl/rc4.h"
-
 #include <stdexcept>
 #include "base/Logging.h"
 #include "base/Utils.h"
-//------------------------------------------------------------
-//       使用json 来进行处理   
 #include "simdjson/simdjson.h"
-// #include "zlib.h"
 #include "fmt/format.h"
 #include "base/ZipUtils.h"
 #include "base/PaddedString.h"
 #include <string_view>
 #include <span>
 #include "yasio/byte_buffer.hpp"
-#include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
-//------------------------------------------------------------
+#include "rapidjson/document.h"
+
 
 NS_AX_BEGIN
-std::string UserDataEx::_storagename = "ken";
-DataExMap UserDataEx::_dictionaryemap;                      //词典表
+std::string UserDataEx::_storagename;
+//std::unordered_map<std::string, std::unique_ptr<UserDataEx>>
+DataExMap* UserDataEx::_dataExMaps = nullptr;
 
 UserDataEx::UserDataEx() :
-    _dataReady(false),
-    _isModified(false),
-    _autoSave(false),
-    _encryptEnabled(false),
-    _udname(""),
-    _key(""),
-    _iv(""),
-    _values({}) {}
-
-UserDataEx::UserDataEx(std::string_view sname) : UserDataEx() {
-    if (!sname.empty()) {
-        _udname = std::string(sname);
-        AXLOGD("UserDataEx sname:{} this:{}", sname, fmt::ptr(this));
-        getUserDatainfoFromDefault();
-    }
+   _dataReady(false),
+   _isModified(false),
+   _autoSave(false),
+   _encryptEnabled(false),
+   _udname(""),
+   _key(""),
+   _iv(""),
+   _valueExMap(new ValueExMap()){
+	    if (_dataExMaps == nullptr) {
+	        _dataExMaps = new DataExMap();
+			//std::unordered_map<std::string, std::unique_ptr<UserDataEx>>();
+	    }
+   }
+UserDataEx::UserDataEx(std::string_view name)
+{
+    _udname=std::string(name);
+    getUserDatainfoFromDefault();
 }
+// std::unordered_map<std::string, std::unique_ptr<ValueEx>>
 
 bool UserDataEx::getUserDatainfoFromDefault(){
     //从 UserDefault 获得 持久数据加载
@@ -60,7 +55,7 @@ bool UserDataEx::getUserDatainfoFromDefault(){
             //直接返回 读出的字符串 并解析 到内部
             if (!sstrv.empty()) 
                 return initFromString(sstrv);
-            _values.clear();
+            _valueExMap->clear();
             //AXLOGD("getUserDatainfoFromDefault 3 rkey:{} this:{} 读出为空,初始化", 
             //            rkey,fmt::ptr(this));
             return true;    
@@ -71,21 +66,17 @@ bool UserDataEx::getUserDatainfoFromDefault(){
 
 UserDataEx::~UserDataEx() {
     if (_isModified) {
-        // Consider moving save logic outside of destructor or using RAII
         saveData();
-    }
+	}
+	AX_SAFE_DELETE(_valueExMap);
 }
 
-    void modify();
 void UserDataEx::modify() {
     _isModified=true;                                          //是否修改标志
     if (_autoSave) {                                           //自动保存开关 开启的话，会自动调用 保存             
         saveData();
     }
 }
-
-
-
 bool UserDataEx::initFromString(std::string_view rhs){
     using namespace simdjson;
     //读取过程 Base64解码 解压缩 反序列化
@@ -104,14 +95,14 @@ bool UserDataEx::initFromString(std::string_view rhs){
         };
         std::string_view svdatas = settings["datas"];
         //AXLOGD("initFromString svdatas:{} this:{}", svdatas,fmt::ptr(this));
-        _values.clear();
+        _valueExMap->clear();
         if (svdatas.empty()) {
             return true;
         }
         auto comprData   = utils::base64Decode(svdatas);
         auto  uncomprData = ZipUtils::decompressGZ(std::span{comprData});
         std::string sjdata(reinterpret_cast<const char*>(uncomprData.data()), uncomprData.size());
-        AXLOGD("initFromString Get Str:{}",sjdata);
+        // AXLOGD("initFromString Get Str:{}",sjdata);
         simdjson::padded_string strJson2(sjdata); // copies to a padded buffer
         // simdjson::padded_string strJson2(std::string("")); // copies to a padded buffer
         dom::parser parser2;
@@ -165,8 +156,10 @@ bool UserDataEx::initFromString(std::string_view rhs){
                 continue;
             }
             auto etype = static_cast<u_char>(etypeRes.value());
-            AXLOGD("initFromString setTypeValueForKey svname:{}  svvalue:{} etypeRes:{} this:{}", svname, svvalue,etype,fmt::ptr(this));
-            setTypeValueForKey(svname, svvalue, etype);
+            // AXLOGD("initFromString setTypeValueForKey svname:{}  svvalue:{} etypeRes:{} this:{}", svname, svvalue,etype,fmt::ptr(this));
+            // setTypeValueForKey(svname, svvalue, etype);
+
+            //需要调整 为 用 反序列化 进行处理。
         }
         _dataReady=true;
         _isModified=false;
@@ -180,288 +173,180 @@ bool UserDataEx::initFromString(std::string_view rhs){
     }
     return false;
 };
+// 在 UserDataEx.cpp 中实现 GetType 函数
+int GetType(const ValueEx& value) {
+    if (std::holds_alternative<bool>(value)) return 0;
+    if (std::holds_alternative<int>(value)) return 1;
+    if (std::holds_alternative<int64_t>(value)) return 2;
+    if (std::holds_alternative<float>(value)) return 3;
+    if (std::holds_alternative<double>(value)) return 4;
+    if (std::holds_alternative<std::string>(value)) return 5;
+    return -1; // Should never reach here
+}
 
-//生成 一个具体 项 的 存储字符串
-std::string UserDataEx::GenJsonString(){
+std::string UserDataEx::Serialize() const {
     rapidjson::Document document;
     document.SetObject();
+    rapidjson::Document::AllocatorType& allocator = document.GetAllocator();
 
-    // Add boolean value "Encrypt"
-    auto sdata=GenJsonDictString();
-    document.AddMember("Encrypt", _encryptEnabled, document.GetAllocator());
-    if (_encryptEnabled) {        //存在加密 需要输出 密钥
-        // Add string values "key", "iv", and "data"
-        document.AddMember("key", rapidjson::Value().SetString(_key.data(),_key.size(), document.GetAllocator()), document.GetAllocator());
-        document.AddMember("iv", rapidjson::Value().SetString(_iv.data(),_iv.size(), document.GetAllocator()), document.GetAllocator());
-    }
-    document.AddMember("datas", rapidjson::Value().SetString(sdata.data(),sdata.size(), document.GetAllocator()), document.GetAllocator());
-    // Serialize JSON to a string
     rapidjson::StringBuffer buffer;
     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-    document.Accept(writer);
 
+    for (const auto& [key, valuePtr] : *_valueExMap) {
+        const auto& value = *valuePtr;
+        rapidjson::Value jsonKey;
+        jsonKey.SetString(key.c_str(), allocator);
+        // std::cout << "key: " << key << std::endl;
+
+        rapidjson::Value jsonValue;
+        jsonValue.SetObject();
+
+        jsonValue.AddMember("type", rapidjson::Value().SetInt(GetType(value)), allocator);
+
+        std::visit([&](const auto& val) {
+            using T = std::decay_t<decltype(val)>;
+            if constexpr (std::is_same_v<T, bool>) {
+                jsonValue.AddMember("value", rapidjson::Value().SetBool(val), allocator);
+                // std::cout << "value "<< val << std::endl;
+            } else if constexpr (std::is_same_v<T, int>) {
+                jsonValue.AddMember("value", rapidjson::Value().SetInt(val), allocator);
+                // std::cout << "value "<< val << std::endl;
+
+            } else if constexpr (std::is_same_v<T, int64_t>) {
+                jsonValue.AddMember("value", rapidjson::Value().SetInt64(val), allocator);
+                // std::cout << "value "<< val << std::endl;
+            } else if constexpr (std::is_same_v<T, float>) {
+                jsonValue.AddMember("value", rapidjson::Value().SetFloat(val), allocator);
+                // std::cout << "value "<< val << std::endl;
+            } else if constexpr (std::is_same_v<T, double>) {
+                jsonValue.AddMember("value", rapidjson::Value().SetDouble(val), allocator);
+                // std::cout << "value "<< val << std::endl;
+            } else if constexpr (std::is_same_v<T, std::string>) {
+                jsonValue.AddMember("value", rapidjson::Value().SetString(val.c_str(), allocator), allocator);
+                // std::cout << "value "<< val << std::endl;
+            }
+        }, value);        
+        // std::cout << "value "<< value << std::endl;
+        document.AddMember(jsonKey, jsonValue, allocator);
+    }
+
+    document.Accept(writer);
     return buffer.GetString();
 }
 
-//生成字典的 存储字符串
-std::string UserDataEx::GenJsonDictString(){
-    //生成过程 序列化 加密 压缩 Base64
-    rapidjson::Document doc;
-    doc.SetObject();
-    // 创建一个数组
-    rapidjson::Value dictArray(rapidjson::kArrayType);
-    // 遍历_values并添加到数组
-    for (const auto& [key, value] : _values) {
-        rapidjson::Value dict(rapidjson::kObjectType);
-        //不管什么类型 采用字符串模式 去存储        
-        dict.AddMember("name", rapidjson::Value().SetString(key.data(), key.size(), doc.GetAllocator()), doc.GetAllocator());
-        dict.AddMember("value", rapidjson::Value().SetString(value.asString().c_str(), value.asString().size(), doc.GetAllocator()), doc.GetAllocator());
-        dict.AddMember("type", static_cast<int>(value.getType()), doc.GetAllocator());
-        dictArray.PushBack(dict, doc.GetAllocator());
+bool UserDataEx::Deserialize(const std::string& jsonStr) {
+    rapidjson::Document document;
+    document.Parse(jsonStr.c_str());
+    if (document.HasParseError()) {
+        std::cerr << "JSON parse error: " << document.GetParseError() << std::endl;
+        return false;
     }
-    // 将数组添加到文档
-    doc.AddMember("dict", dictArray, doc.GetAllocator());
-    // 创建一个StringBuffer用于保存JSON字符串
-    rapidjson::StringBuffer buffer;
-    // 创建一个Writer用于写入StringBuffer
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-    // 将文档写入StringBuffer
-    doc.Accept(writer);
-    // 返回构建的JSON字符串
-    // Step 2: Encrypt the JSON string
-    std::string jsonStr = buffer.GetString();
-    if (_encryptEnabled) {
-        encrypt(jsonStr,AES_ENCRYPT);                       //加密 
+
+    _valueExMap->clear();
+    for (auto& member : document.GetObj()) {
+        std::string key = member.name.GetString();
+        const rapidjson::Value& jsonValue = member.value;
+
+        int type = jsonValue["type"].GetInt();
+        std::unique_ptr<ValueEx> valueEx;
+        switch (type) {
+            case 0: valueEx = std::make_unique<ValueEx>(jsonValue["value"].GetBool()); break;
+            case 1: valueEx = std::make_unique<ValueEx>(jsonValue["value"].GetInt()); break;
+            case 2: valueEx = std::make_unique<ValueEx>(jsonValue["value"].GetInt64()); break;
+            case 3: valueEx = std::make_unique<ValueEx>(jsonValue["value"].GetFloat()); break;
+            case 4: valueEx = std::make_unique<ValueEx>(jsonValue["value"].GetDouble()); break;
+            // case 5: valueEx = std::make_unique<ValueEx>(jsonValue["value"].GetString()); break;
+            case 5: valueEx = std::make_unique<ValueEx>(std::string(jsonValue["value"].GetString())); break;
+            default: continue;
+        }
+        _valueExMap->emplace(key, std::move(valueEx));
     }
-    // Step 2.5: Compress the encrypted JSON string Convert the string to a span of characters
-    std::span<char> span{jsonStr};
-    // Use the provided compressGZ function to compress the data
-    yasio::byte_buffer compressedData = ZipUtils::compressGZ(span);         //压缩数据
-    // Step 3: Base64 encode the compressed data 
-    return  utils::base64Encode(compressedData.data(), compressedData.size()); //Base64
-
+    return true;
 }
 
-ValueEx& UserDataEx::getValueEx(std::string_view skey) {
-   std::string sskey(skey);  
-  //AXLOGD("getValueEx skey:{}  this:{}  _values:{} ",sskey,fmt::ptr(this),fmt::ptr(&_values));
-  auto it = _values.find(sskey);
-  ////AXLOGD("getValueEx skey:{}  this:{}",skey,fmt::ptr(this));
-//   if (it != _values.end()) {
-//         //AXLOGD("Found value it:{}",fmt::ptr(static_cast<void*>(&it->second))); // 假设 ValueEx 有一个 get() 成员
-//     } else {
-//         //AXLOGD("No value found for key'");
-//     }
-  if (it != _values.end()) {
-    // //AXLOGD("getValueEx skey:{} it->second:{}",skey,fmt::ptr(it->second));
-    return it->second;
-  }
-//   return nil
-  throw std::runtime_error("Key not found in UserDataEx.");
+
+
+void UserDataEx::PrintData() const {
+    std::cout << "json: " << Serialize() << std::endl;
 }
 
-void UserDataEx::setDoubleForKey(std::string_view skey, double value) {
-    std::string sskey(skey);  
-  //AXLOGD("setDoubleForKey skey:{} value:{} this:{}",sskey,value,fmt::ptr(this));
-  _values[sskey] = ValueEx(value);
-  //AXLOGD("setDoubleForKey check value:{}",_values[sskey].asDouble());
-  auto aa     = getDoubleForKey(sskey);
-  //AXLOGD("getDoubleForKey check value:{}",aa);
-  modify();
-  //_isModified=true;                                          //是否修改标志
+template <typename T>
+void UserDataEx::setForKey(const std::string_view& key, T value) {
+    _valueExMap->emplace(std::string(key), std::make_unique<ValueEx>(value));
+    modify();
 }
 
-void UserDataEx::setFloatForKey(std::string_view skey, float value) {
- std::string sskey(skey);  
-  //AXLOGD("setFloatForKey skey:{} value:{} this:{}",sskey,value,fmt::ptr(this));
-  _values[sskey] = ValueEx(value);
-  modify();
-  //_isModified=true;                                          //是否修改标志
-}
-
-void UserDataEx::setTypeValueForKey(std::string_view skey,std::string_view value,u_char ntype){
- std::string sskey(skey);  
- //AXLOGD("setTypeValueForKey skey:{} value:{} this:{}",sskey,value,fmt::ptr(this));
-  _values[sskey] = ValueEx(value,ntype);
-  modify();
-  //_isModified=true;                                          //是否修改标志
-}
-
-void UserDataEx::setStringForKey(std::string_view skey,
-                                 std::string_view value) {
-    std::string sskey(skey);                                      
-  //AXLOGD("setStringForKey skey:{} value:{} this:{}",sskey,value,fmt::ptr(this));
-  _values[sskey] = ValueEx(value);
-  modify();
-  //_isModified=true;                                          //是否修改标志
-}
-void  UserDataEx::setStringForKey(std::string skey, std::string value){
-  std::string sskey(skey);  
-  //AXLOGD("setStringForKey skey:{} value:{} this:{}",sskey,value,fmt::ptr(this));
-  _values[sskey] = ValueEx(value);
-  modify();
-  //_isModified=true;                                          //是否修改标志
-}
-
-void UserDataEx::setBoolForKey(std::string_view skey, bool value) {
-  std::string sskey(skey);  
-  //AXLOGD("setBoolForKey skey:{} value:{} this:{}",sskey,value,fmt::ptr(this));
-  _values[sskey] = ValueEx(value);
-  modify();
-  //_isModified=true;                                          //是否修改标志
-}
-
-void UserDataEx::setIntegerForKey(std::string_view skey, int value) {
-  std::string sskey(skey);  
-  //AXLOGD("setIntegerForKey skey:{} value:{} this:{}",sskey,value,fmt::ptr(this));
-  _values[sskey] = ValueEx(value);
-  modify();
-  //_isModified=true;                                          //是否修改标志
-}
-
-void UserDataEx::setUnsignedForKey(std::string_view skey,
-                                   unsigned int value) {
-  std::string sskey(skey);  
-  //AXLOGD("setUnsignedForKey skey:{} value:{} this:{}",sskey,value,fmt::ptr(this));
-  _values[sskey] = ValueEx(value);
-  modify();
-  //_isModified=true;                                          //是否修改标志
-}
-
-void  UserDataEx::setInt64ForKey(std::string_view skey, int64_t value){
-  std::string sskey(skey);  
-  //AXLOGD("setInt64ForKey skey:{} value:{} this:{}",sskey,value,fmt::ptr(this));
-  _values[sskey] = ValueEx(value);
-  modify();
-  //_isModified=true;                                          //是否修改标志
-};
-void UserDataEx::setUnsignedInt64ForKey(std::string_view skey, uint64_t value){
-  std::string sskey(skey);  
-  //AXLOGD("setUnsignedInt64ForKey skey:{} value:{} this:{}",sskey,value,fmt::ptr(this));
-  _values[sskey] = ValueEx(value);
-  modify();
-  //_isModified=true;                                          //是否修改标志
-};
-
-
-
-void UserDataEx::setByteForKey(std::string_view skey, unsigned char value) {
-  std::string sskey(skey);  
-  //AXLOGD("setByteForKey skey:{} value:{} this:{}",sskey,value,fmt::ptr(this));
-  _values[sskey] = ValueEx(value);
-  modify();
-  //_isModified=true;                                          //是否修改标志
-}
-
-double UserDataEx::getDoubleForKey(std::string_view skey) {
-  std::string sskey(skey);  
-  //AXLOGD("getDoubleForKey skey:{} this:{}",sskey,fmt::ptr(this));
-//   auto exd=getValueEx(skey);
-//   //AXLOGD("getDoubleForKey skey:{} exd:{}",skey,fmt::ptr(&exd));
-//   return exd.asDouble();
-// 使用 find 函数检查 "abc" 是否存在
-    auto it = _values.find(sskey);
-    if (it != _values.end()) {
-        // 如果存在，it 指向该元素
-        auto valueEx = it->second;
-        //AXLOGD("getDoubleForKey skey:{} asdouble:{}",sskey, valueEx.asDouble());
-        return valueEx.asDouble();
-    } else {
-        // 如果不存在，可以通过其他方式处理
-        // 例如抛出异常、返回默认值或插入新值
-        //AXLOGD("getDoubleForKey skey:{} 没找到",sskey);
-        return 0.0;
+template <typename T>
+T UserDataEx::getForKey(const std::string_view& key, T def) const {
+    std::string keyStr(key);
+    auto it = _valueExMap->find(keyStr);
+    if (it == _valueExMap->end()) {
+        // 如果键不存在，则创建一个新的 ValueEx 对象并初始化为默认值
+        _valueExMap->emplace(keyStr, std::make_unique<ValueEx>(def));
+        return def;
+    }
+    try {
+        // 如果键存在，尝试获取值
+        return std::get<T>(*it->second);
+    } catch (const std::bad_variant_access&) {
+        // 如果类型不匹配，返回默认值
+        return def;
     }
 }
-
-float UserDataEx::getFloatForKey(std::string_view skey) {
-  std::string sskey(skey);  
-  //AXLOGD("getFloatForKey skey:{} this:{}",sskey,fmt::ptr(this));
-  return getValueEx(sskey).asFloat();
-}
-
-bool UserDataEx::getBoolForKey(std::string_view skey) {
-  std::string sskey(skey);  
-  //AXLOGD("getBoolForKey skey:{} this:{}",sskey,fmt::ptr(this));
-  return getValueEx(sskey).asBool();
-}
-
-std::string UserDataEx::getStringForKey(std::string_view skey,std::string_view defstr) {
-  std::string sskey(skey);  
-  //AXLOGD("getStringForKey skey:{} this:{}",sskey,fmt::ptr(this));
-    auto it = _values.find(sskey);
-    if (it != _values.end()) {
-        // 如果存在，it 指向该元素
-        auto valueEx = it->second;
-        //AXLOGD("getDoubleForKey skey:{} asdouble:{}",sskey, valueEx.asDouble());
-        return valueEx.asString();
-    } 
-    // else {
-        // 如果不存在，可以通过其他方式处理
-        // 例如抛出异常、返回默认值或插入新值
-        AXLOGD("getDoubleForKey skey:{}  写入默认值:{}",sskey,defstr);
-        setStringForKey(skey,defstr);
-        return std::string(defstr);
-    // }
-//   return getValueEx(sskey).asString();
-}
-
-bool UserDataEx::deleteForKey(std::string_view skey){
-    // 使用 erase 函数删除 key，返回被删除元素的数量（0 或 1）
-    std::string sskey(skey);  
-    auto result = _values.erase(sskey);
-        // 如果 result 是 1，说明找到了 key 并成功删除；如果是 0，说明 key 不存在
-    return result > 0;
-    // return getValueEx(skey).asString();
+void UserDataEx::setDoubleForKey(const std::string_view& key, double value){
+    setForKey(key,value);
 };
-int UserDataEx::getIntegerForKey(std::string_view skey,int def) {
-  //AXLOGD("getIntegerForKey skey:{} this:{}",skey,fmt::ptr(this));
-  //return getValueEx(skey).asInt();
-  std::string sskey(skey);  
-  //AXLOGD("getStringForKey skey:{} this:{}",sskey,fmt::ptr(this));
-  auto it = _values.find(sskey);
-  if (it != _values.end()) {
-    // 如果存在，it 指向该元素
-    auto valueEx = it->second;
-    //AXLOGD("getDoubleForKey skey:{} asdouble:{}",sskey, valueEx.asDouble());
-    return valueEx.asInt32();
-  };
-//    else {
-    // 如果不存在，可以通过其他方式处理
-    // 例如抛出异常、返回默认值或插入新值
-    // AXLOGD("getDoubleForKey skey:{}  写入默认值:{}",sskey,defstr);
-    setIntegerForKey(skey,def);
-    return def;
-//   }
-    //return getValueEx(sskey).asString();
+void UserDataEx::setFloatForKey(const std::string_view& key, float value){
+    setForKey(key,value);
+};
+void UserDataEx::setStringForKey(const std::string_view& key, const std::string& value){
+    setForKey(key,value);
+};
+
+void UserDataEx::setBoolForKey(const std::string_view& key, bool value){
+    setForKey(key,value);
+};
+void UserDataEx::setIntegerForKey(const std::string_view& key, int value){
+    setForKey(key,value);
+};
+void UserDataEx::setInt64ForKey(const std::string_view& key, int64_t value){
+    setForKey(key,value);
+};
+
+double UserDataEx::getDoubleForKey(const std::string_view& key, double value){
+    return getForKey(key,value);
+};
+float UserDataEx::getFloatForKey(const std::string_view& key, float value){
+    return getForKey(key,value);
+};
+bool UserDataEx::getBoolForKey(const std::string_view& key, bool value){
+    return getForKey(key,value);
+};
+
+std::string UserDataEx::getStringForKey(const std::string_view& key, const std::string& value){
+    return getForKey(key,value);
+}    
+bool UserDataEx::deleteForKey(std::string_view skey) {
+    // 检查 _valueExMap 是否为空以及键是否存在
+	std::string sskey(skey);  
+    if (_valueExMap != nullptr && 
+		_valueExMap->find(sskey) != _valueExMap->end()) 
+		{
+	        // 删除指定的键
+    	    _valueExMap->erase(sskey);
+        	return true;
+    }
+    // 键不存在或 _valueExMap 为空
+    return false;
 }
 
-unsigned int UserDataEx::getUnsignedForKey(std::string_view skey) {
-  //AXLOGD("getUnsignedForKey skey:{} this:{}",skey,fmt::ptr(this));
-  return getValueEx(skey).asUInt();
-}
-int64_t UserDataEx::getInt64ForKey(std::string_view skey,int64_t def) {
-  std::string sskey(skey);  
-  auto it = _values.find(sskey);
-  if (it != _values.end()) {
-    auto valueEx = it->second;
-    return valueEx.asInt64();
-  };
-    setInt64ForKey(skey,def);
-    return def;
+int UserDataEx::getIntegerForKey(const std::string_view& key, int value){
+    return getForKey(key,value);
+};
+int64_t UserDataEx::getInt64ForKey(const std::string_view& key, int64_t value){
+    return getForKey(key,value);
+};
 
-//   return getValueEx(skey).asInt64();
-}
-
-uint64_t UserDataEx::getUnsignedInt64ForKey(std::string_view skey) {
-  //AXLOGD("getUnsignedInt64ForKey skey:{} this:{}",skey,fmt::ptr(this));  
-  return getValueEx(skey).asUInt64();
-}
-
-unsigned char UserDataEx::getByteForKey(std::string_view skey) {
-  //AXLOGD("getByteForKey skey:{} this:{}",skey,fmt::ptr(this));  
-  return getValueEx(skey).asUChar();
-}
 
 void UserDataEx::ud_setkey(std::string& lhs,std::string_view rhs){
   static const size_t keyLen = 16;
@@ -472,7 +357,6 @@ void UserDataEx::ud_setkey(std::string& lhs,std::string_view rhs){
   } else
     lhs.assign(keyLen, '\0');  
 }
-
 void UserDataEx::setEncryptEnabled(bool enabled, std::string_view key, std::string_view iv)
 {
     _encryptEnabled = enabled;
@@ -520,22 +404,20 @@ void UserDataEx::encrypt(char* inout, size_t size, int enc) {
                            &aeskey, iv, &ignored_num, enc);
       }
 }
-//---class function
-//--------------------------------------------------------------------------------------------
 
 void UserDataEx::deleteStorage(std::string_view name) 
 {
     std::string  rkey;                             //组合主键       
     auto ud =UserDefault::getInstance();
-    //AXLOGD("deleteStorage name:{} this:{}",name,fmt::ptr(ud));  
+     //AXLOGD("deleteStorage name:{} this:{}",name,fmt::ptr(ud));  
     if (ud){
-        for (const auto& pair : _dictionaryemap) {
-           //std::cout << "Key: " << pair.first << std::endl;
-           auto rkey=std::string(name)+pair.first;
-           //AXLOGD("删除 键:{}",rkey);
-        //    //AXLOGD("deleteStorage name:{} this:{}",name,fmt::ptr(ud));  
-           ud->deleteValueForKey(rkey.c_str());
-        }
+         for (const auto& pair : *_dataExMaps) {
+            //std::cout << "Key: " << pair.first << std::endl;
+            auto rkey=std::string(name)+pair.first;
+            //AXLOGD("删除 键:{}",rkey);
+         //    //AXLOGD("deleteStorage name:{} this:{}",name,fmt::ptr(ud));  
+            ud->deleteValueForKey(rkey.c_str());
+         }
     }
 }
 void UserDataEx::saveStorage() 
@@ -543,28 +425,27 @@ void UserDataEx::saveStorage()
     auto ud =UserDefault::getInstance();        
     //AXLOGD("saveStorage this:{}",fmt::ptr(ud));  
     if (ud){
-        for (const auto& pair : _dictionaryemap) {      //遍历所有的 实例 执行存储
+        for (const auto& pair : *_dataExMaps) {      //遍历所有的 实例 执行存储
            auto rkey=_storagename+std::string(pair.first);
            //AXLOGD("执行 所有函数的 保存:{}",rkey);
            pair.second->saveData();
         }
     }
 }
-
 void UserDataEx::setStorageName(std::string_view name) {
   if (!_storagename.empty()){
     deleteStorage(getStorageName());                    //从持久化 删除所有的 数据
   } 
-  _storagename =std::string(name);
+    _storagename = std::string(name);
   saveStorage();                        //保存所有数据到 持久化
 }
-
 void UserDataEx::clearAll(){                                   //  清除所有的字典
     deleteStorage(_storagename);                               // 清除存储的数据
-    _dictionaryemap.clear();                                   // 删除所有的字典地点 
+    _dataExMaps->clear();                                       // 删除所有的字典地点 
 }
-std::string_view UserDataEx::getStorageName() { return _storagename; }
-
+std::string_view UserDataEx::getStorageName() {
+    return _storagename;
+}
 bool UserDataEx::saveData(){
     //从 UserDefault 获得 持久数据加载
     //if (_isModified) {
@@ -574,7 +455,7 @@ bool UserDataEx::saveData(){
         auto ud =UserDefault::getInstance();
         //AXLOGD("saveData  rkey:{}  ud:{} ",rkey,fmt::ptr(ud));
         if (ud){
-            auto svalue =  GenJsonString();             //获得生成字符串 以 复合Key  写入到 UserDefault
+            auto svalue =  Serialize();             //获得生成字符串 以 复合Key  写入到 UserDefault
             //AXLOGD("saveData  rkey:{}  ud:{}  svalue:{}",rkey,fmt::ptr(ud),svalue);
             ud->setStringForKey(rkey.c_str(),std::string_view(svalue.data()));
             _isModified=false;
@@ -591,42 +472,27 @@ bool UserDataEx::checkAndSave(){
     }
     return false;
 }
-
-UserDataEx* UserDataEx::GetUserDataEx(std::string_view skey) {
-  // Check if the UserDataEx instance already exists in the map
-  std::string sskey(skey);    
-  auto it = _dictionaryemap.find(sskey);
-    AXLOGD("GetUserDataEx skey:{} ",skey);
-  if (it != _dictionaryemap.end()) {
-    //Return the existing instance
-    AXLOGD("GetUserDataEx skey:{} ",skey);
-    return it->second.get();
-  }
-    //Attempt to create and insert a new UserDataEx instance atomically
-  auto result = _dictionaryemap.emplace(sskey, std::make_unique<UserDataEx>(sskey));  //带 名字创建的时候，会自动从 持久化存储 获取历史信息
-    AXLOGD("GetUserDataEx skey:{}",skey);
-  if (result.second) {
-    AXLOGD("GetUserDataEx skey:{} ",skey);
-    // return result->second.get();
-     return result.first->second.get();
-  }
-  return nullptr;
+UserDataEx* UserDataEx::GetUserDataEx(const std::string_view& key) {
+    std::string skey=std::string(key);
+    if (_dataExMaps->find(skey) == _dataExMaps->end()) {
+        _dataExMaps->emplace(skey, std::make_unique<UserDataEx>(skey));
+    }
+    return _dataExMaps->at(skey).get();
 }
+bool UserDataEx::DeleteUserDataEx(const std::string_view& key) {
 
-
-bool UserDataEx::DeleteUserDataEx(std::string_view skey) {
-  std::string sskey(skey);  
-  auto it = _dictionaryemap.find(sskey);
-    //AXLOGD("DeleteUserDataEx skey:{}  it:{}",skey,fmt::ptr(it));
-  if (it != _dictionaryemap.end()) {
-    //Erase the UserDataEx instance from the map
-    //AXLOGD("DeleteUserDataEx skey:{} find delete",skey);
-    deleteStorage(sskey);                                    //从持久删除 一个 字典。
-    _dictionaryemap.erase(it);
-    return true;
-  }
-  return false;
+   if (_dataExMaps != nullptr) {
+	   std::string sskey(key);  
+	   auto it = _dataExMaps->find(sskey);
+       //AXLOGD("DeleteUserDataEx skey:{}  it:{}",skey,fmt::ptr(it));
+  	   if (it != _dataExMaps->end()) {
+	   //Erase the UserDataEx instance from the map
+	   //AXLOGD("DeleteUserDataEx skey:{} find delete",skey);
+	   deleteStorage(sskey);                                    //从持久删除 一个 字典。
+       _dataExMaps->erase(it);
+	   return true;
+	  }
+    }
+	return false;    
 }
-
-
 NS_AX_END

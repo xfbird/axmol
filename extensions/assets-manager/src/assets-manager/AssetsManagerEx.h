@@ -56,18 +56,18 @@ public:
     //! Update states
     enum class State
     {
-        UNCHECKED,
-        PREDOWNLOAD_VERSION,
-        DOWNLOADING_VERSION,
-        VERSION_LOADED,
-        PREDOWNLOAD_MANIFEST,
-        DOWNLOADING_MANIFEST,
-        MANIFEST_LOADED,
-        NEED_UPDATE,
-        UPDATING,
-        UNZIPPING,
-        UP_TO_DATE,
-        FAIL_TO_UPDATE
+        UNCHECKED,                                  //0
+        PREDOWNLOAD_VERSION,                        //1        
+        DOWNLOADING_VERSION,                        //2
+        VERSION_LOADED,                             //3
+        PREDOWNLOAD_MANIFEST,                       //4    
+        DOWNLOADING_MANIFEST,                       //5    
+        MANIFEST_LOADED,                            //6    
+        NEED_UPDATE,                                //7        
+        UPDATING,                                   //8
+        UNZIPPING,                                  //9                
+        UP_TO_DATE,                                 //10
+        FAIL_TO_UPDATE                              //11
     };
 
     const static std::string VERSION_ID;
@@ -85,6 +85,14 @@ public:
      *          You may use this method before updating, then let user determine whether
      *          he wants to update resources.
      */
+    // -- local downloadEntity = ax.AssetsManagerEx:create( localManifestPath, storagePath, true,
+    // --                                                   tempManifestName, tempDirName,
+    // --                                                   resUrl, manifestUrl, versionUrl )
+
+
+    static AssetsManagerEx* create(std::string_view localManifestPath,std::string_view storagePath,bool manualUpdat,
+                                    std::string_view resUrl,std::string_view manifestUrl,std::string_view versionUrl);
+
     void checkUpdate();
 
     /** @brief Update with the current local manifest.
@@ -115,9 +123,25 @@ public:
      */
     const int getMaxConcurrentTask() const { return _maxConcurrentTask; };
 
+    const double getTotalDiffFileSize() const { return _totalDiffFileSize; };
+
     /** @brief Function for setting the max concurrent task count
      */
     void setMaxConcurrentTask(const int max) { _maxConcurrentTask = max; };
+
+
+    const bool isInterruptFlag() const { return _InterruptFlag; };
+
+    /** @brief Function for setting the max concurrent task count
+     */
+    void setInterruptFlag(const bool flag) { _InterruptFlag = flag; };
+
+    const bool isManualUpdate() const { return _ManualUpdate; };
+
+    /** @brief Function for setting the max concurrent task count
+     */
+    void setManualUpdate(const bool flag) { _ManualUpdate = flag; };
+
 
     /** @brief Set the handle function for comparing manifests versions
      * @param handle    The compare function
@@ -136,10 +160,19 @@ public:
         _verifyCallback = callback;
     };
 
-    AssetsManagerEx(std::string_view manifestUrl, std::string_view storagePath);
+    AssetsManagerEx(std::string_view manifestUrl, std::string_view storagePath,bool needinit=true);
+                    // std::string_view manifestUrl, std::string_view storagePath,bool needinit
 
+    // void exinitManifests(std:string_view localManifestPath,
+    //                      std::string_view resUrl,
+    //                      std::string_view manifestUrl,
+    //                      std::string_view versionUrl);
+    void exinitManifests(std::string_view localManifestPath,
+                         std::string_view resUrl,
+                         std::string_view manifestUrl,
+                         std::string_view versionUrl);
     virtual ~AssetsManagerEx();
-
+    void startManualUpdate();    
 protected:
     std::string_view basename(std::string_view path) const;
 
@@ -166,6 +199,7 @@ protected:
     void downloadManifest();
     void parseManifest();
     void startUpdate();
+
     void updateSucceed();
     bool decompress(std::string_view filename);
     void decompressDownloadedZip(std::string_view customId, std::string_view storagePath);
@@ -185,7 +219,7 @@ protected:
     /** @brief Download items in queue with max concurrency setting
      */
     void queueDowload();
-
+    void calcUpdateDiff();
     void fileError(std::string_view identifier,
                    std::string_view errorStr,
                    int errorCode         = 0,
@@ -318,6 +352,8 @@ private:
     //! Total file size need to be downloaded (sum of all file)
     double _totalSize;
 
+    double _totalDiffFileSize;
+
     //! Downloaded size for each file
     hlookup::string_map<double> _downloadedSize;
 
@@ -328,6 +364,8 @@ private:
     //! Next target percent for saving the manifest file
     float _nextSavePoint = 0.f;
 
+
+
     //! Handle function to compare versions between different manifests
     std::function<int(std::string_view versionA, std::string_view versionB)> _versionCompareHandle = nullptr;
 
@@ -336,6 +374,8 @@ private:
 
     //! Marker for whether the assets manager is inited
     bool _inited = false;
+    bool _ManualUpdate=false;
+    bool _InterruptFlag=false;
 };
 
 NS_AX_EXT_END
