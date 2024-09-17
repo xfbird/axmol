@@ -174,12 +174,12 @@ TOLUA_API int tolua_luanode_open(lua_State* tolua_S)
     tolua_open(tolua_S);
     tolua_reg_LuaNode_type(tolua_S);
     tolua_module(tolua_S, "ax", 0);
-    tolua_beginmodule(tolua_S, "ax");
-    tolua_cclass(tolua_S, "LuaNode", "ax.LuaNode", "ax.Node", tolua_collect_LuaNode);
-    tolua_beginmodule(tolua_S, "LuaNode");
-    tolua_function(tolua_S, "create", tolua_Cocos2d_LuaNode_create00);
-    tolua_endmodule(tolua_S);
-    tolua_endmodule(tolua_S);
+        tolua_beginmodule(tolua_S, "ax");
+            tolua_cclass(tolua_S, "LuaNode", "ax.LuaNode", "ax.Node", tolua_collect_LuaNode);
+                tolua_beginmodule(tolua_S, "LuaNode");
+                    tolua_function(tolua_S, "create", tolua_Cocos2d_LuaNode_create00);
+                tolua_endmodule(tolua_S);
+        tolua_endmodule(tolua_S);
     return 1;
 }
 
@@ -1634,31 +1634,31 @@ static int tolua_cocos2d_Scheduler_unscheduleScriptEntry(lua_State* tolua_S)
     int argc        = 0;
     Scheduler* self = nullptr;
 
-#if _AX_DEBUG >= 1
-    tolua_Error tolua_err;
-    if (!tolua_isusertype(tolua_S, 1, "ax.Scheduler", 0, &tolua_err))
-        goto tolua_lerror;
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+        if (!tolua_isusertype(tolua_S, 1, "ax.Scheduler", 0, &tolua_err))
+            goto tolua_lerror;
+    #endif
 
     self = static_cast<ax::Scheduler*>(tolua_tousertype(tolua_S, 1, 0));
 
-#if _AX_DEBUG >= 1
-    if (nullptr == self)
-    {
-        tolua_error(tolua_S, "invalid 'self' in function 'tolua_cocos2d_Scheduler_unscheduleScriptEntry'\n", NULL);
-        return 0;
-    }
-#endif
+    #if _AX_DEBUG >= 1
+        if (nullptr == self)
+        {
+            tolua_error(tolua_S, "invalid 'self' in function 'tolua_cocos2d_Scheduler_unscheduleScriptEntry'\n", NULL);
+            return 0;
+        }
+    #endif
 
     argc = lua_gettop(tolua_S) - 1;
     if (1 == argc)
     {
-#if _AX_DEBUG >= 1
-        if (!tolua_isnumber(tolua_S, 2, 0, &tolua_err))
-        {
-            goto tolua_lerror;
-        }
-#endif
+    #if _AX_DEBUG >= 1
+            if (!tolua_isnumber(tolua_S, 2, 0, &tolua_err))
+            {
+                goto tolua_lerror;
+            }
+    #endif
 
         unsigned int scheduleScriptEntryID = ((unsigned int)tolua_tonumber(tolua_S, 2, 0));
         self->unscheduleScriptEntry(scheduleScriptEntryID);
@@ -1669,13 +1669,62 @@ static int tolua_cocos2d_Scheduler_unscheduleScriptEntry(lua_State* tolua_S)
                "ax.Scheduler:unscheduleScriptEntry", argc, 1);
     return 0;
 
-#if _AX_DEBUG >= 1
-tolua_lerror:
-    tolua_error(tolua_S, "#ferror in function 'tolua_cocos2d_Scheduler_unscheduleScriptEntry'.", &tolua_err);
-    return 0;
-#endif
+    #if _AX_DEBUG >= 1
+    tolua_lerror:
+        tolua_error(tolua_S, "#ferror in function 'tolua_cocos2d_Scheduler_unscheduleScriptEntry'.", &tolua_err);
+        return 0;
+    #endif
 }
 
+static int tolua_cocos2d_Scheduler_unscheduleAllWithMinPriority(lua_State* tolua_S)
+{
+    if (NULL == tolua_S)
+        return 0;
+
+    int argc        = 0;
+    Scheduler* self = nullptr;
+
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+        if (!tolua_isusertype(tolua_S, 1, "ax.Scheduler", 0, &tolua_err))
+            goto tolua_lerror;
+    #endif
+
+    self = static_cast<ax::Scheduler*>(tolua_tousertype(tolua_S, 1, 0));
+
+    #if _AX_DEBUG >= 1
+        if (nullptr == self)
+        {
+            tolua_error(tolua_S, "invalid 'self' in function 'tolua_ax_Scheduler_unscheduleAllWithMinPriority'\n", NULL);
+            return 0;
+        }
+    #endif
+
+    argc = lua_gettop(tolua_S) - 1;
+    if (1 == argc)
+    {
+    #if _AX_DEBUG >= 1
+            if (!tolua_isnumber(tolua_S, 2, 0, &tolua_err))
+            {
+                goto tolua_lerror;
+            }
+    #endif
+
+        unsigned int scheduleScriptEntryID = ((unsigned int)tolua_tonumber(tolua_S, 2, 0));
+        self->unscheduleAllWithMinPriority(scheduleScriptEntryID);
+        return 0;
+    }
+
+    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d\n",
+               "ax.Scheduler:unscheduleAllWithMinPriority", argc, 1);
+    return 0;
+
+    #if _AX_DEBUG >= 1
+    tolua_lerror:
+        tolua_error(tolua_S, "#ferror in function 'tolua_cocos2d_Scheduler_unscheduleAllWithMinPriority'.", &tolua_err);
+        return 0;
+    #endif
+}
 static int tolua_cocos2d_RenderTexture_newImage(lua_State* tolua_S)
 {
     int argc                     = 0;
@@ -4115,6 +4164,10 @@ static void extendScheduler(lua_State* tolua_S)
         lua_pushstring(tolua_S, "unscheduleScriptEntry");
         lua_pushcfunction(tolua_S, tolua_cocos2d_Scheduler_unscheduleScriptEntry);
         lua_rawset(tolua_S, -3);
+        lua_pushstring(tolua_S, "unscheduleAllWithMinPriority");
+        lua_pushcfunction(tolua_S, tolua_cocos2d_Scheduler_unscheduleAllWithMinPriority);
+        lua_rawset(tolua_S, -3);
+
     }
     lua_pop(tolua_S, 1);
 }
@@ -7565,20 +7618,20 @@ int register_all_ax_module_manual(lua_State* tolua_S)
     tolua_open(tolua_S);
     tolua_module(tolua_S, "ax", 0);
     tolua_beginmodule(tolua_S, "ax");
-    tolua_module(tolua_S, "utils", 0);
-    tolua_beginmodule(tolua_S, "utils");
-    tolua_function(tolua_S, "captureNode", tolua_cocos2d_utils_captureNode);
-    tolua_function(tolua_S, "captureScreen", tolua_cocos2d_utils_captureScreen);
-    tolua_function(tolua_S, "findChildren", tolua_cocos2d_utils_findChildren);
-    tolua_function(tolua_S, "findChild", tolua_cocos2d_utils_findChild);
-    tolua_function(tolua_S, "gettime", tolua_cocos2d_utils_gettime);
-    tolua_function(tolua_S, "getTimeInMilliseconds", tolua_cocos2d_utils_getTimeInMilliseconds);
-    tolua_function(tolua_S, "getStringMD5Hash", tolua_cocos2d_utils_getStringMD5Hash);
-    tolua_function(tolua_S, "getFileMD5Hash", tolua_cocos2d_utils_getFileMD5Hash);
-    tolua_function(tolua_S, "base64Encode", tolua_cocos2d_utils_base64Encode);
-    tolua_function(tolua_S, "base64Decode", tolua_cocos2d_utils_base64Decode);
-    tolua_function(tolua_S, "getCascadeBoundingBox", tolua_cocos2d_utils_getCascadeBoundingBox);
-    tolua_endmodule(tolua_S);
+        tolua_module(tolua_S, "utils", 0);
+            tolua_beginmodule(tolua_S, "utils");
+                tolua_function(tolua_S, "captureNode", tolua_cocos2d_utils_captureNode);
+                tolua_function(tolua_S, "captureScreen", tolua_cocos2d_utils_captureScreen);
+                tolua_function(tolua_S, "findChildren", tolua_cocos2d_utils_findChildren);
+                tolua_function(tolua_S, "findChild", tolua_cocos2d_utils_findChild);
+                tolua_function(tolua_S, "gettime", tolua_cocos2d_utils_gettime);
+                tolua_function(tolua_S, "getTimeInMilliseconds", tolua_cocos2d_utils_getTimeInMilliseconds);
+                tolua_function(tolua_S, "getStringMD5Hash", tolua_cocos2d_utils_getStringMD5Hash);
+                tolua_function(tolua_S, "getFileMD5Hash", tolua_cocos2d_utils_getFileMD5Hash);
+                tolua_function(tolua_S, "base64Encode", tolua_cocos2d_utils_base64Encode);
+                tolua_function(tolua_S, "base64Decode", tolua_cocos2d_utils_base64Decode);
+                tolua_function(tolua_S, "getCascadeBoundingBox", tolua_cocos2d_utils_getCascadeBoundingBox);
+            tolua_endmodule(tolua_S);
     tolua_endmodule(tolua_S);
 
     return 0;
@@ -8268,19 +8321,19 @@ int register_all_ax_math_manual(lua_State* tolua_S)
 
     tolua_module(tolua_S, nullptr, 0);
     tolua_beginmodule(tolua_S, nullptr);
-    tolua_function(tolua_S, "mat4_getInversed", tolua_cocos2d_Mat4_getInversed);
-    tolua_function(tolua_S, "mat4_transformVector", tolua_cocos2d_Mat4_transformVector);
-    tolua_function(tolua_S, "mat4_decompose", tolua_cocos2d_Mat4_decompose);
-    tolua_function(tolua_S, "mat4_multiply", tolua_cocos2d_Mat4_multiply);
-    tolua_function(tolua_S, "mat4_translate", tolua_cocos2d_Mat4_translate);
-    tolua_function(tolua_S, "mat4_createRotationZ", tolua_cocos2d_Mat4_createRotationZ);
-    tolua_function(tolua_S, "mat4_setIdentity", tolua_cocos2d_Mat4_setIdentity);
-    tolua_function(tolua_S, "mat4_createTranslation", tolua_cocos2d_Mat4_createTranslation);
-    tolua_function(tolua_S, "mat4_createRotation", tolua_cocos2d_Mat4_createRotation);
-    tolua_function(tolua_S, "vec3_cross", tolua_cocos2d_Vec3_cross);
-    tolua_function(tolua_S, "vec2_new", tolua_cocos2d_Vec2_new);
-    tolua_function(tolua_S, "vec3_new", tolua_cocos2d_Vec3_new);
-    tolua_function(tolua_S, "vec4_new", tolua_cocos2d_Vec4_new);
+        tolua_function(tolua_S, "mat4_getInversed", tolua_cocos2d_Mat4_getInversed);
+        tolua_function(tolua_S, "mat4_transformVector", tolua_cocos2d_Mat4_transformVector);
+        tolua_function(tolua_S, "mat4_decompose", tolua_cocos2d_Mat4_decompose);
+        tolua_function(tolua_S, "mat4_multiply", tolua_cocos2d_Mat4_multiply);
+        tolua_function(tolua_S, "mat4_translate", tolua_cocos2d_Mat4_translate);
+        tolua_function(tolua_S, "mat4_createRotationZ", tolua_cocos2d_Mat4_createRotationZ);
+        tolua_function(tolua_S, "mat4_setIdentity", tolua_cocos2d_Mat4_setIdentity);
+        tolua_function(tolua_S, "mat4_createTranslation", tolua_cocos2d_Mat4_createTranslation);
+        tolua_function(tolua_S, "mat4_createRotation", tolua_cocos2d_Mat4_createRotation);
+        tolua_function(tolua_S, "vec3_cross", tolua_cocos2d_Vec3_cross);
+        tolua_function(tolua_S, "vec2_new", tolua_cocos2d_Vec2_new);
+        tolua_function(tolua_S, "vec3_new", tolua_cocos2d_Vec3_new);
+        tolua_function(tolua_S, "vec4_new", tolua_cocos2d_Vec4_new);
     tolua_endmodule(tolua_S);
     return 0;
 }
@@ -8289,56 +8342,56 @@ int register_all_ax_shaders_manual(lua_State* tolua_S)
 {
     if (nullptr == tolua_S)
         return 0;
-#define set_lua_field(field)             \
-    do                                   \
-    {                                    \
-        lua_pushlstring(tolua_S, #field, sizeof(#field) - 1); \
-        lua_pushlstring(tolua_S, field.data(), field.length());  \
-        lua_rawset(tolua_S, -3);         \
-    } while (false)
+    #define set_lua_field(field)             \
+        do                                   \
+        {                                    \
+            lua_pushlstring(tolua_S, #field, sizeof(#field) - 1); \
+            lua_pushlstring(tolua_S, field.data(), field.length());  \
+            lua_rawset(tolua_S, -3);         \
+        } while (false)
 
     tolua_open(tolua_S);
     tolua_module(tolua_S, "ax", 0);
     tolua_beginmodule(tolua_S, "ax");
-    set_lua_field(positionColor_vert);
-    set_lua_field(positionColor_frag);
-    set_lua_field(positionTexture_vert);
-    set_lua_field(positionTexture_frag);
-    set_lua_field(positionTextureColor_vert);
-    set_lua_field(positionTextureColor_frag);
-    set_lua_field(positionTextureColorAlphaTest_frag);
-    set_lua_field(label_normal_frag);
-    set_lua_field(label_distanceNormal_frag);
-    set_lua_field(label_outline_frag);
-    set_lua_field(label_distanceGlow_frag);
-    set_lua_field(lineColor_frag);
-    set_lua_field(lineColor_vert);
-    set_lua_field(positionColorLengthTexture_vert);
-    set_lua_field(positionColorLengthTexture_frag);
-    set_lua_field(positionColorTextureAsPointsize_vert);
-    set_lua_field(position_vert);
-    set_lua_field(layer_radialGradient_frag);
-    set_lua_field(grayScale_frag);
-    set_lua_field(positionUColor_vert);
-    set_lua_field(dualSampler_frag);
-    set_lua_field(dualSampler_gray_frag);
-    set_lua_field(cameraClear_vert);
-    set_lua_field(cameraClear_frag);
-    set_lua_field(color_frag);
-    set_lua_field(colorNormal_frag);
-    set_lua_field(colorNormalTexture_frag);
-    set_lua_field(colorTexture_frag);
-    set_lua_field(particleTexture_frag);
-    set_lua_field(particleColor_frag);
-    set_lua_field(particle_vert);
-    set_lua_field(positionNormalTexture_vert);
-    set_lua_field(skinPositionNormalTexture_vert);
-    set_lua_field(positionTexture3D_vert);
-    set_lua_field(skinPositionTexture_vert);
-    set_lua_field(skybox_frag);
-    set_lua_field(skybox_vert);
-    set_lua_field(terrain_frag);
-    set_lua_field(terrain_vert);
+        set_lua_field(positionColor_vert);
+        set_lua_field(positionColor_frag);
+        set_lua_field(positionTexture_vert);
+        set_lua_field(positionTexture_frag);
+        set_lua_field(positionTextureColor_vert);
+        set_lua_field(positionTextureColor_frag);
+        set_lua_field(positionTextureColorAlphaTest_frag);
+        set_lua_field(label_normal_frag);
+        set_lua_field(label_distanceNormal_frag);
+        set_lua_field(label_outline_frag);
+        set_lua_field(label_distanceGlow_frag);
+        set_lua_field(lineColor_frag);
+        set_lua_field(lineColor_vert);
+        set_lua_field(positionColorLengthTexture_vert);
+        set_lua_field(positionColorLengthTexture_frag);
+        set_lua_field(positionColorTextureAsPointsize_vert);
+        set_lua_field(position_vert);
+        set_lua_field(layer_radialGradient_frag);
+        set_lua_field(grayScale_frag);
+        set_lua_field(positionUColor_vert);
+        set_lua_field(dualSampler_frag);
+        set_lua_field(dualSampler_gray_frag);
+        set_lua_field(cameraClear_vert);
+        set_lua_field(cameraClear_frag);
+        set_lua_field(color_frag);
+        set_lua_field(colorNormal_frag);
+        set_lua_field(colorNormalTexture_frag);
+        set_lua_field(colorTexture_frag);
+        set_lua_field(particleTexture_frag);
+        set_lua_field(particleColor_frag);
+        set_lua_field(particle_vert);
+        set_lua_field(positionNormalTexture_vert);
+        set_lua_field(skinPositionNormalTexture_vert);
+        set_lua_field(positionTexture3D_vert);
+        set_lua_field(skinPositionTexture_vert);
+        set_lua_field(skybox_frag);
+        set_lua_field(skybox_vert);
+        set_lua_field(terrain_frag);
+        set_lua_field(terrain_vert);
     tolua_endmodule(tolua_S);
     return 0;
 }
@@ -8685,22 +8738,20 @@ tolua_lerror:
 
 int register_all_ax_bytearray_manual(lua_State* tolua_S)
 {
-    if (nullptr == tolua_S)
-        return 0;
-
+    if (nullptr == tolua_S) return 0;
     tolua_module(tolua_S, "ax", 0);
-    tolua_beginmodule(tolua_S, "ax");
-    tolua_module(tolua_S, "bytearray", 0);
-    tolua_beginmodule(tolua_S, "bytearray");
-    tolua_function(tolua_S, "from_vec2", tolua_cocos2d_bytearray_vec2);
-    tolua_function(tolua_S, "from_vec3", tolua_cocos2d_bytearray_vec3);
-    tolua_function(tolua_S, "from_vec4", tolua_cocos2d_bytearray_vec4);
-    tolua_function(tolua_S, "from_mat4", tolua_cocos2d_bytearray_mat4);
-    tolua_function(tolua_S, "from_int", tolua_cocos2d_bytearray_int);
-    tolua_function(tolua_S, "from_float", tolua_cocos2d_bytearray_float);
-    tolua_function(tolua_S, "from_intv", tolua_cocos2d_bytearray_intv);
-    tolua_function(tolua_S, "from_floatv", tolua_cocos2d_bytearray_floatv);
-    tolua_endmodule(tolua_S);
-    // tolua_endmodule(tolua_S);
+        tolua_beginmodule(tolua_S, "ax");
+            tolua_module(tolua_S, "bytearray", 0);
+                tolua_beginmodule(tolua_S, "bytearray");
+                    tolua_function(tolua_S, "from_vec2", tolua_cocos2d_bytearray_vec2);
+                    tolua_function(tolua_S, "from_vec3", tolua_cocos2d_bytearray_vec3);
+                    tolua_function(tolua_S, "from_vec4", tolua_cocos2d_bytearray_vec4);
+                    tolua_function(tolua_S, "from_mat4", tolua_cocos2d_bytearray_mat4);
+                    tolua_function(tolua_S, "from_int", tolua_cocos2d_bytearray_int);
+                    tolua_function(tolua_S, "from_float", tolua_cocos2d_bytearray_float);
+                    tolua_function(tolua_S, "from_intv", tolua_cocos2d_bytearray_intv);
+                    tolua_function(tolua_S, "from_floatv", tolua_cocos2d_bytearray_floatv);
+                tolua_endmodule(tolua_S);
+        tolua_endmodule(tolua_S);
     return 0;
 }

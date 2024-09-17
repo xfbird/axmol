@@ -17769,24 +17769,24 @@ int lua_ax_base_Director_isValid(lua_State* tolua_S)
     ax::Director* cobj = nullptr;
     bool ok  = true;
 
-#if _AX_DEBUG >= 1
-    tolua_Error tolua_err;
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
 
 
-#if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S,1,"ax.Director",0,&tolua_err)) goto tolua_lerror;
-#endif
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertype(tolua_S,1,"ax.Director",0,&tolua_err)) goto tolua_lerror;
+    #endif
 
     cobj = (ax::Director*)tolua_tousertype(tolua_S,1,0);
 
-#if _AX_DEBUG >= 1
-    if (!cobj) 
-    {
-        tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_Director_isValid'", nullptr);
-        return 0;
-    }
-#endif
+    #if _AX_DEBUG >= 1
+        if (!cobj) 
+        {
+            tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_Director_isValid'", nullptr);
+            return 0;
+        }
+    #endif
 
     argc = lua_gettop(tolua_S)-1;
     if (argc == 0) 
@@ -17803,10 +17803,10 @@ int lua_ax_base_Director_isValid(lua_State* tolua_S)
     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.Director:isValid",argc, 0);
     return 0;
 
-#if _AX_DEBUG >= 1
-    tolua_lerror:
-    tolua_error(tolua_S,"#ferror in function 'lua_ax_base_Director_isValid'.",&tolua_err);
-#endif
+    #if _AX_DEBUG >= 1
+        tolua_lerror:
+        tolua_error(tolua_S,"#ferror in function 'lua_ax_base_Director_isValid'.",&tolua_err);
+    #endif
 
     return 0;
 }
@@ -34048,6 +34048,7 @@ int lua_register_ax_base_FileUtils(lua_State* tolua_S)
         tolua_function(tolua_S,"isAbsolutePath",lua_ax_base_FileUtils_isAbsolutePath);
         tolua_function(tolua_S,"isDirectoryExist",lua_ax_base_FileUtils_isDirectoryExist);
         tolua_function(tolua_S,"createDirectories",lua_ax_base_FileUtils_createDirectories);
+        tolua_function(tolua_S,"createDirectory",lua_ax_base_FileUtils_createDirectories);
         tolua_function(tolua_S,"removeDirectory",lua_ax_base_FileUtils_removeDirectory);
         tolua_function(tolua_S,"removeFile",lua_ax_base_FileUtils_removeFile);
         tolua_function(tolua_S,"renameFile",lua_ax_base_FileUtils_renameFile);
