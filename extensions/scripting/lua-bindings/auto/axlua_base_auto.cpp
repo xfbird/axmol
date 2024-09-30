@@ -8,6 +8,7 @@
 #include "lua-bindings/manual/tolua_fix.h"
 #include "lua-bindings/manual/LuaBasicConversions.h"
 #include "lua-bindings/manual/base/axlua_base_manual.hpp"
+#include "lua-bindings/manual/base/axlua_base_UserDATAEx.hpp"
 #include "lua-bindings/manual/LuaValue.h"
 #include "lua-bindings/manual/LuaEngine.h"
 #include "base/Logging.h"
@@ -113185,6 +113186,10 @@ TOLUA_API int register_all_ax_base(lua_State* tolua_S)
 	lua_register_ax_base_FastTMXTiledMap(tolua_S);
 	lua_register_ax_base_MotionStreak3D(tolua_S);
 	lua_register_ax_base_ComponentLua(tolua_S);
+
+    register_all_axlua_bindings_UserDATAEx(tolua_S);
+    register_all_axlua_bindings_TileMapManager(tolua_S);
+    register_all_axlua_bindings_LuaBridgeControl(tolua_S);
 
 	tolua_endmodule(tolua_S);
 	return 1;

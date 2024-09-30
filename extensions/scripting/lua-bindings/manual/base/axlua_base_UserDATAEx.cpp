@@ -11,6 +11,7 @@
 #include "LuaBridgeControl.h"
 #include "base/Logging.h"
 #include "tolua++.h"
+//#include "logquery.h"
 
 using namespace axmol;
 int lua_ax_base_UserDataEx_saveData(lua_State* tolua_S)
@@ -2208,16 +2209,14 @@ int lua_ax_LuaBridgeControl_new(lua_State* tolua_S) {
         // 推送对象到 Lua 栈上
         tolua_pushusertype(tolua_S, (void*)tolua_ret, "ax.LuaBridgeControl");
         return 1;
-    } else {
-        luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d\n", "LuaBridgeControl:new", argc, 0);
-        return 0;
-    }
-
+    } 
+    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d\n", "LuaBridgeControl:new", argc, 0);
     #if _AX_DEBUG >= 1
     tolua_lerror:
         tolua_error(tolua_S, "#ferror in function 'lua_ax_LuaBridgeControl_new'.", &tolua_err);
-        return 0;
+        // return 0;
     #endif
+    return 0;    
 }
 
 int lua_ax_LuaBridgeControl_destroyInstance(lua_State* tolua_S) {
@@ -2470,18 +2469,17 @@ int lua_ax_LuaBridgeControl_CreateNewState(lua_State* tolua_S) {
 // Registration function to bind LuaBridgeControl class to Lua
 int register_all_axlua_bindings_LuaBridgeControl(lua_State* tolua_S)
 {
+    // AXLOGD("register_all_axlua_bindings_LuaBridgeControl");
+    // toluafix_stack_logdump(tolua_S,"LuaBridgeControl");
     tolua_usertype(tolua_S, "ax.LuaBridgeControl");
-    AXLOGD(" bindings LuaBridgeControl Start ax.LuaBridgeControl");
+    // AXLOGD("tolua_usertype(tolua_S, ax.LuaBridgeControl)");
     tolua_cclass(tolua_S, "LuaBridgeControl", "ax.LuaBridgeControl", "ax.Object", nullptr);
+    // AXLOGD("tolua_cclass(tolua_S, LuaBridgeControl ,  ax.LuaBridgeControl ,  ax.Object , nullptr);");
     tolua_beginmodule(tolua_S, "LuaBridgeControl");
+    // AXLOGD("tolua_beginmodule(tolua_S,  LuaBridgeControl );");
         tolua_function(tolua_S, "Inst",lua_ax_LuaBridgeControl_new);
+        // AXLOGD("tolua_function(tolua_S,  Inst ,lua_ax_LuaBridgeControl_new);");
         tolua_function(tolua_S,"destroyInstance", lua_ax_LuaBridgeControl_destroyInstance);
-        //AXLOGI(" bindings LuaBridgeControl Add New")
-        //释放一个 指定键名 的 字典对象 该对象 的数据会立即持久化
-        //------------------------------------------------------------------------------------
-        //下面都是 实例方法
-        // -- CreateNewState
-        // -- IsInit3rdparty
         tolua_function(tolua_S, "CreateNewState", lua_ax_LuaBridgeControl_CreateNewState);
         tolua_function(tolua_S, "IsInit3rdparty", lua_ax_LuaBridgeControl_GetInit3rdparty);
         tolua_function(tolua_S, "Set3rdpartyInited", lua_ax_LuaBridgeControl_SetInit3rdparty);
@@ -2491,6 +2489,6 @@ int register_all_axlua_bindings_LuaBridgeControl(lua_State* tolua_S)
     auto typeName = typeid(ax::LuaBridgeControl).name(); 
     g_luaType[reinterpret_cast<uintptr_t>(typeName)] = "ax.LuaBridgeControl";
     g_typeCast[typeName] = "ax.LuaBridgeControl";
-    AXLOGD(" bindings LuaBridgeControl Start ax.LuaBridgeControl ok");
+    // AXLOGD("bindings LuaBridgeControl Start ax.LuaBridgeControl ok");
     return 1;
 }

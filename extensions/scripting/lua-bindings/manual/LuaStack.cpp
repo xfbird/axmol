@@ -48,7 +48,6 @@ extern "C" {
 #include "lua-bindings/manual/base/LuaScriptHandlerMgr.h"
 #include "lua-bindings/auto/axlua_base_auto.hpp"
 #include "lua-bindings/manual/base/axlua_base_manual.hpp"
-#include "lua-bindings/manual/base/axlua_base_UserDATAEx.hpp"
 #include "lua-bindings/manual/LuaBasicConversions.h"
 #include "lua-bindings/auto/axlua_physics_auto.hpp"
 #include "lua-bindings/manual/physics/axlua_physics_manual.hpp"
@@ -164,6 +163,68 @@ int axlua_log_with_level(lua_State* L)
     return 0;
 }
 
+int axlua_stackdump(lua_State* L)
+{
+    int argc = 0;
+    bool ok  = true;
+
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
+
+    argc = lua_gettop(L);
+
+    if (argc == 1)
+    {
+        std::string slabel;
+        ok &= luaval_to_std_string(L, 1, &slabel, "stackdump");
+        if (!ok)
+        {
+            tolua_error(L,"invalid arguments in function 'axlua_stackdump'", nullptr);
+            return 0;
+        }
+        lua_pop(L,1);               //把 自己的参数 弹出去
+        toluafix_stack_dump(L,slabel.c_str());
+        return 1;
+    }
+    luaL_error(L, "%s has wrong number of arguments: %d, was expecting %d\n ", "axlua_stackdump",argc, 1);
+    #if _AX_DEBUG >= 1
+    tolua_lerror:
+        tolua_error(L,"#ferror in function 'axlua_stackdump'.",&tolua_err);
+    #endif
+    return 0;
+}
+int axlua_stackdumpex(lua_State* L)
+{
+    int argc = 0;
+    bool ok  = true;
+
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
+
+    argc = lua_gettop(L);
+
+    if (argc == 1)
+    {
+        std::string slabel;
+        ok &= luaval_to_std_string(L, 1, &slabel, "stackdump");
+        if (!ok)
+        {
+            tolua_error(L,"invalid arguments in function 'axlua_stackdumpex'", nullptr);
+            return 0;
+        }
+        lua_pop(L,1);               //把 自己的参数 弹出去
+        toluafix_stack_logdump(L,slabel.c_str());
+        return 1;
+    }
+    luaL_error(L, "%s has wrong number of arguments: %d, was expecting %d\n ", "axlua_stackdumpex",argc, 1);
+    #if _AX_DEBUG >= 1
+    tolua_lerror:
+        tolua_error(L,"#ferror in function 'lua_ax_base_UserDataEx_setStorageName'.",&tolua_err);
+    #endif
+    return 0;
+}
 int axlua_log_setlevel(lua_State* tolua_S)
 {
     int argc = 0;
@@ -287,7 +348,9 @@ bool LuaStack::init()
                                          {"release_print", lua_release_print},
                                          {"AXLOG_WITH_LEVEL", axlua_log_with_level},
                                          {"AXLOG_WITH_LEVELEx", axlua_log_with_level_Line},
-                                         {"AXLOG_SetLevel", axlua_log_setlevel},
+                                         {"AXLOG_SetLevel",axlua_log_setlevel},
+                                         {"AXStackDump", axlua_stackdump},
+                                         {"AXStackDumpEx",axlua_stackdumpex},
                                          {"version", lua_version},
                                          {nullptr, nullptr}};
     luaL_register(_state, "_G", global_functions);
@@ -299,9 +362,8 @@ bool LuaStack::init()
     register_all_ax_module_manual(_state);
     register_all_ax_math_manual(_state);
     register_all_ax_shaders_manual(_state);
+
     register_all_ax_bytearray_manual(_state);
-    register_all_axlua_bindings_UserDATAEx(_state);
-    register_all_axlua_bindings_TileMapManager(_state);
 
     tolua_luanode_open(_state);
     register_luanode_manual(_state);
