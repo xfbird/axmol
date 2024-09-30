@@ -27,10 +27,72 @@
 #include "base/Object.h"
 #include "lua-bindings/manual/LuaBasicConversions.h"
 #include <stdlib.h>
+#include "base/Logging.h"
+#include "lua_stackdump.h"
 
+//  * to create the implementation,
+//  *     #define LUASD_IMPLEMENTATION
+//  * in *one* C/CPP file that includes this file.
 USING_NS_AX;
 
 static int s_function_ref_id = 0;
+// luaSD_printf _Logprintf = logprint;
+// #ifndef luaSD_PRINT
+// #include <stdio.h>
+// #define luaSD_PRINT logprint
+// #endif
+
+#include <iostream>
+#include <queue>
+#include <string>
+#include <mutex>
+
+class StringQueue {
+private:
+    std::queue<std::string> queue;
+    mutable std::mutex mutex;
+
+public:
+    void lock() {
+        mutex.lock();
+    }
+
+    // 解锁
+    void unlock() {
+        mutex.unlock();
+    }
+
+    // 入列函数
+    void enqueue(const std::string& item) {
+        queue.push(item);
+    }
+
+    // 出列函数
+    bool dequeue(std::string& item) {
+        if (queue.empty()) {
+            // 队列空时返回 false
+            return false;
+        }
+        item = queue.front();
+        queue.pop();
+        return true;
+    }
+
+    // 检查队列是否为空
+    bool isEmpty() const {
+        return queue.empty();
+    }
+
+    // 获取队列大小
+    size_t size() const {
+        return queue.size();
+    }
+};
+
+
+static StringQueue sq;
+
+
 
 TOLUA_API void toluafix_open(lua_State* L)
 {
@@ -255,24 +317,91 @@ TOLUA_API void toluafix_stack_dump(lua_State* L, const char* label)
 {
     int i;
     int top = lua_gettop(L);
-    AXLOGD("Total [{}] in lua stack: {}\n", top, label != 0 ? label : "");
+    AXLOGD("[SD] Total [{}] in lua stack: {}", top, label != 0 ? label : "");
     for (i = -1; i >= -top; i--)
     {
         int t = lua_type(L, i);
         switch (t)
         {
-        case LUA_TSTRING:
-            AXLOGD("  [{:2}] string {}\n", i, lua_tostring(L, i));
-            break;
-        case LUA_TBOOLEAN:
-            AXLOGD("  [{:2}] boolean {}\n", i, lua_toboolean(L, i) ? "true" : "false");
-            break;
-        case LUA_TNUMBER:
-            AXLOGD("  [{:2}] number {}\n", i, lua_tonumber(L, i));
-            break;
-        default:
-            AXLOGD("  [{:2}] {}n", i, lua_typename(L, t));
+            case LUA_TSTRING:
+                AXLOGD("[SD]  [{:2}] string {}", i, lua_tostring(L, i));
+                break;
+            case LUA_TBOOLEAN:
+                AXLOGD("[SD]  [{:2}] boolean {}", i, lua_toboolean(L, i) ? "true" : "false");
+                break;
+            case LUA_TNUMBER:
+                AXLOGD("[SD]  [{:2}] number {}", i, lua_tonumber(L, i));
+                break;
+            case LUA_TNIL:
+                AXLOGD("[SD]  [{:2}]  number nil",i);
+                break;
+            case LUA_TFUNCTION:
+                AXLOGD("[SD]  [{:2}] function {}",i,lua_topointer(L, i));
+                break;
+            // #define LUA_TLIGHTUSERDATA	2
+            // #define LUA_TTABLE		5
+            // #define LUA_TUSERDATA		7
+            // #define LUA_TTHREAD		8
+            default:
+                AXLOGD("[SD]  [{:2}] {} PTR:{}", i, lua_typename(L, t),lua_topointer(L, i));
         }
     }
-    AXLOGD("\n");
+    // AXLOGD("\n");
 }
+
+int logprint(const char *__restrict __format, ...){
+    va_list args;
+    int result;
+    char *buffer;
+
+    // 假设最大日志长度为 1024 字节
+    const int MAX_LOG_LENGTH = 1024;
+    buffer = (char *)malloc(MAX_LOG_LENGTH * sizeof(char));
+    if (buffer == NULL) {
+        // 内存分配失败
+        return -1;
+    }
+
+    // 初始化 args 以访问可变参数列表
+    va_start(args, __format);
+    // 使用 vsnprintf 将格式化的字符串写入 buffer
+    result = vsnprintf(buffer, MAX_LOG_LENGTH, __format, args);
+    // 清理 args
+    va_end(args);
+    std::string so=std::string(buffer);
+    //  AXLOGD("---->{}",so);
+    // // }
+    sq.enqueue(so);
+    // 释放 buffer
+    free(buffer);
+    return result; 
+
+}
+
+TOLUA_API void toluafix_stack_logdump(lua_State* L, const char* label)
+{
+    sq.lock();
+    delete_all();       //删除所有的 内容
+    luaSD_stackdump(L,logprint,label);
+    std::string ssout="";
+    std::string item;
+    while (!sq.isEmpty()) {
+        if (sq.dequeue(item)) {
+           ssout=ssout+item;
+        }
+    }
+    AXLOGD("StackDump {}{}",label,ssout);
+    ssout="";
+    print_rtables(logprint);
+    while (!sq.isEmpty()) {
+        if (sq.dequeue(item)) {
+           ssout=ssout+item;
+        }
+    }
+    AXLOGD("StackMapTable {}{}",label,ssout);
+    delete_all();       //删除所有的 内容
+    sq.unlock();
+}
+
+
+

@@ -5,6 +5,7 @@
 #include "lua-bindings/manual/LuaEngine.h"
 #include "lua-bindings/manual/lua_module_register.h"
 #include "base/Configuration.h"
+#include "lua-bindings/manual/tolua_fix.h"
 
 NS_AX_BEGIN
 // 初始化静态成员变量
@@ -26,12 +27,13 @@ LuaBridgeControl::~LuaBridgeControl() {
 
 // 获取单例对象的静态方法
 LuaBridgeControl* LuaBridgeControl::GetInstance() {
-    AXLOGD("LuaBridgeControl::GetInstance");
+    // AXLOGD("LuaBridgeControl::GetInstance");
     // std::lock_guard<std::mutex> lock(_Mutex);
     if (_Instance == nullptr) {
         _Instance = new LuaBridgeControl();
         AXLOGD("LuaBridgeControl::GetInstance need new :{}",fmt::ptr(_Instance));
     }
+    AXLOGD("LuaBridgeControl::GetInstance ret:{}",fmt::ptr(_Instance));
     return _Instance;
 }
 
@@ -79,7 +81,7 @@ bool LuaBridgeControl::GameMain()
     
     AXLOGD("lua_module_register(L)");
     lua_module_register(L);
-    LuaStack* stack = engine->getLuaStack();
+   // //LuaStack* stack = engine->getLuaStack();
 
     auto fui = FileUtils::getInstance();
     // 1. 获取默认资源根路径，并在其后面加上 "cache/"
@@ -88,7 +90,6 @@ bool LuaBridgeControl::GameMain()
     AXLOGD("设置当前写入 路径: {}",resourceRootPath);
     // 2. 设置当前写入目录
     fui->setWritablePath(resourceRootPath);
-
     // 3. 获取当前的搜索路径列表
     // const std::vector<std::string>& cursearchdirs = fui->getSearchPaths();
     // 4. 清空搜索路径列表
@@ -102,14 +103,11 @@ bool LuaBridgeControl::GameMain()
     writablePath += "mod_launcher";
     AXLOGD("设置 可写目录添加 mod_launcher: {} 加入到搜索目录",writablePath);
     newSearchDirs.push_back(writablePath);
-
     // 6. 将 "mod_launcher" 目录添加到新的搜索路径列表
     newSearchDirs.push_back("mod_launcher");
     AXLOGD("设置 可写目录添加 mod_launcher: {} 加入到搜索目录","mod_launcher");
     newSearchDirs.push_back("mod_launcher/stab/");
     AXLOGD("设置 可写目录添加 mod_launcher: {} 加入到搜索目录","mod_launcher");
-
-
     // 7. 设置新的搜索顺序
     fui->setSearchPaths(newSearchDirs);
     for (const auto& dir : newSearchDirs) 
@@ -122,6 +120,8 @@ bool LuaBridgeControl::GameMain()
     // auto lSearchResolutions=fui->getSearchResolutionsOrder();
     // stack->addSearchPath("src");
     engine->addSearchPath("scripts");
+
+    AXLOGD("启动脚本运行");
     // FileUtils::getInstance()->addSearchPath("res");
     if (engine->executeScriptFile("scripts/main.lua"))
     {

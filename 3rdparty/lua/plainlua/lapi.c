@@ -1261,7 +1261,14 @@ LUA_API int lua_next (lua_State *L, int idx) {
     api_incr_top(L);
   }
   else  /* no more elements */
-    L->top.p -= 1;  /* remove key */
+    // L->top.p -= 1;  /* remove key */
+    {  // 如果没有更多元素避免越界访问
+        if (L->top.p == L->stack.p) {
+        lua_unlock(L);
+        return 0;  // 返回 0 表示没有更多元素
+        }
+        L->top.p -= 1;  /* 移除 key */
+    }
   lua_unlock(L);
   return more;
 }

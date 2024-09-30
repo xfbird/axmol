@@ -33,6 +33,10 @@
 #define TOLUA_REFID_TYPE_MAPPING "toluafix_refid_type_mapping"
 #define TOLUA_REFID_FUNCTION_MAPPING "toluafix_refid_function_mapping"
 
+#ifndef LUASD_IMPLEMENTATION  
+   #define LUASD_IMPLEMENTATION  
+#endif
+
 /**
  * @addtogroup lua
  * @{
@@ -156,6 +160,7 @@ TOLUA_API int toluafix_istable(lua_State* L, int lo, const char* type, int def, 
  * @js NA
  */
 TOLUA_API void toluafix_stack_dump(lua_State* L, const char* label);
+TOLUA_API void toluafix_stack_logdump(lua_State* L, const char* label);
 
 inline void tolua_pushsv (lua_State* L, const std::string_view& v)
 {

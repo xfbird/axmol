@@ -343,5 +343,5 @@ AX_API void print(const char* format, ...)
         outputLog(LogItem::vformat(FMT_COMPILE("{}{}\n"), preprocessLog(LogItem{LogLevel::Silent},__FILE__,__LINE__,nullptr,0), message),
                   "axmol debug info");
 }
-
+#endif
 NS_AX_END

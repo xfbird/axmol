@@ -17,6 +17,9 @@ set(lua_bindings_manual_headers
     manual/audioengine/axlua_audioengine_manual.h
     manual/Lua-BindingsExport.h
     manual/tolua_fix.h
+    manual/uthash.h
+    manual/luaNameMap.h
+    manual/lua_stackdump.h
     manual/navmesh/axlua_navmesh_manual.h
     manual/navmesh/axlua_navmesh_conversions.h
     manual/base/LuaScriptHandlerMgr.h
