@@ -8,6 +8,7 @@
 #include <cstdint>
 
 NS_AX_BEGIN
+
 //通用格式的 内部存储结构
 //处理 map 文件 结构读出，存放到 TGMapInfo 数组
 class AX_DLL TGMapInfo  {
