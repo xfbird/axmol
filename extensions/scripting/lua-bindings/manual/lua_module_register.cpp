@@ -36,6 +36,7 @@
 #include "lua-bindings/manual/physics3d/axlua_physics3d_manual.h"
 #include "lua-bindings/manual/navmesh/axlua_navmesh_manual.h"
 #include "lua-bindings/manual/fairygui/axlua_fairygui_manual.hpp"
+#include "lua-bindings/manual/tolua_fix.h"
 #include "base/logging.h"
 #include "lua_cjson.h"
 #include "luasocket.h"
@@ -80,5 +81,6 @@ int lua_module_register(lua_State* L)
     register_fairygui_module(L);
     // register extensions: yaiso, lua-cjson
     lua_register_extensions(L);
+    // toluafix_stack_logdump(L, "Lua engine Begin");
     return 1;
 }

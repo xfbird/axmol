@@ -18,9 +18,10 @@
 
 
 NS_AX_BEGIN
-std::string UserDataEx::_storagename;
+std::string UserDataEx::_storagename = "";
 //std::unordered_map<std::string, std::unique_ptr<UserDataEx>>
 DataExMap* UserDataEx::_dataExMaps = nullptr;
+bool UserDataEx::_initialize=false;
 
 UserDataEx::UserDataEx() :
    _dataReady(false),
@@ -407,6 +408,7 @@ void UserDataEx::encrypt(char* inout, size_t size, int enc) {
 
 void UserDataEx::deleteStorage(std::string_view name) 
 {
+    _initializecheck();
     std::string  rkey;                             //组合主键       
     auto ud =UserDefault::getInstance();
      //AXLOGD("deleteStorage name:{} this:{}",name,fmt::ptr(ud));  
@@ -433,17 +435,20 @@ void UserDataEx::saveStorage()
     }
 }
 void UserDataEx::setStorageName(std::string_view name) {
-  if (!_storagename.empty()){
+    _initializecheck();
+    if (!_storagename.empty()){
     deleteStorage(getStorageName());                    //从持久化 删除所有的 数据
   } 
     _storagename = std::string(name);
   saveStorage();                        //保存所有数据到 持久化
 }
 void UserDataEx::clearAll(){                                   //  清除所有的字典
+    _initializecheck();
     deleteStorage(_storagename);                               // 清除存储的数据
     _dataExMaps->clear();                                       // 删除所有的字典地点 
 }
 std::string_view UserDataEx::getStorageName() {
+    _initializecheck();
     return _storagename;
 }
 bool UserDataEx::saveData(){
@@ -472,7 +477,20 @@ bool UserDataEx::checkAndSave(){
     }
     return false;
 }
+
+void UserDataEx::_initializecheck()
+{
+    if (_initialize)
+    {
+        return;
+    }
+    _dataExMaps = new DataExMap();
+    _storagename = "userdataEx";
+    _initialize  = true;
+}
+
 UserDataEx* UserDataEx::GetUserDataEx(const std::string_view& key) {
+    _initializecheck();
     std::string skey=std::string(key);
     if (_dataExMaps->find(skey) == _dataExMaps->end()) {
         _dataExMaps->emplace(skey, std::make_unique<UserDataEx>(skey));
@@ -480,7 +498,7 @@ UserDataEx* UserDataEx::GetUserDataEx(const std::string_view& key) {
     return _dataExMaps->at(skey).get();
 }
 bool UserDataEx::DeleteUserDataEx(const std::string_view& key) {
-
+    _initializecheck();
    if (_dataExMaps != nullptr) {
 	   std::string sskey(key);  
 	   auto it = _dataExMaps->find(sskey);

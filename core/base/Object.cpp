@@ -51,32 +51,32 @@ Object::Object()
     , _luaID(0)
 #endif
 {
-    AXLOGD("Object() @ this:{:12X}",FMT_TOPOINT(this));
-#if AX_ENABLE_SCRIPT_BINDING
-    static unsigned int uObjectCount = 0;
-    _ID                              = ++uObjectCount;
-#endif
+    // AXLOGD("Object() @ this:{:12X}",FMT_TOPOINT(this));
+    #if AX_ENABLE_SCRIPT_BINDING
+        static unsigned int uObjectCount = 0;
+        _ID   = ++uObjectCount;
+    #endif
 
-#if AX_OBJECT_LEAK_DETECTION
-    trackRef(this);
-#endif
+    #if AX_OBJECT_LEAK_DETECTION
+        trackRef(this);
+    #endif
 }
 
 Object::~Object()
 {
-#if AX_ENABLE_SCRIPT_BINDING
-    ScriptEngineProtocol* pEngine = ScriptEngineManager::getInstance()->getScriptEngine();
-    if (pEngine != nullptr && _luaID)
-    {
-        // if the object is referenced by Lua engine, remove it
-        pEngine->removeScriptObjectByObject(this);
-    }
-#endif  // AX_ENABLE_SCRIPT_BINDING
+    #if AX_ENABLE_SCRIPT_BINDING
+        ScriptEngineProtocol* pEngine = ScriptEngineManager::getInstance()->getScriptEngine();
+        if (pEngine != nullptr && _luaID)
+        {
+            // if the object is referenced by Lua engine, remove it
+            pEngine->removeScriptObjectByObject(this);
+        }
+    #endif  // AX_ENABLE_SCRIPT_BINDING
 
-#if AX_OBJECT_LEAK_DETECTION
-    if (_referenceCount != 0)
-        untrackRef(this);
-#endif
+    #if AX_OBJECT_LEAK_DETECTION
+        if (_referenceCount != 0)
+            untrackRef(this);
+    #endif
     AXLOGD("~Object() @ this:{:12X}",FMT_TOPOINT(this));
 }
 

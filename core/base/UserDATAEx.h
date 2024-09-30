@@ -1,4 +1,4 @@
-﻿/*
+/*
     重新来实现 UserDataEx 目的 对外暴露 UserDataEx 类。
     可以 设置公共的引导头 。
     以 Key 可以获得一个 UserDataEx 实例，该实例 里面包含 多个 KV 键值对。
@@ -118,8 +118,11 @@ public:
     static void deleteStorage(std::string_view name);         //  
     static void clearAll();                                   //  清除所有的字典
 private:    
-    static void saveStorage();	
+    static void saveStorage();
+    static void _initializecheck();
+
 private:
+    static bool _initialize;
     static std::string _storagename;
     static std::unordered_map<std::string, std::unique_ptr<UserDataEx>>* _dataExMaps;
 };
