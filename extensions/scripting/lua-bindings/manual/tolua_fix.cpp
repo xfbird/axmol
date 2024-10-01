@@ -89,7 +89,9 @@ public:
 
 static StringQueue sq;
 
-
+// rtablemap  tabledict{};
+//&tabledict;
+// static rtablemap *ptabledict = NULL;
 
 TOLUA_API void toluafix_open(lua_State* L)
 {
@@ -378,8 +380,9 @@ int logprint(const char *__restrict __format, ...){
 TOLUA_API void toluafix_stack_logdump(lua_State* L, const char* label)
 {
     sq.lock();
-    delete_all();       //删除所有的 内容
-    luaSD_stackdump(L,logprint,label);
+    rtablemap *ptabledict = NULL;
+    delete_all(ptabledict);           //删除所有的 内容
+    luaSD_stackdump(ptabledict,L,logprint,label);
     std::string ssout="";
     std::string item;
     while (!sq.isEmpty()) {
@@ -389,14 +392,14 @@ TOLUA_API void toluafix_stack_logdump(lua_State* L, const char* label)
     }
     AXLOGD("StackDump {}{}",label,ssout);
     ssout="";
-    print_rtables(logprint);
+    print_rtables(ptabledict,logprint);
     while (!sq.isEmpty()) {
         if (sq.dequeue(item)) {
            ssout=ssout+item;
         }
     }
     AXLOGD("StackMapTable {}{}",label,ssout);
-    delete_all();       //删除所有的 内容
+    delete_all(ptabledict);           //删除所有的 内容
     sq.unlock();
 }
 

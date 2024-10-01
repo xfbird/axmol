@@ -5,7 +5,7 @@
     // #include <stdio.h>
     // #include <stdlib.h>
     #include <string.h>
-    #include "base/Logging.h"
+    // #include "base/Logging.h"
 
     typedef int (*luaSD_printf) (const char *__restrict __format, ...);
 
@@ -17,9 +17,9 @@
             UT_hash_handle hh;          /* makes this structure hashable */
         };
 
-        struct rtablemap *rtables = NULL;
+        // struct rtablemap *rtables = NULL;
 
-        static void add_table(const void *funcpoint_id, const char *name,const void *fatherfp_id=NULL)
+        static void add_table(rtablemap *rtables,  const void *funcpoint_id, const char *name,const void *fatherfp_id=NULL)
         {
             struct rtablemap *s;
 
@@ -40,7 +40,7 @@
             }
         }
 
-        static struct rtablemap *find_table(const void *funcpoint_id)
+        static struct rtablemap *find_table(rtablemap *rtables,const void *funcpoint_id)
         {
             struct rtablemap *s;
 
@@ -48,7 +48,7 @@
             return s;
         }
 
-        static const char * getnamebyfpid (const void *funcpoint_id)
+        static const char * getnamebyfpid (rtablemap *rtables,const void *funcpoint_id)
         {
             struct rtablemap *s;
 
@@ -60,13 +60,12 @@
         }
 
 
-        static void delete_table(struct rtablemap *table)
+        static void delete_table(rtablemap *rtables,struct rtablemap *table)
         {
             HASH_DEL(rtables, table);  /* user: pointer to deletee */
             free(table);
         }
-
-        void delete_all()
+        static void delete_all(rtablemap *rtables)
         {
             struct rtablemap *current_table, *tmp;
 
@@ -76,7 +75,17 @@
             }
         }
 
-        void print_rtables(luaSD_printf luasdprintf)
+
+        void initialize_tablemap(rtablemap *rtables)
+        {
+            if (rtables) {
+                delete_all(rtables);
+            }  
+            rtables=NULL;
+        }
+
+
+        void print_rtables(rtablemap *rtables,luaSD_printf luasdprintf)
         {
             struct rtablemap *s;
             luasdprintf("\nTable Map Print \n");
@@ -84,7 +93,7 @@
             {
                 // AXLOGD("table funcpoint [{}]--->{}", (void*)s->p, s->name);
                 const void * vpp=s->fp;
-                luasdprintf("   [%p]:%s Owner is[%p(%s)] \n",(void*)s->p, s->name,(void*)vpp,getnamebyfpid(vpp));
+                luasdprintf("   [%p]:%s Owner is[%p(%s)] \n",(void*)s->p, s->name,(void*)vpp,getnamebyfpid(rtables,vpp));
             }
             luasdprintf("Table Map Print End \n");
         }
