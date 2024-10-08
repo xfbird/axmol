@@ -19,7 +19,7 @@
 #define LUA_STACKDUMP_H
 
     #ifndef luaSD_MAXDEPTH
-    #define luaSD_MAXDEPTH 12
+    #define luaSD_MAXDEPTH 5
     #endif
 
     #ifndef luaSD_PRINT
@@ -46,8 +46,10 @@
 
 
     // extern void luaSD_stackdump (lua_State* state, luaSD_printf luasdprintf);
-    extern void luaSD_stackdump (rtablemap *rtables,lua_State* state, luaSD_printf luasdprintf, const char * label);
-    extern void luaSD_stackdump_default (rtablemap *rtables,lua_State* state, const char * label);
+    // extern void luaSD_stackdump (tablemap::rtablemap *rtables,lua_State* state, luaSD_printf luasdprintf, const char * label);
+    // extern void luaSD_stackdump_default (tablemap::rtablemap *rtables,lua_State* state, const char * label);
+    extern void luaSD_stackdump (lua_State* state, luaSD_printf luasdprintf, const char * label);
+    extern void luaSD_stackdump_default (lua_State* state, const char * label);
 
     #ifdef __cplusplus
     }
@@ -282,8 +284,9 @@
 
             //Number of members
         //----------------------------------------------------------------------------------------------
-        static void luaSD_stackdumpvalue (
-                rtablemap *rtables,
+        // static 
+        void luaSD_stackdumpvalue (
+               // tablemap::rtablemap *rtables,
                 lua_State* state, 
                 luaSD_printf luasdorintf, 
                 int stackIndex, 
@@ -337,7 +340,6 @@
                         //if (lua_getmetatable(state, -1) == 0) {             //如果没有配置 元表
                         lua_pushfstring(state, "[%s] [%p] (no metatable)", luaL_typename(state, -1), lua_topointer(state, -1));   //显示 指针 无元表 模式 指针显示
                         // AXLOGD("LSD UserData stackIndex:{} depth:{} top:{} name:{} return:{}", stackIndex, depth,lua_gettop(state),tablename,lua_tostring(state,-1));  
-                        
                         //} else {
                         //    /* TODO: this else branch was never reached in my tests */          
                         //    lua_getfield(state, -1, "__tostring");          //存在元表 模式。 获得 字符串名字的 函数
@@ -397,8 +399,9 @@
                     }
                 case LUA_TTABLE: 
                     {
-                        // AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} performIndent:{}表初始处理", 
-                            //       stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),performIndent);
+                        void * tablep= (void*)lua_topointer(state, -1);
+                         AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} performIndent:{} 表指针:{}", 
+                                   stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),performIndent,fmt::ptr(tablep));
                             // if (performIndent) {
                             //     if (depth == 0) {
                             //         if (isGobal) {
@@ -490,16 +493,21 @@
                         auto str=lua_tostring(state, -1);
                         luasdorintf("%s", str);
                         lua_pop(state, 1);                      //将 复制的     
-                        void * tablep= (void*)lua_topointer(state, -1);
-                        rtablemap * tablerec=find_table(rtables,tablep);
-                        if (tablerec) 
+                        void * tablepn1= (void*)lua_topointer(state, -1);
+                        // if  (tablepn1!=tablep) {
+                        //      AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 两个指针不一致 ", 
+                        //            stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len);
+                        // }
+                        rtablemap * tablerec=find_table(tablep);
+                        AXLOGD("LSD Table 查询 {} 结果:{}",fmt::ptr(tablep),fmt::ptr(tablerec));
+                        if (tablerec)
                         {   //找到就不需要再继续处理了 
                             lua_pop(state, 1);                            
                             if (newline) {
                                 luasdorintf("\n");                  //输出一个换行
                             }
-                            // AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 已经处理过的表 处理完成", 
-                            //       stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len);
+                             AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 已经处理过的表 处理完成", 
+                                   stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len);
 
                             if (stypename != NULL) {
                                 free(stypename); // 释放分配的内存
@@ -524,21 +532,25 @@
                             //没有得到  [ ..., nil]  或者 成功 [ ..., result ] 或者 不是函数  都需要清理 一个 
                             lua_pop(state, 1);                        //把 取出的函数 空值 丢弃
                         }
-                        add_table(rtables,tablep,tablename,fatherfp_id);
+                        add_table(tablep,tablename,fatherfp_id);
+                        AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 记录P:{} 到map", 
+                                 stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len,fmt::ptr(tablep));
+
                         const void * myfatherid=lua_topointer(state, -1);           //自己的 表id
                         bool needlog =false;
-                        // AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 遍历子节点", 
-                        //         stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len);
+                        //  AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 遍历子节点", 
+                        //          stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len);
 
                         if ((len>0)&&(depth < luaSD_MAXDEPTH)) {
                             lua_pushnil(state);
+                            int nodeindex=0;
                             int checknextpos = lua_gettop(state);
                             bool bonext = lua_next(state, -2);
                             int curpos  = lua_gettop(state);
                             char* NodeKeystr=NULL;
 
-                            // AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 首轮", 
-                            //     stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len);
+                            //  AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 首轮", 
+                            //      stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len);
                             while (bonext)
                             {
                                 //遍历 过程中，不可以对 Key 进行操作。
@@ -555,20 +567,20 @@
                                 luaspIndent(luasdorintf,-2,depth + 1,indentLevel + 4,1,0);
                                 luasdorintf("%s ",NodeKeystr);    //输出换行。然后 输出 Key = value 
                                 luasdorintf(" = ");
-                                luaSD_stackdumpvalue(rtables,state, luasdorintf, -1, depth + 1, 0, indentLevel + 4, 0,0,NodeKeystr,myfatherid);
+                                luaSD_stackdumpvalue(state, luasdorintf, -1, depth + 1, 0, indentLevel + 4, 0,0,NodeKeystr,myfatherid);
                                 lua_pop(state, 1);          //把 值 删除 然后 继续遍历
                                 bonext = lua_next(state, -2);
                                 curpos = lua_gettop(state);
-                                // AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 继续:{}", 
-                                //     stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len,bonext);
-
+                                nodeindex++;
+                                //  AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} CurNodes:{}  Nodes:{} 继续:{} NodeKeystr:{}", 
+                                //      stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),nodeindex,len,bonext,NodeKeystr);
                             }
                             if (NodeKeystr!=NULL){
                                 free(NodeKeystr);
                             };
                         }
-                        // AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 遍历完成 ", 
-                        //        stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len);
+                        //  AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 遍历完成 ", 
+                        //         stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len);
                         lua_pop(state, 1);
                         if (newline) {
                             luasdorintf("\n");
@@ -594,8 +606,8 @@
                     }
                 default:
                     lua_pushfstring(state, "%s [%p]", luaL_typename(state, -1), lua_topointer(state, -1));
-                    // AXLOGD("LSD stackIndex:{} depth:{} top:{} TypeName:{}  输出:{}", 
-                    //            stackIndex, depth,lua_gettop(state),std::string(stypename),lua_tostring(state, -1));
+                    //  AXLOGD("LSD stackIndex:{} depth:{} top:{} TypeName:{}  输出:{}", 
+                    //             stackIndex, depth,lua_gettop(state),std::string(stypename),lua_tostring(state, -1));
                     break;
             }
             {
@@ -640,7 +652,9 @@
             }
         }
 
-        LUASD_API void luaSD_stackdump (rtablemap *rtables,lua_State* state, luaSD_printf luasdprintf, const char * label) {
+        LUASD_API void luaSD_stackdump (
+            // tablemap::rtablemap *rtables,
+            lua_State* state, luaSD_printf luasdprintf, const char * label) {
 
             const int top = lua_gettop(state);
             luasdprintf("\n--------------------start-of-stacktrace----------------\n");
@@ -648,7 +662,7 @@
             // AXLOGD("luaSD_stackdump 进入 top:{} ",lua_gettop(state)); 
             lua_pushglobaltable(state); //输出 全局变量。    1
             // toluafix_stack_dump(state,"stack top globaltable");
-            luaSD_stackdumpvalue(rtables,state, luasdprintf, -1, 0, 1, 1, 1,1,"_G_Grobal");
+            luaSD_stackdumpvalue(state, luasdprintf, -1, 0, 1, 1, 1,1,"_G_Grobal");
             //     lua_getfield(state, -1, "GameStateMgr");       //2  
             //     // toluafix_stack_dump(state,"stack top GameStateMgr");
             //     // luaSD_stackdumpvalue(state, luasdprintf, -1, 0, 1, 1, 1,0,"GameStateMgr");
@@ -676,7 +690,7 @@
             for (i = -1; i >= -top; i--) {
                 try {
                     snprintf(namebuffer,sizeof(namebuffer), "stack_%d", i);
-                    luaSD_stackdumpvalue(rtables,state, luasdprintf, i, 0, 1, 1, 1,0,namebuffer);
+                    luaSD_stackdumpvalue(state, luasdprintf, i, 0, 1, 1, 1,0,namebuffer);
                 } catch (...) {
                     AXLOGD("luaSD stack dump value catch:{}",i);
                     break;    
@@ -689,8 +703,10 @@
             // lua_pop(state, 5);          //删除 全局变量
         }
 
-        LUASD_API void luaSD_stackdump_default (rtablemap *rtables,lua_State* state, const  char * label) {
-            luaSD_stackdump(rtables,state, luaSD_PRINT,label);
+        LUASD_API void luaSD_stackdump_default (
+            // tablemap::rtablemap *rtables,
+            lua_State* state, const  char * label) {
+            luaSD_stackdump(state, luaSD_PRINT,label);
         }
     #endif
 
