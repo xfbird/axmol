@@ -29,6 +29,7 @@
 #include <stdlib.h>
 #include "base/Logging.h"
 #include "lua_stackdump.h"
+#include "luaNameMap.h"                     //C Table 指针索引的名字表
 
 using namespace ax;
 
@@ -83,7 +84,7 @@ public:
 
 static StringQueue sq;
 
-
+// static tablemap::rtablemap *ptabledict = NULL;
 TOLUA_API void toluafix_open(lua_State* L)
 {
     lua_pushstring(L, TOLUA_REFID_PTR_MAPPING);
@@ -371,9 +372,10 @@ int logprint(const char *__restrict __format, ...){
 TOLUA_API void toluafix_stack_logdump(lua_State* L, const char* label)
 {
     sq.lock();
-    rtablemap *ptabledict = NULL;
-    delete_all(ptabledict);           //删除所有的 内容
-    luaSD_stackdump(ptabledict,L,logprint,label);
+    //tablemap::rtablemap *ptabledict = NULL;
+    // delete_all(ptabledict);           //删除所有的 内容
+    delete_all();           //删除所有的 内容
+    luaSD_stackdump(L,logprint,label);
     std::string ssout="";
     std::string item;
     while (!sq.isEmpty()) {
@@ -383,14 +385,16 @@ TOLUA_API void toluafix_stack_logdump(lua_State* L, const char* label)
     }
     AXLOGD("StackDump {}{}",label,ssout);
     ssout="";
-    print_rtables(ptabledict,logprint);
+    // tablemap::print_rtables(ptabledict,logprint);
+    print_rtables(logprint);
     while (!sq.isEmpty()) {
         if (sq.dequeue(item)) {
            ssout=ssout+item;
         }
     }
     AXLOGD("StackMapTable {}{}",label,ssout);
-    delete_all(ptabledict);           //删除所有的 内容
+    // tablemap::delete_all(ptabledict);           //删除所有的 内容
+    delete_all();           //删除所有的 内容
     sq.unlock();
 }
 
