@@ -606,7 +606,7 @@ bool Image::initWithImageFileThreadSafe(std::string_view fullpath)
 {
     bool ret  = false;
     _filePath = fullpath;
-    AXLOGD("Image::initWithImageFileThreadSafe _filePath:{}",_filePath);
+    //AXLOGD("Image::initWithImageFileThreadSafe _filePath:{}",_filePath);
     Data data = FileUtils::getInstance()->getDataFromFile(_filePath);
     
     if (!data.isNull())
@@ -614,7 +614,7 @@ bool Image::initWithImageFileThreadSafe(std::string_view fullpath)
         ssize_t n = 0;
         auto buf  = data.takeBuffer(&n);
         ret       = initWithImageData(buf, n, true);
-        AXLOGD("Image::initWithImageFileThreadSafe initWithImageData n:{}",n);
+        //AXLOGD("Image::initWithImageFileThreadSafe initWithImageData n:{}",n);
     }
 
     return ret;
@@ -640,18 +640,18 @@ bool Image::initWithImageData(uint8_t* data, ssize_t dataLen, bool ownData)
         if (ZipUtils::isCCZBuffer(data, dataLen))
         {
             unpackedLen = ZipUtils::inflateCCZBuffer(data, dataLen, &unpackedData);
-            AXLOGD("Image::initWithImageData isCCZBuffer ZipUtils::inflateCCZBuffer unpackedLen:{}",unpackedLen);            
+            //AXLOGD("Image::initWithImageData isCCZBuffer ZipUtils::inflateCCZBuffer unpackedLen:{}",unpackedLen);            
         }
         else if (ZipUtils::isGZipBuffer(data, dataLen))
         {
             unpackedLen = ZipUtils::inflateMemory(const_cast<uint8_t*>(data), dataLen, &unpackedData);
-            AXLOGD("Image::initWithImageData isGZipBuffer ZipUtils::inflateMemory unpackedLen:{}",unpackedLen);            
+            //AXLOGD("Image::initWithImageData isGZipBuffer ZipUtils::inflateMemory unpackedLen:{}",unpackedLen);            
         }
         else
         {
             unpackedData = const_cast<uint8_t*>(data);
             unpackedLen  = dataLen;
-            AXLOGD("Image::initWithImageData isorthers unpackedLen:{}",unpackedLen);            
+            //AXLOGD("Image::initWithImageData isorthers unpackedLen:{}",unpackedLen);            
         }
 
         if (unpackedData != data)
@@ -666,49 +666,49 @@ bool Image::initWithImageData(uint8_t* data, ssize_t dataLen, bool ownData)
         switch (_fileType)
         {
         case Format::PNG:
-            AXLOGD("Image::initWithImageData isPNG initWithPngData");
+            //AXLOGD("Image::initWithImageData isPNG initWithPngData");
             ret = initWithPngData(unpackedData, unpackedLen);
             break;
         case Format::JPG:
-            AXLOGD("Image::initWithImageData isJPG initWithJpgData");
+            //AXLOGD("Image::initWithImageData isJPG initWithJpgData");
             ret = initWithJpgData(unpackedData, unpackedLen);
             break;
         case Format::WEBP:
-            AXLOGD("Image::initWithImageData isWEBP initWithWebpData");
+            //AXLOGD("Image::initWithImageData isWEBP initWithWebpData");
             ret = initWithWebpData(unpackedData, unpackedLen);
             break;
         case Format::PVR:
-            AXLOGD("Image::initWithImageData isPVR initWithPVRData");
+            //AXLOGD("Image::initWithImageData isPVR initWithPVRData");
             ret = initWithPVRData(unpackedData, unpackedLen, ownData);
             break;
         case Format::ETC1:
-            AXLOGD("Image::initWithImageData isETC initWithETCData");
+            //AXLOGD("Image::initWithImageData isETC initWithETCData");
             ret = initWithETCData(unpackedData, unpackedLen, ownData);
             break;
         case Format::ETC2:
-            AXLOGD("Image::initWithImageData isETC2 initWithETC2Data");
+            //AXLOGD("Image::initWithImageData isETC2 initWithETC2Data");
             ret = initWithETC2Data(unpackedData, unpackedLen, ownData);
             break;
         case Format::S3TC:
-            AXLOGD("Image::initWithImageData isS3TC initWithS3TCData");
+            //AXLOGD("Image::initWithImageData isS3TC initWithS3TCData");
             ret = initWithS3TCData(unpackedData, unpackedLen, ownData);
             break;
         case Format::ATITC:
-            AXLOGD("Image::initWithImageData isATITC initWithATITCData");
+            //AXLOGD("Image::initWithImageData isATITC initWithATITCData");
             ret = initWithATITCData(unpackedData, unpackedLen, ownData);
             break;
         case Format::ASTC:
-            AXLOGD("Image::initWithImageData isASTC initWithASTCData");
+            //AXLOGD("Image::initWithImageData isASTC initWithASTCData");
             ret = initWithASTCData(unpackedData, unpackedLen, ownData);
             break;
         case Format::BMP:
-            AXLOGD("Image::initWithImageData isBMP initWithBmpData");
+            //AXLOGD("Image::initWithImageData isBMP initWithBmpData");
             ret = initWithBmpData(unpackedData, unpackedLen);
             break;
         default:
         {
             // load and detect image format
-            AXLOGD("Image::initWithImageData isDefault");
+            //AXLOGD("Image::initWithImageData isDefault");
             tImageTGA* tgaData = tgaLoadBuffer(unpackedData, static_cast<int32_t>(unpackedLen));
 
             if (tgaData != nullptr && tgaData->status == TGA_OK)
@@ -729,12 +729,12 @@ bool Image::initWithImageData(uint8_t* data, ssize_t dataLen, bool ownData)
             free(unpackedData);
         // else, the hardware texture decoder used, the compressed data was stored directly
     } while (0);
-    if (ret) {
-        AXLOGD("Image::initWithImageData is ok ");
-    } else
-    {
-        AXLOGD("Image::initWithImageData is fail");
-    }
+    //if (ret) {
+        //AXLOGD("Image::initWithImageData is ok ");
+    //} else
+    //{
+        //AXLOGD("Image::initWithImageData is fail");
+    //}
 
     
     return ret;
@@ -1919,7 +1919,7 @@ bool Image::initWithETC2Data(uint8_t* data, ssize_t dataLen, bool ownData)
             pixelOffset = KTX_V1_HEADER_SIZE + header->bytesOfKeyValueData + 4;
         }
         
-        AXLOGD("Image::initWithETC2Data 宽度:{} 高度:{} format:{} pixelOffset:{}",_width,_height,format,pixelOffset);
+        //AXLOGD("Image::initWithETC2Data 宽度:{} 高度:{} format:{} pixelOffset:{}",_width,_height,format,pixelOffset);
         // We only support ETC2_RGBA_NO_MIPMAPS and ETC2_RGB_NO_MIPMAPS
         assert(format == ETC2_RGBA_NO_MIPMAPS || format == ETC2_RGB_NO_MIPMAPS);
 
@@ -1950,7 +1950,7 @@ bool Image::initWithETC2Data(uint8_t* data, ssize_t dataLen, bool ownData)
         }
 
         _hasPremultipliedAlpha = isCompressedImageHavePMA(CompressedImagePMAFlag::ETC2);
-        AXLOGD("Image::initWithETC2Data 完成");
+        //AXLOGD("Image::initWithETC2Data 完成");
         return true;
     } while (false);
 

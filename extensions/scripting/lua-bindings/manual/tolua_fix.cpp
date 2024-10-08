@@ -33,12 +33,6 @@
 using namespace ax;
 
 static int s_function_ref_id = 0;
-// luaSD_printf _Logprintf = logprint;
-// #ifndef luaSD_PRINT
-// #include <stdio.h>
-// #define luaSD_PRINT logprint
-// #endif
-
 #include <iostream>
 #include <queue>
 #include <string>
@@ -89,9 +83,6 @@ public:
 
 static StringQueue sq;
 
-// rtablemap  tabledict{};
-//&tabledict;
-// static rtablemap *ptabledict = NULL;
 
 TOLUA_API void toluafix_open(lua_State* L)
 {

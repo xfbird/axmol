@@ -77,7 +77,7 @@ Object::~Object()
         if (_referenceCount != 0)
             untrackRef(this);
     #endif
-    AXLOGD("~Object() @ this:{:12X}",FMT_TOPOINT(this));
+    //AXLOGD("~Object() @ this:{:12X}",FMT_TOPOINT(this));
 }
 
 void Object::retain()

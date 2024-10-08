@@ -89,45 +89,50 @@ int Application::run()
     auto glView   = director->getGLView();
 
     // Retain glView to avoid glView being released in the while loop
-    glView->retain();
-
-    LONGLONG interval = 0LL;
-    LONG waitMS       = 0L;
-
-    LARGE_INTEGER freq;
-    QueryPerformanceFrequency(&freq);
-
-    while (!glView->windowShouldClose())
+    if (glView)
     {
-        QueryPerformanceCounter(&nNow);
-        interval = nNow.QuadPart - nLast.QuadPart;
-        if (interval >= _animationInterval.QuadPart)
+        glView->retain();
+
+        LONGLONG interval = 0LL;
+        LONG waitMS       = 0L;
+
+        LARGE_INTEGER freq;
+        QueryPerformanceFrequency(&freq);
+
+        while (!glView->windowShouldClose())
         {
-            nLast.QuadPart = nNow.QuadPart;
+            QueryPerformanceCounter(&nNow);
+            interval = nNow.QuadPart - nLast.QuadPart;
+            if (interval >= _animationInterval.QuadPart)
+            {
+                nLast.QuadPart = nNow.QuadPart;
+                director->mainLoop();
+                glView->pollEvents();
+            }
+            else
+            {
+                // The precision of timer on Windows is set to highest (1ms) by 'timeBeginPeriod' from above code,
+                // but it's still not precise enough. For example, if the precision of timer is 1ms,
+                // Sleep(3) may make a sleep of 2ms or 4ms. Therefore, we subtract 1ms here to make Sleep time shorter.
+                // If 'waitMS' is equal or less than 1ms, don't sleep and run into next loop to
+                // boost CPU to next frame accurately.
+                waitMS = static_cast<LONG>((_animationInterval.QuadPart - interval) * 1000LL / freq.QuadPart - 1L);
+                if (waitMS > 1L)
+                    Sleep(waitMS);
+            }
+        }
+
+        // Director should still do a cleanup if the window was closed manually.
+        if (glView->isOpenGLReady())
+        {
+            director->end();
             director->mainLoop();
-            glView->pollEvents();
+            director = nullptr;
         }
-        else
-        {
-            // The precision of timer on Windows is set to highest (1ms) by 'timeBeginPeriod' from above code,
-            // but it's still not precise enough. For example, if the precision of timer is 1ms,
-            // Sleep(3) may make a sleep of 2ms or 4ms. Therefore, we subtract 1ms here to make Sleep time shorter.
-            // If 'waitMS' is equal or less than 1ms, don't sleep and run into next loop to
-            // boost CPU to next frame accurately.
-            waitMS = static_cast<LONG>((_animationInterval.QuadPart - interval) * 1000LL / freq.QuadPart - 1L);
-            if (waitMS > 1L)
-                Sleep(waitMS);
-        }
+        glView->release();
     }
 
-    // Director should still do a cleanup if the window was closed manually.
-    if (glView->isOpenGLReady())
-    {
-        director->end();
-        director->mainLoop();
-        director = nullptr;
-    }
-    glView->release();
+
 
 
     return 0;
