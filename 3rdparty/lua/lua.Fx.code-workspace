@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../../extensions/scripting"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.tsx": "xml",
+			"*.cfg": "klipper-config",
+			"*.scad": "scad",
+			"*.lua": "lua",
+			"random": "cpp"
+		}
+	}
+}

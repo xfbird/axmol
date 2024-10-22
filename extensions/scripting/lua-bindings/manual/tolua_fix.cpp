@@ -339,6 +339,73 @@ TOLUA_API void toluafix_stack_dump(lua_State* L, const char* label)
     }
     // AXLOGD("\n");
 }
+void  toluafix_outTable(lua_State *L, int nindex) {
+    // 确保指定位置的元素是一个表
+    if (!lua_istable(L, nindex)) {
+        // std::cerr << "The specified index is not a table." << std::endl;
+        AXLOGD("目标不是表");
+        return;
+    }
+
+    // 保存原始的栈状态
+    int top = lua_gettop(L);
+
+    // 初始化键为 nil，开始遍历
+    lua_pushnil(L); // 将 nil 压入栈以开始遍历
+
+    // 遍历表中的所有键值对
+    while (lua_next(L, nindex) != 0) {
+        // 栈顶的两个值分别是值和键（注意顺序）
+        const char *value = lua_tostring(L, -1); // 获取值
+        const char *key = lua_tostring(L, -2);   // 获取键
+        // 打印键值对
+        //std::cout << key << ": " << value << std::endl;
+        AXLOGD("表项:{} 值:{}",key,value);
+        // 移除栈顶的值，恢复原始的栈状态
+        lua_pop(L, 1);
+    }
+
+    // 恢复原始的栈状态
+    lua_settop(L, top);
+}
+TOLUA_API void toluafix_stack_dumpsm(lua_State* L, const char* label)
+{
+    int i;
+    int top = lua_gettop(L);
+    AXLOGD("[SMD] Total [{}] in lua stack: {}", top, label != 0 ? label : "");
+    for (i = -1; i >= -top; i--)
+    {
+        int t = lua_type(L, i);
+        switch (t)
+        {
+            case LUA_TSTRING:
+                AXLOGD("[SMD]  [{:2}] string {}", i, lua_tostring(L, i));
+                break;
+            case LUA_TBOOLEAN:
+                AXLOGD("[SMD]  [{:2}] boolean {}", i, lua_toboolean(L, i) ? "true" : "false");
+                break;
+            case LUA_TNUMBER:
+                AXLOGD("[SMD]  [{:2}] number {}", i, lua_tonumber(L, i));
+                break;
+            case LUA_TNIL:
+                AXLOGD("[SMD]  [{:2}]  number nil",i);
+                break;
+            case LUA_TFUNCTION:
+                AXLOGD("[SMD]  [{:2}] function {}",i,lua_topointer(L, i));
+                break;
+            // #define LUA_TLIGHTUSERDATA	2
+            // #define LUA_TTABLE		5
+            // #define LUA_TUSERDATA		7
+            // #define LUA_TTHREAD		8
+            default:
+                AXLOGD("[SMD]  [{:2}] {} PTR:{}", i, lua_typename(L, t),lua_topointer(L, i));
+                if ((t==LUA_TTABLE) ||(t==LUA_TTABLE)) {
+                    toluafix_outTable(L,i);
+                }
+        }
+    }
+    // AXLOGD("\n");
+}
 
 int logprint(const char *__restrict __format, ...){
     va_list args;

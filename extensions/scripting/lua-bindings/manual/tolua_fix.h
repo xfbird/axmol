@@ -161,6 +161,8 @@ TOLUA_API int toluafix_istable(lua_State* L, int lo, const char* type, int def, 
  */
 TOLUA_API void toluafix_stack_dump(lua_State* L, const char* label);
 TOLUA_API void toluafix_stack_logdump(lua_State* L, const char* label);
+TOLUA_API void toluafix_stack_dumpsm(lua_State* L, const char* label);
+
 
 inline void tolua_pushsv (lua_State* L, const std::string_view& v)
 {
