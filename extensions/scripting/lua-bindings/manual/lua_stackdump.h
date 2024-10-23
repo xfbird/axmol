@@ -47,11 +47,8 @@
     #include "base/Logging.h"
 
 
-    // extern void luaSD_stackdump (lua_State* state, luaSD_printf luasdprintf);
-    // extern void luaSD_stackdump (tablemap::rtablemap *rtables,lua_State* state, luaSD_printf luasdprintf, const char * label);
-    // extern void luaSD_stackdump_default (tablemap::rtablemap *rtables,lua_State* state, const char * label);
-    extern void luaSD_stackdump (lua_State* state, luaSD_printf luasdprintf, const char * label);
-    extern void luaSD_stackdump_default (lua_State* state, const char * label);
+    extern void luaSD_stackdump (lua_State* state, luaSD_printf luasdprintf, const char * label,int showmode=0);
+    extern void luaSD_stackdump_default (lua_State* state, const char * label,int showmode=0);
 
     #ifdef __cplusplus
     }
@@ -87,7 +84,7 @@
                     return NULL;
                 }
 
-                int length = strlen(str);
+                size_t length = strlen(str);
                 // 分配足够的内存，每个字符最多替换为3个字符（例如：'\n' -> '\\n'）
                 char *result = (char *)malloc(3 * length + 1); // 显式类型转换
                 if (result == NULL) {
@@ -113,7 +110,6 @@
             }
 
             static const char* noname = "noname";
-            static const char* metas = "meta->";
 
             static int  ccount=0;
         //----------------------------------------------------------------------------------------------
@@ -128,6 +124,17 @@
                 // [SD]  [-2] table PTR:0x2aaa5974d70 _G根
                 if (lua_type(L, index) == LUA_TTABLE) {
                     // toluafix_stack_dump(L,"sdis_class in");
+                    lua_getfield(L, index, ".classname");                      //index-1
+                    if (lua_isstring(L, -1)){
+
+                        lua_getfield(L, index, "__name");                      //index-1
+                        if (lua_isstring(L, -1)) {
+                            lua_pop(L, 1); // ——name
+                            return 1;      // 存在 .classname 且 __name 是字符串确认是 Class
+                        }
+                        lua_pop(L, 1); // 弹出 字符串的 __name
+                    }
+                    lua_pop(L, 1);     // 弹出 nil 或非字符串的 .classname
 
                     // AXLOGD("sdis_class top:{} confirm is Table", lua_gettop(L));
                     lua_getfield(L, index, "__cname");                      //index-1
@@ -301,163 +308,164 @@
 
 
             // 辅助函数，用于检查给定索引处的表是否是类
-            static int is_class(lua_State *L, int index) {
-                int LC = lua_gettop(L);
-                if (lua_type(L, index) != LUA_TTABLE) {
-                    __checkluastack__(LC,L);
-                    //CheckLuaStack(LC,lua_gettop(L));
-                    return 0; // 必须是表
-                }
+            // 暂时未用 先 关闭
+                // static int is_class(lua_State *L, int index) {
+                //     int LC = lua_gettop(L);
+                //     if (lua_type(L, index) != LUA_TTABLE) {
+                //         __checkluastack__(LC,L);
+                //         //CheckLuaStack(LC,lua_gettop(L));
+                //         return 0; // 必须是表
+                //     }
 
-                // 获取元表
-                if (!lua_getmetatable(L, index)) {
-                    //CheckLuaStack(LC,lua_gettop(L));
-                    __checkluastack__(LC,L);
-                    return 0; // 没有元表
-                }
+                //     // 获取元表
+                //     if (!lua_getmetatable(L, index)) {
+                //         //CheckLuaStack(LC,lua_gettop(L));
+                //         __checkluastack__(LC,L);
+                //         return 0; // 没有元表
+                //     }
 
-                lua_getfield(L, index, "__cname");
-                if (!lua_isstring(L, -1))
-                    {
-                    lua_pop(L, 1); // 弹出元表和 nil 或非字符串的 __cname
-                    __checkluastack__(LC,L);
-                    // int LC1 = lua_gettop(L);
-                    // if (LC1 != LC)
-                    // {
-                    //     AXLOGD("出现 堆栈不平衡  检查{}   {} ",LC,LC1);
-                    // }
-                    return 0; // __cname 不存在或不是字符串
-                }
-                lua_pop(L, 1); // 弹出 __cname
+                //     lua_getfield(L, index, "__cname");
+                //     if (!lua_isstring(L, -1))
+                //         {
+                //         lua_pop(L, 1); // 弹出元表和 nil 或非字符串的 __cname
+                //         __checkluastack__(LC,L);
+                //         // int LC1 = lua_gettop(L);
+                //         // if (LC1 != LC)
+                //         // {
+                //         //     AXLOGD("出现 堆栈不平衡  检查{}   {} ",LC,LC1);
+                //         // }
+                //         return 0; // __cname 不存在或不是字符串
+                //     }
+                //     lua_pop(L, 1); // 弹出 __cname
 
-                lua_getfield(L, index, "create");
-                if (!lua_iscfunction(L, -1))
-                {
-                    lua_pop(L, 1);  // 弹出元表和 nil 或非字符串的 __cname
-                    __checkluastack__(LC,L);
-                    // int LC1 = lua_gettop(L);
-                    // if (LC1 != LC)
-                    // {
-                    //     AXLOGD("出现 堆栈不平衡  检查{}   {} ",LC,LC1);
-                    // }
+                //     lua_getfield(L, index, "create");
+                //     if (!lua_iscfunction(L, -1))
+                //     {
+                //         lua_pop(L, 1);  // 弹出元表和 nil 或非字符串的 __cname
+                //         __checkluastack__(LC,L);
+                //         // int LC1 = lua_gettop(L);
+                //         // if (LC1 != LC)
+                //         // {
+                //         //     AXLOGD("出现 堆栈不平衡  检查{}   {} ",LC,LC1);
+                //         // }
 
-                    return 0;       // __cname 不存在或不是字符串
-                }
-                lua_pop(L, 1);  // 弹出 __cname
+                //         return 0;       // __cname 不存在或不是字符串
+                //     }
+                //     lua_pop(L, 1);  // 弹出 __cname
 
-                lua_getfield(L, index, "new");
-                if (!lua_iscfunction(L, -1))
-                {
-                    lua_pop(L, 1);  // 弹出元表和 nil 或非字符串的 __cname
-                    __checkluastack__(LC,L);
-                    // int LC1 = lua_gettop(L);
-                    // if (LC1 != LC)
-                    // {
-                    //     AXLOGD("出现 堆栈不平衡  检查{}   {} ",LC,LC1);
-                    // }
+                //     lua_getfield(L, index, "new");
+                //     if (!lua_iscfunction(L, -1))
+                //     {
+                //         lua_pop(L, 1);  // 弹出元表和 nil 或非字符串的 __cname
+                //         __checkluastack__(LC,L);
+                //         // int LC1 = lua_gettop(L);
+                //         // if (LC1 != LC)
+                //         // {
+                //         //     AXLOGD("出现 堆栈不平衡  检查{}   {} ",LC,LC1);
+                //         // }
 
-                    return 0;       // __cname 不存在或不是字符串
-                }
-                lua_pop(L, 1); // 弹出元表
-                __checkluastack__(LC,L);
-                // int LC1 = lua_gettop(L);
-                // if (LC1 != LC)
-                // {
-                //     AXLOGD("出现 堆栈不平衡  检查{}   {} ",LC,LC1);
+                //         return 0;       // __cname 不存在或不是字符串
+                //     }
+                //     lua_pop(L, 1); // 弹出元表
+                //     __checkluastack__(LC,L);
+                //     // int LC1 = lua_gettop(L);
+                //     // if (LC1 != LC)
+                //     // {
+                //     //     AXLOGD("出现 堆栈不平衡  检查{}   {} ",LC,LC1);
+                //     // }
+                //     return 1;
                 // }
-                return 1;
-            }
 
-            // 辅助函数，用于检查给定索引处的表是否是对象
-            static int is_object(lua_State *L, int index) {
-                int LC = lua_gettop(L);
-                if (lua_type(L, index) != LUA_TTABLE) {
-                    int LC1 = lua_gettop(L);
-                    if (LC1 != LC)
-                    {
-                        AXLOGD("出现 堆栈不平衡  检查{}   {} ",LC,LC1);
-                    }
+                // // 辅助函数，用于检查给定索引处的表是否是对象
+                // static int is_object(lua_State *L, int index) {
+                //     int LC = lua_gettop(L);
+                //     if (lua_type(L, index) != LUA_TTABLE) {
+                //         int LC1 = lua_gettop(L);
+                //         if (LC1 != LC)
+                //         {
+                //             AXLOGD("出现 堆栈不平衡  检查{}   {} ",LC,LC1);
+                //         }
 
-                    return 0; // 必须是表
-                }
+                //         return 0; // 必须是表
+                //     }
 
-                // 获取元表
-                if (!lua_getmetatable(L, index)) {
-                    int LC1 = lua_gettop(L);
-                    if (LC1 != LC)
-                    {
-                        AXLOGD("出现 堆栈不平衡  检查{}   {} ",LC,LC1);
-                    }
+                //     // 获取元表
+                //     if (!lua_getmetatable(L, index)) {
+                //         int LC1 = lua_gettop(L);
+                //         if (LC1 != LC)
+                //         {
+                //             AXLOGD("出现 堆栈不平衡  检查{}   {} ",LC,LC1);
+                //         }
 
-                    return 0; // 没有元表
-                }
-                lua_getfield(L, index, "class");
-                if (lua_type(L, -1) != LUA_TTABLE)
-                {
-                    lua_pop(L, 2);  // 弹出元表和 nil 或非字符串的 __cname
-                    int LC1 = lua_gettop(L);
-                    if (LC1 != LC)
-                    {
-                        AXLOGD("出现 堆栈不平衡  检查{}   {} ",LC,LC1);
-                    }
+                //         return 0; // 没有元表
+                //     }
+                //     lua_getfield(L, index, "class");
+                //     if (lua_type(L, -1) != LUA_TTABLE)
+                //     {
+                //         lua_pop(L, 2);  // 弹出元表和 nil 或非字符串的 __cname
+                //         int LC1 = lua_gettop(L);
+                //         if (LC1 != LC)
+                //         {
+                //             AXLOGD("出现 堆栈不平衡  检查{}   {} ",LC,LC1);
+                //         }
 
-                    return 0;       // __cname 不存在或不是字符串
-                }
-                // AXLOGD("__cname :{}",lua_tostring(L, -1));
-                lua_pop(L, 1);  // 弹出元表
-                int LC1 = lua_gettop(L);
-                if (LC1 != LC)
-                {
-                    AXLOGD("出现 堆栈不平衡  检查{}   {} ",LC,LC1);
-                }
+                //         return 0;       // __cname 不存在或不是字符串
+                //     }
+                //     // AXLOGD("__cname :{}",lua_tostring(L, -1));
+                //     lua_pop(L, 1);  // 弹出元表
+                //     int LC1 = lua_gettop(L);
+                //     if (LC1 != LC)
+                //     {
+                //         AXLOGD("出现 堆栈不平衡  检查{}   {} ",LC,LC1);
+                //     }
 
-                return 1;
-            }
+                //     return 1;
+                // }
 
-            // 主函数，用于确定给定索引处的变量是普通表、类还是对象
-            static int identifyTCO(lua_State *L, int index) {
-                int LC=lua_gettop(L);
-                int type = lua_type(L, index);
-                if (type != LUA_TTABLE && type != LUA_TUSERDATA) {
-                    __checkluastack__(LC,L);
-                    // return "Not a table or userdata";
-                    // int LC1 = lua_gettop(L);
-                    // if (LC1 != LC)
-                    // {
-                    //     AXLOGD("出现 堆栈不平衡  检查{}   {} ",LC,LC1);
-                    // }
-                    return 0;
-                }
+                // // 主函数，用于确定给定索引处的变量是普通表、类还是对象
+                // static int identifyTCO(lua_State *L, int index) {
+                //     int LC=lua_gettop(L);
+                //     int type = lua_type(L, index);
+                //     if (type != LUA_TTABLE && type != LUA_TUSERDATA) {
+                //         __checkluastack__(LC,L);
+                //         // return "Not a table or userdata";
+                //         // int LC1 = lua_gettop(L);
+                //         // if (LC1 != LC)
+                //         // {
+                //         //     AXLOGD("出现 堆栈不平衡  检查{}   {} ",LC,LC1);
+                //         // }
+                //         return 0;
+                //     }
 
-                if (is_class(L, index)) {
-                    // int LC1 = lua_gettop(L);
-                    // if (LC1 != LC)
-                    // {
-                    //     AXLOGD("出现 堆栈不平衡  检查{}   {} ",LC,LC1);
-                    // }
-                    __checkluastack__(LC,L);
-                    return 2;
-                    // return "Class";
-                } else if (is_object(L, index)) {
-                    // return "Object";
-                    // int LC1 = lua_gettop(L);
-                    // if (LC1 != LC)
-                    // {
-                    //     AXLOGD("出现 堆栈不平衡  检查{}   {} ",LC,LC1);
-                    // }
-                    __checkluastack__(LC,L);                    
-                    return 3;
-                } else {
-                    // return "Table";
-                    __checkluastack__(LC,L);
-                    // int LC1 = lua_gettop(L);
-                    // if (LC1 != LC)
-                    // {
-                    //     AXLOGD("出现 堆栈不平衡  检查{}   {} ",LC,LC1);
-                    // }
-                    return 1;
-                }
-            }
+                //     if (is_class(L, index)) {
+                //         // int LC1 = lua_gettop(L);
+                //         // if (LC1 != LC)
+                //         // {
+                //         //     AXLOGD("出现 堆栈不平衡  检查{}   {} ",LC,LC1);
+                //         // }
+                //         __checkluastack__(LC,L);
+                //         return 2;
+                //         // return "Class";
+                //     } else if (is_object(L, index)) {
+                //         // return "Object";
+                //         // int LC1 = lua_gettop(L);
+                //         // if (LC1 != LC)
+                //         // {
+                //         //     AXLOGD("出现 堆栈不平衡  检查{}   {} ",LC,LC1);
+                //         // }
+                //         __checkluastack__(LC,L);                    
+                //         return 3;
+                //     } else {
+                //         // return "Table";
+                //         __checkluastack__(LC,L);
+                //         // int LC1 = lua_gettop(L);
+                //         // if (LC1 != LC)
+                //         // {
+                //         //     AXLOGD("出现 堆栈不平衡  检查{}   {} ",LC,LC1);
+                //         // }
+                //         return 1;
+                //     }
+                // }
 
             static int GetTableName(lua_State *L, int index) {
                 // 检查指定索引处的值是否为表
@@ -540,7 +548,7 @@
             t = lua_type(state, -1);
 
             char * stypename=safe_strdup(luaL_typename(state, -1));     //获得 类型
-            int tnamlen=strlen(tablename);
+            size_t tnamlen=strlen(tablename);
             int CheckPos=lua_gettop(state);
             // AXLOGD("LSD  in stackIndex:{} depth:{} intop:{} name:{} ntype:{}  typename:{} ccount:{} curpos:{} ",
             //        stackIndex, depth,nstackok,tablename,t,std::string(stypename),ccount,CheckPos);
@@ -746,21 +754,33 @@
                                 //  AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} CurNodes:{}  Nodes:{} 继续:{} NodeKeystr:{}", 
                                 //      stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),nodeindex,len,bonext,NodeKeystr);
                             }
-
+                            
+                            int LC = lua_gettop(state);
                             // 尝试获取该表的元表
                             if (lua_getmetatable(state, -1)) {
                                 // 检查是否成功获取到元表
+                                // AXLOGD("lua_getmetatable 内 堆栈 {} ", lua_gettop(state)); 
                                 if (!lua_isnil(state, -1)) {
                                     // 元表存在，使用 lua_pushfstring 将元表指针转换为字符串
+                                    // AXLOGD("isnil 堆栈 {} ", lua_gettop(state)); 
                                     luasdorintf("\n");                              //输出换行。然后 输出 Key = value  直接输出 字符串
                                     luaspIndent(luasdorintf,-2,depth + 1,indentLevel + 4,1,0); //做出缩进
-                                    lua_pushfstring(state, "metas->%p",lua_topointer(state, -1));                                    
-                                    luasdorintf("%s", lua_tostring(state, -1));
+                                    // lua_pushfstring(state, "metas->%p",lua_topointer(state, -1));                                    
+                                    // luasdorintf("%s", lua_tostring(state, -1));
+                                    luasdorintf("MetaTable->");
+                                    luaSD_stackdumpvalue(state, luasdorintf, -1, depth + 1, 0, indentLevel + 4, 0,0,NULL,myfatherid);
+                                    // AXLOGD("isnil 堆栈 pop 前 {} ", lua_gettop(state)); 
                                     lua_pop(state, 1); // 弹出 字符串
+                                    // AXLOGD("isnil 堆栈 pop 后 {} ", lua_gettop(state)); 
                                 } 
                                 // 元表不存在，什么都不做
-                                lua_pop(state, 1); // 弹出 元表
+                                // AXLOGD("isnil 堆栈 判断出 后 {} ", lua_gettop(state)); 
+                                // // lua_pop(state, 1); // 弹出 元表
+                                // AXLOGD("isnil 堆栈 判断出  pop后 {} ", lua_gettop(state)); 
                             }
+                            // lua_pop(state, 1); // 弹出 元表
+                            __checkluastack__(LC,state);
+
                             // int ctype = identifyTCO(state, -1); 
                             // AXLOGD("LUA_TUSERDATA tablename:{}  ctype:{}",tablename,ctype);
                             if (NodeKeystr!=NULL){
@@ -840,24 +860,19 @@
             }
         }
 
-        LUASD_API void luaSD_stackdump (
-            // tablemap::rtablemap *rtables,
-            lua_State* state, luaSD_printf luasdprintf, const char * label) {
-
+        LUASD_API void luaSD_stackdump (lua_State* state, luaSD_printf luasdprintf, const char * label,int showmode) {
             const int top = lua_gettop(state);
             luasdprintf("\n--------------------start-of-stacktrace----------------\n");
             luasdprintf("Check in %s index | details (%i entries)\n",label, top);
-            // AXLOGD("luaSD_stackdump 进入 top:{} ",lua_gettop(state)); 
             // lua_pushglobaltable(state); //输出 全局变量。    1
             // luaSD_stackdumpvalue(state, luasdprintf, -1, 0, 1, 1, 1,1,"_G_Grobal");
             //对于 根部的 注册表 进行输出
-            lua_pushvalue(state, LUA_REGISTRYINDEX);
-            luaSD_stackdumpvalue(state, luasdprintf, -1, 0, 1, 1, 1,1,"_REGISTRYINDEX");
-            // toluafix_stack_dump(state,"stack top globaltable");
-           
-            // lua_pop(state, 4);          //删除 全局变量
-            lua_pop(state, 1);             //删除 全局变量
-            // // AXLOGD("luaSD_stackdump 进入 top:{}  退出时:nt{}",lua_gettop(state),nt); 
+            if (showmode==1) {
+                lua_pushvalue(state, LUA_REGISTRYINDEX);
+                luaSD_stackdumpvalue(state, luasdprintf, -1, 0, 1, 1, 1,1,"_REGISTRYINDEX");
+                lua_pop(state, 1);             //删除 全局变量
+            }
+            //下面输出当前堆栈    
             int i;
             char namebuffer[50];
             for (i = -1; i >= -top; i--) {
@@ -871,37 +886,9 @@
             }
             
             luasdprintf("----------------------end-of-stacktrace----------------\n\n");
-            // // lua_pushglobaltable(state); //输出 全局变量。
-            // // toluafix_stack_dump(state,"test");
-            // lua_pop(state, 5);          //删除 全局变量
-
-           
-            //     lua_getfield(state, -1, "GameStateMgr");       //2  
-            //     // toluafix_stack_dump(state,"stack top GameStateMgr");
-            //     // luaSD_stackdumpvalue(state, luasdprintf, -1, 0, 1, 1, 1,0,"GameStateMgr");
-            //     // AXLOGD("luaSD_stackdump GameStateMgr 进入check_table_type top:{} typename:{} ", lua_gettop(state), luaL_typename(state, -1));   //2
-            //     //    int nt=check_table_type(state,-1,"_G_Grobal");   //3
-            //     // AXLOGD("luaSD_stackdump GameStateMgr 离开check_table_type top:{} ostring:{}",lua_gettop(state),lua_tostring(state,-1));  //3
-            //     //    lua_pop(state, 1);          //删除 GameStateMgr 以及 其字符串  2
-            //     // lua_pushglobaltable(state); //输出 全局变量。
-            //    lua_getfield(state, -2, "global");               //3
-            //     // toluafix_stack_dump(state,"stack top global");
-            //     // luaSD_stackdumpvalue(state, luasdprintf, -1, 0, 1, 1, 1,0,"global");
-            //    lua_getfield(state, -1, "L_GameEnvManager");    //4 
-            // toluafix_stack_dump(state,"stack top L_GameEnvManager");
-            // luaSD_stackdumpvalue(state, luasdprintf, -1, 0, 1, 1, 1,0,"L_GameEnvManager");
-            // AXLOGD("luaSD_stackdump L_GameEnvManager 进入check_table_type top:{} typename:{} ", lua_gettop(state), luaL_typename(state, -1)); //4
-            //    nt=check_table_type(state,-1,"L_GameEnvManager");         //5   
-            //    AXLOGD("luaSD_stackdump L_GameEnvManager 离开check_table_type top:{} ostring:{}",lua_gettop(state),lua_tostring(state,-1)); 
-            //    lua_pop(state, 1);          //删除 GameStateMgr 以及 其字符串  //4
-
-
         }
-
-        LUASD_API void luaSD_stackdump_default (
-            // tablemap::rtablemap *rtables,
-            lua_State* state, const  char * label) {
-            luaSD_stackdump(state, luaSD_PRINT,label);
+        LUASD_API void luaSD_stackdump_default (lua_State* state, const  char * label,int showmode) {
+            luaSD_stackdump(state, luaSD_PRINT,label,showmode);
         }
     #endif
 

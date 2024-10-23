@@ -218,6 +218,22 @@ int axlua_stackdumpex(lua_State* L)
         toluafix_stack_logdump(L,slabel.c_str());
         return 1;
     }
+    if (argc == 2)
+    {
+        std::string slabel;
+        int showmode=0;
+        ok &= luaval_to_std_string(L, 1, &slabel, "stackdump");
+        ok &= luaval_to_int32(L, 2,&showmode, "showmode");
+        if (!ok)
+        {
+            tolua_error(L,"invalid arguments in function 'axlua_stackdumpex'", nullptr);
+            return 0;
+        }
+        lua_pop(L,1);               //把 自己的参数 弹出去
+        toluafix_stack_logdump(L,slabel.c_str(),showmode);
+        return 1;
+    }
+
     luaL_error(L, "%s has wrong number of arguments: %d, was expecting %d\n ", "axlua_stackdumpex",argc, 1);
     #if _AX_DEBUG >= 1
     tolua_lerror:

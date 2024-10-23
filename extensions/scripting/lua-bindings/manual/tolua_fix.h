@@ -160,7 +160,7 @@ TOLUA_API int toluafix_istable(lua_State* L, int lo, const char* type, int def, 
  * @js NA
  */
 TOLUA_API void toluafix_stack_dump(lua_State* L, const char* label);
-TOLUA_API void toluafix_stack_logdump(lua_State* L, const char* label);
+TOLUA_API void toluafix_stack_logdump(lua_State* L, const char* label,int showmode=0);
 TOLUA_API void toluafix_stack_dumpsm(lua_State* L, const char* label);
 
 
