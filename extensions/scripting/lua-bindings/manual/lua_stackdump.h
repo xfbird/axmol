@@ -282,10 +282,19 @@
                                 case 1 :luasdorintf("REGISTRY| ");//全局变量输出
                                 break;
                                 case 2 :luasdorintf("Gobal   | ");//全局变量输出
+                                break;
+                                case 3 :luasdorintf("LuaSuper| ");//全局变量输出
+                                break;
+                                case 4 :luasdorintf("LuaGC   | ");//全局变量输出
+                                break;
+                                case 5 :luasdorintf("LuaPeers| ");//全局变量输出
+                                break;
+                                //case 6 :luasdorintf("LuaPeers| ");//全局变量输出
+                                //break;
                             }                            
                          // luasdorintf("Gobal | ");//全局变量输出
                         }else {
-                            luasdorintf("%-7i | ", stackIndex);//堆栈序号 
+                            luasdorintf("%-7i    | ", stackIndex);//堆栈序号 
                         }
                     } else {
                         luasdorintf("         ", stackIndex);
@@ -863,15 +872,57 @@
         LUASD_API void luaSD_stackdump (lua_State* state, luaSD_printf luasdprintf, const char * label,int showmode) {
             const int top = lua_gettop(state);
             luasdprintf("\n--------------------start-of-stacktrace----------------\n");
-            luasdprintf("Check in %s index | details (%i entries)\n",label, top);
-            // lua_pushglobaltable(state); //输出 全局变量。    1
-            // luaSD_stackdumpvalue(state, luasdprintf, -1, 0, 1, 1, 1,1,"_G_Grobal");
+            luasdprintf("Check in %s index | details (%i entries) showmode:%d \n ",label, top,showmode);
             //对于 根部的 注册表 进行输出
-            if (showmode==1) {
-                lua_pushvalue(state, LUA_REGISTRYINDEX);
-                luaSD_stackdumpvalue(state, luasdprintf, -1, 0, 1, 1, 1,1,"_REGISTRYINDEX");
+            if (showmode & 32) {
+                lua_pushstring(state,"tolua_opened");
+                lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
+                if (!lua_isnil(state,-1)) {
+                    luaSD_stackdumpvalue(state, luasdprintf, -1, 0, 1, 1, 1,6,"_ToLua_Opened");
+                }
                 lua_pop(state, 1);             //删除 全局变量
             }
+            if (showmode & 16) {
+                lua_pushstring(state,"tolua_peers");
+                lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
+                if (!lua_isnil(state,-1)) {
+                    luaSD_stackdumpvalue(state, luasdprintf, -1, 0, 1, 1, 1,5,"_ToLua_peers");
+                }
+                lua_pop(state, 1);             //删除 全局变量
+            }
+            if (showmode & 8) {
+                lua_pushstring(state,"tolua_gc");
+                lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
+                if (!lua_isnil(state,-1)) {
+                    luaSD_stackdumpvalue(state, luasdprintf, -1, 0, 1, 1, 1,4,"_ToLua_GC");
+                }
+                lua_pop(state, 1);             //删除 全局变量
+            }
+            if (showmode & 4) {
+                lua_pushstring(state,"tolua_super");
+                lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
+                if (!lua_isnil(state,-1)) {
+                    luaSD_stackdumpvalue(state, luasdprintf, -1, 0, 1, 1, 1,3,"_ToLuaSuper");
+                }
+                lua_pop(state, 1);             //删除 全局变量
+            }
+            // 检查次右边的位（次低位）
+            if (showmode & 2) {
+                lua_pushglobaltable(state); //输出 全局变量。    1
+                if (!lua_isnil(state,-1)) {
+                    luaSD_stackdumpvalue(state, luasdprintf, -1, 0, 1, 1, 1,2,"_G_Grobal");
+                }
+                lua_pop(state, 1);             //删除 全局变量
+            }
+
+            if (showmode & 1) {
+                lua_pushvalue(state, LUA_REGISTRYINDEX);
+                if (!lua_isnil(state,-1)) {
+                    luaSD_stackdumpvalue(state, luasdprintf, -1, 0, 1, 1, 1,1,"_REGISTRYINDEX");
+                }
+                lua_pop(state, 1);             //删除 全局变量
+            }
+
             //下面输出当前堆栈    
             int i;
             char namebuffer[50];

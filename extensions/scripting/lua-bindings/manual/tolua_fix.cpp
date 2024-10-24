@@ -440,7 +440,7 @@ TOLUA_API void toluafix_stack_logdump(lua_State* L, const char* label,int showmo
 {
     sq.lock();
     delete_all();           //删除所有的 内容
-    luaSD_stackdump(L,logprint,label,1);
+    luaSD_stackdump(L,logprint,label,showmode);
     std::string ssout="";
     std::string item;
     while (!sq.isEmpty()) {
