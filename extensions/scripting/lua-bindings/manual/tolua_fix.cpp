@@ -379,29 +379,29 @@ TOLUA_API void toluafix_stack_dumpsm(lua_State* L, const char* label)
         switch (t)
         {
             case LUA_TSTRING:
-                AXLOGD("[SMD]  [{:2}] string {}", i, lua_tostring(L, i));
+                AXLOGD("[SMD]  [{:2}] {} {}", i, tolua_typename(L,i),lua_tostring(L, i));
                 break;
             case LUA_TBOOLEAN:
-                AXLOGD("[SMD]  [{:2}] boolean {}", i, lua_toboolean(L, i) ? "true" : "false");
+                AXLOGD("[SMD]  [{:2}] {} {}", i, tolua_typename(L,i),lua_toboolean(L, i) ? "true" : "false");
                 break;
             case LUA_TNUMBER:
-                AXLOGD("[SMD]  [{:2}] number {}", i, lua_tonumber(L, i));
+                AXLOGD("[SMD]  [{:2}] {} {}", i, tolua_typename(L,i),lua_tonumber(L, i));
                 break;
             case LUA_TNIL:
-                AXLOGD("[SMD]  [{:2}]  number nil",i);
+                AXLOGD("[SMD]  [{:2}] {} nil",i,tolua_typename(L,i));
                 break;
             case LUA_TFUNCTION:
-                AXLOGD("[SMD]  [{:2}] function {}",i,lua_topointer(L, i));
+                AXLOGD("[SMD]  [{:2}] {} {}",i,tolua_typename(L,i),lua_topointer(L, i));
                 break;
             // #define LUA_TLIGHTUSERDATA	2
             // #define LUA_TTABLE		5
             // #define LUA_TUSERDATA		7
             // #define LUA_TTHREAD		8
             default:
-                AXLOGD("[SMD]  [{:2}] {} PTR:{}", i, lua_typename(L, t),lua_topointer(L, i));
-                if ((t==LUA_TTABLE) ||(t==LUA_TTABLE)) {
-                    toluafix_outTable(L,i);
-                }
+                AXLOGD("[SMD]  [{:2}] {} PTR:{}", i, tolua_typename(L, i),lua_topointer(L, i));
+                // if ((t==LUA_TTABLE) ||(t==LUA_TTABLE)) {
+                //     toluafix_outTable(L,i);
+                // }
         }
     }
     // AXLOGD("\n");
