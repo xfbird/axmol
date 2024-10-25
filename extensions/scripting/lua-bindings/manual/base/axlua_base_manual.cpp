@@ -3065,7 +3065,7 @@ static int toaxlua_DrawNode_drawPolygon(lua_State* tolua_S)
             goto tolua_lerror;
         }
 #endif
-        int size = lua_tointeger(tolua_S, 3);
+        size_t size = lua_tointeger(tolua_S, 3);
         if (size > 0)
         {
             ax::Vec2* points = new ax::Vec2[size];
