@@ -7,7 +7,7 @@
 #include "axmol.h"
 // #include "2d/Node.h"
 #include "lua-bindings/manual/LuaBasicConversions.h"
-#include "UserDataEx.h"
+//#include "UserDataEx.h"
 #include "LuaBridgeControl.h"
 #include "base/Logging.h"
 #include "tolua++.h"
