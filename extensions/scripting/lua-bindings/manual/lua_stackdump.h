@@ -610,22 +610,22 @@
                 lua_pop(state, 1);
                 // __checkluastack__(LC1,state);
             }
-            // __checkluastack__(LC1,state);
+            __checkluastack__(LC1,state);
             ccount++;
             int nstackok=lua_gettop(state);
             /* ensure that the value is on the top of the stack */
             lua_pushvalue(state, stackIndex);               //把 指定的数据 压入 栈顶
-            // __checkluastack__(LC1+1,state);
+            __checkluastack__(LC1+1,state);
             t = lua_type(state, -1);
-            // __checkluastack__(LC1+1,state);
+            __checkluastack__(LC1+1,state);
             char * stypename=safe_strdup(tolua_typename(state, -1));
             lua_pop(state, 1);                             //将 类型字符串 弹出
-            // __checkluastack__(LC1+1,state);
+            __checkluastack__(LC1+1,state);
                 // luaL_typename(state, -1));     //获得 类型
             size_t tnamlen=strlen(tablename);
-            // __checkluastack__(LC1+1,state);
+            __checkluastack__(LC1+1,state);
             int CheckPos=lua_gettop(state);
-            // __checkluastack__(LC1+1,state);
+            __checkluastack__(LC1+1,state);
                 // AXLOGD("LSD  in stackIndex:{} depth:{} intop:{} name:{} ntype:{}  typename:{} ccount:{} curpos:{} ",
                 //        stackIndex, depth,nstackok,tablename,t,std::string(stypename),ccount,CheckPos);
                 // if ((stackIndex==-1)&&(depth==3)&&(CheckPos==14) && (t==6) &&(tnamlen==1)) {
@@ -658,7 +658,7 @@
                         //     AXLOGD("LSD UserData stackIndex:{} depth:{} top:{} name:{}", stackIndex, depth,lua_gettop(state),tablename);
                         //     lua_pushfstring(state, "[%p(%s)](no meta) [%s]",lua_topointer(state, -1),tablename,stypename);   //显示 指针 无元表 模式 指针显示
                         //     AXLOGD("LSD UserData stackIndex:{} depth:{} top:{} name:{}", stackIndex, depth,lua_gettop(state),tablename);
-                        //     __checkluastack__(LC11+1,state);
+                            // __checkluastack__(LC11+1,state);
                         //     // AXLOGD("LSD UserData stackIndex:{} depth:{} top:{} name:{} return:{}", stackIndex, depth,lua_gettop(state),tablename,lua_tostring(state,-1));  
                         // } else {
                         //    __checkluastack__(LC11+1,state);
@@ -712,27 +712,19 @@
                     }
                 case LUA_TTABLE: 
                     {
-                        // int ctype = identifyTCO(state, -1); 
-                        // AXLOGD("LUA_TTABLE tablename:{}  type:{}",tablename,stypename);
                         __checkluastack__(LC1+1,state);
-                        // int LC2 = lua_gettop(state);
+                        //[...]
+                        int LC2 = lua_gettop(state);
                         void * tablep= (void*)lua_topointer(state, -1);
                         luaspIndent(luasdorintf,stackIndex,depth,indentLevel,performIndent,isGobal,tablename);
-                        // AXLOGD("LUA_TTABLE tablename:{}  type:{}  LC2:{}",tablename,stypename,LC2);
-                        // __checkluastack__(LC2,state);
+                        // AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} 进入表处理 ", 
+                        //           stackIndex, depth,lua_gettop(state),tablename,std::string(stypename));
+                        __checkluastack__(LC2,state);
                         __checkluastack__(LC1+1,state);
                         int len = 0;
                         int ttn = 0;
-                        // lua_pushnil(state);                 //计算有多少 子节点
-                        // toluafix_stack_dumpsm(state, "lua_next begin");
-                        // while (lua_next(state, -2)) {
-                        //     //toluafix_stack_dumpsm(state, "lua_next");
-                        //     lua_pop(state, 1);
-                        //     ++len;
-                        // }
-                        // AXLOGD("LUA_TTABLE tablename:{}  type:{}",tablename,stypename);
                         lua_pushnil(state);  // 初始化键
-                        // __checkluastack__(LC2+1,state);
+                        __checkluastack__(LC2+1,state);
                         __checkluastack__(LC1+2,state);
                         while (lua_next(state, -2) != 0) {
                             // 'key' 现在是栈顶的 -2，'value' 是栈顶的 -1
@@ -740,15 +732,17 @@
                             // print(lua_type(L, -2), lua_tostring(L, -2), lua_type(L, -1), lua_tostring(L, -1));
                             // 准备下一次迭代
                             lua_pop(state, 1);  // 弹出值，保留键以进行下一次迭代
-                            // __checkluastack__(LC2+1,state);
+                            __checkluastack__(LC2+1,state);
                             // AXLOGD("LUA_TTABLE tablename:{}  type:{}",tablename,stypename);
                             ++len;
                         }
                         // AXLOGD("LUA_TTABLE tablename:{}  type:{}",tablename,stypename);
-                        // __checkluastack__(LC2,state);
+                        __checkluastack__(LC2,state);
                         __checkluastack__(LC1+1,state);
+                        // AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 计算好 len LC1:{} LC2:{}", 
+                        //           stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len,LC1,LC2);
+
                         rtablemap * tablerec=find_table(tablep);        //在表库 查询 指针
-                        // int LC4 = lua_gettop(state);
                         if (!isGobal)                                   //如果是 0 表示不是有确定名字的固定结构。进行检查类型。
                             {
                                 //如果不是 Gobal 全局变量  需要检查
@@ -760,13 +754,13 @@
                                 }
                                 lua_pushfstring(state, "%p (%s)[BaseDICT] (member:%d)",tablep,tablename,len);
                             }
-                        // __checkluastack__(LC1+2,state);
+                        __checkluastack__(LC1+2,state);
                         auto str=lua_tostring(state, -1);
                         // AXLOGD("通过类型检查结果 :{}  名字:{}",ttn,str);                        
                         luasdorintf("%s", str);
                         lua_pop(state, 1);                          //将 复制的     
                         __checkluastack__(LC1+1,state);
-                        // __checkluastack__(LC2,state);                        
+                        __checkluastack__(LC2,state);                        
                         if (!isGobal){                              //不是 Grobal 需要查询 __tostring 获得名字
                             lua_getfield(state, -1, "__tostring");  //存在元表 模式。 获得 字符串名字的 函数  +1
                             if (lua_isfunction(state, -1)) {        //检查是否是函数
@@ -783,7 +777,7 @@
                             //没有得到  [ ..., nil]  或者 成功 [ ..., result ] 或者 不是函数  都需要清理 一个 
                             lua_pop(state, 1);                        //把 取出的函数 空值 丢弃
                         }
-                        // __checkluastack__(LC2,state);                        
+                        __checkluastack__(LC2,state);                        
                         if (tablerec)                                   //存在的话。
                         {   //找到就不需要再继续处理了 
                             lua_pop(state, 1);
@@ -801,7 +795,7 @@
                             return;
                             //break;
                         }
-                        // __checkluastack__(LC2,state);
+                        __checkluastack__(LC2,state);
                         // if  (CallTableName==NULL) {
                         //   if (GetTableName(state, -1)==1) {
                         //      tablename= lua_tostring(state, -1);  
@@ -809,40 +803,65 @@
                         //   lua_pop(state, 1);                      //将 复制的
                         // }
                         //AXLOGD("AddDict  :{}   name:{}",str,tablename);
+
                         add_table(tablep,tablename,fatherfp_id);
-                        // __checkluastack__(LC2,state);
+                        // AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 表加入字典 len LC1:{} LC2:{}", 
+                        //           stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len,LC1,LC2);
+                        __checkluastack__(LC2,state);
                         // AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 记录P:{} 到map", 
                         //          stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len,fmt::ptr(tablep));
                         const void * myfatherid=lua_topointer(state, -1);           //自己的 表id
                         //bool needlog =false;
-                        //  AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 遍历子节点", 
-                        //          stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len);
+                        //   AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 遍历子节点", 
+                        //           stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len);
                         int LC5 = lua_gettop(state);
+                        // AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 表加入字典 len LC1:{} LC2:{} LC5:{}", 
+                        //           stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len,LC1,LC2,LC5);
+
                         if ((len>0)&&(depth < luaSD_MAXDEPTH)) {
                             int LC6 = lua_gettop(state);
+                            // AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 遍历 加入空Key 之前 LC1:{} LC2:{} LC5:{} LC6:{}", 
+                            //       stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len,LC1,LC2,LC5,LC6);
                             lua_pushnil(state);
                             
                             int nodeindex=0;
                             int nodetype= 0;
                             int checknextpos = lua_gettop(state);
-                            //int LC3 = lua_gettop(state);            
+                            int LC3 = lua_gettop(state);            
+                            // AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 遍历 加入空Key 之后 LC1:{} LC2:{} LC3:{} LC5:{} LC6:{}", 
+                            //       stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len,LC1,LC2,LC3,LC5,LC6);
                             bool bonext = lua_next(state, -2);
                             int curpos  = lua_gettop(state);
+                            // AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 遍历Next 后 LC1:{} LC2:{} LC3:{} LC5:{} LC6:{}", 
+                            //       stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len,LC1,LC2,LC3,LC5,LC6);
+
                             char* NodeKeystr=NULL;
                             //  AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 首轮", 
                             //      stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len);
-                            while (bonext)
+                            int LC9 = lua_gettop(state);                //每次 lua_next 完的状态
+                            // AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 遍历Next 后 LC1:{} LC2:{} LC3:{} LC5:{} LC6:{} LC9:{}", 
+                            //       stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len,LC1,LC2,LC3,LC5,LC6,LC9);
+
+                            while (bonext!=0)
                             {
                                 
                                 // 遍历 过程中，不可以对 Key 进行操作。 需要复制
+                                //[...,Table,Key,Value]
+                                __checkluastack__(LC9, state);
                                 lua_pushvalue(state, -2);           // 复制 -2位置的 值 到 栈顶 栈顶是 键。
+                                //[...,Table,Key,Value,Key]
                                 nodetype = lua_type(state, -1);     // 先取 键的 类型
-                                // int LC7 = lua_gettop(state);
+                                int LC7 = lua_gettop(state);
+                                // AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 复制Key 之后 LC1:{} LC2:{} LC3:{} LC5:{} LC6:{} LC7:{} LC9:{}", 
+                                //   stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len,LC1,LC2,LC3,LC5,LC6,LC7,LC9);
+
                                 //此处  栈内容    [...,键,键值,复制键]
                                 //下面 需要 处理 Key ,Key 不同类型，不同处理 
                                 if (nodetype == LUA_TSTRING)        // 如果栈顶是字符串，那么 取出字符串 
                                 {
                                     lua_pushfstring(state, "[%s (String)]",lua_tostring(state, -1));  // 取出字符串
+                                    // AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 字符串Key 入栈字符串 LC1:{} LC2:{} LC3:{} LC5:{} LC6:{} LC7:{} LC9:{}", 
+                                    //       stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len,LC1,LC2,LC3,LC5,LC6,LC7,LC9);
                                 } else 
                                 if (nodetype == LUA_TNUMBER)        // 如果栈顶是数字，那么 取出数字 转换字符串
                                 {
@@ -853,8 +872,14 @@
                                     if (itempname)                                              //如果可以得到 名字 就显示名字                
                                     {
                                        lua_pushfstring(state, "%s(Number)[%s] ]",lua_tostring(state, -1),itempname);  // 值(Number) 名字
+                                        // AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 数值 查询到名字 LC1:{} LC2:{} LC3:{} LC5:{} LC6:{} LC7:{} LC9:{}", 
+                                        //       stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len,LC1,LC2,LC3,LC5,LC6,LC7,LC9);
+
                                     } else {
                                        lua_pushfstring(state, "%s(Number)[nofind]",lua_tostring(state, -1));  // 使用指针模式  
+                                        // AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 数值 未查询到名字 LC1:{} LC2:{} LC3:{} LC5:{} LC6:{} LC7:{} LC9:{}", 
+                                        //       stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len,LC1,LC2,LC3,LC5,LC6,LC7,LC9);
+
                                     }                                    
                                 }  else  // 如果栈顶是字符串，那么 取出字符串
                                 {
@@ -863,36 +888,74 @@
                                     if (itempname)
                                     {
                                        lua_pushfstring(state, "[%p(%s)]", lua_topointer(state, -2),itempname);     // 使用指针模式 
+                                    //    AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 非广义字符串 查询到名字 LC1:{} LC2:{} LC3:{} LC5:{} LC6:{} LC7:{} LC9:{}", 
+                                    //           stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len,LC1,LC2,LC3,LC5,LC6,LC7,LC9);
+
                                     } else {
-                                       lua_pushfstring(state, "[%p](%s)", lua_topointer(state, -2),lua_typename(state, -2));  //使用指针模式  
-                                       AXLOGD("表键处理 未处理情况 Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} CurNodes:{}  Nodes:{} 继续:{}", 
-                                             stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),nodeindex,len,bonext);
+                                       //lua_pushfstring(state, "[%p](%s)", lua_topointer(state, -2),lua_typename(state, -2));  //使用指针模式
+                                       lua_pushfstring(state, "[%p](noo)", lua_topointer(state, -2));  //使用指针模式  
+                                    //    AXLOGD("表键处理 未处理情况 Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} CurNodes:{}  Nodes:{} 继续:{}", 
+                                    //          stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),nodeindex,len,bonext);
+                                    //    AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 非广义字符串 未查询到名字 LC1:{} LC2:{} LC3:{} LC5:{} LC6:{} LC7:{} LC9:{}", 
+                                    //           stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len,LC1,LC2,LC3,LC5,LC6,LC7,LC9);
+
                                     }                                    
-                                }    
+                                }
+                                //[...,Table,Key,Value,Key,Str]
+                                __checkluastack__(LC7+1, state);
                                 NodeKeystr= safe_strdup(lua_tostring(state, -1));   //出去 名字字符串 
-                                lua_pop(state, 2);                                  //弹出 字符串  弹出复制Key  
-                                // __checkluastack__(LC7, state);
+                                lua_pop(state, 1);                             //弹出 字符串  弹出复制Key  
+                                // AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 弹出字符串 LC1:{} LC2:{} LC3:{} LC5:{} LC6:{} LC7:{} LC9:{}", 
+                                //       stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len,LC1,LC2,LC3,LC5,LC6,LC7,LC9);
+
+                                //[...,Table,Key,Value,Key]
+                                __checkluastack__(LC7, state);
+                                lua_pop(state, 1);                                  //弹出 字符串  弹出复制Key  
+                                // AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 弹出复制Key LC1:{} LC2:{} LC3:{} LC5:{} LC6:{} LC7:{} LC9:{}", 
+                                //       stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len,LC1,LC2,LC3,LC5,LC6,LC7,LC9);
+
+                                //[...,Table,Key,Value]
+                                __checkluastack__(LC7-1, state);
                                 luasdorintf("\n");               //输出换行。然后 输出 Key = value  直接输出 字符串
                                 //  luaSD_stackdumpvalue(state, luasdorintf, -2, depth + 1, 0, indentLevel + 4, 1,0,NodeKeystr);  //是 Key 对名字赋值空 
                                 //对于 表  输出  字符串
                                 // lua_pushfstring(state, "%s", NodeKeystr);//lua_tostring(state, -2));   //输出 字符串
                                 luaspIndent(luasdorintf,-2,depth + 1,indentLevel + 4,1,0); //做出缩进
                                 luasdorintf("%s =",NodeKeystr);                             //输出换行。然后输出Key=value
-                                //luasdorintf(" = ");
-                                //int LC4 = lua_gettop(state);            
                                 luaSD_stackdumpvalue(state, luasdorintf, -1, depth + 1, 0, indentLevel + 4, 0,0,NodeKeystr,myfatherid);
-                                // __checkluastack__(LC7, state);
-                                /*__checkluastack__(LC4,state);*/
+                                __checkluastack__(LC7-1, state);
+                                //[...,Table,Key,Value]
                                 lua_pop(state, 1);          //把 值 删除 然后 继续遍历
-                                lua_pop(state, 1);          //把 值 删除 然后 继续遍历
-                                // __checkluastack__(LC3, state);                                
+                                // AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 弹出值 LC1:{} LC2:{} LC3:{} LC5:{} LC6:{} LC7:{} LC9:{}", 
+                                //       stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len,LC1,LC2,LC3,LC5,LC6,LC7,LC9);
+
+                                //[...,Table,Key]
+                                __checkluastack__(LC7-2, state);
+                                //[...,Table,Key]
+                                __checkluastack__(LC3, state);
                                 bonext = lua_next(state, -2);
+                                // AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 查询下一个Key  LC1:{} LC2:{} LC3:{} LC5:{} LC6:{} LC7:{} LC9:{} bonext:{}", 
+                                //       stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len,LC1,LC2,LC3,LC5,LC6,LC7,LC9,bonext);
+
                                 curpos = lua_gettop(state);
+
+                                if (bonext!=0) {
+                                    // AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} CurNodes:{}  Nodes:{} LC9:{} LC7:{} 无法遍历curtop:{} ",stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),nodeindex,LC9,LC7,lua_gettop(state));
+                                } else {
+                                    // AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} CurNodes:{}  Nodes:{} LC9:{} LC7:{} 还可以继续 curtop:{} ",stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),nodeindex,LC9,LC7,lua_gettop(state));
+                                    break;
+                                }
                                 nodeindex++;
+                                __checkluastack__(LC9, state);
+                                __checkluastack__(LC7-1, state);
+
+                                //[...,Table,Key,Value]
                                 //  AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} CurNodes:{}  Nodes:{} 继续:{} NodeKeystr:{}", 
                                 //      stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),nodeindex,len,bonext,NodeKeystr);
                             }
-                            
+                            // AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 遍历结束  LC1:{} LC2:{} LC5:{}", 
+                            //           stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len,LC1,LC2,LC5);
+                            __checkluastack__(LC6,state);
                             // 尝试获取该表的元表
                             if (lua_getmetatable(state, -1)) {
                                 // 检查是否成功获取到元表
@@ -926,7 +989,10 @@
                         __checkluastack__(LC5,state);
                         //  AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 遍历完成 ", 
                         //         stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len);
-                        // __checkluastack__(LC2,state);
+                        __checkluastack__(LC2,state);
+                        // AXLOGD("LSD Table stackIndex:{} depth:{} top:{} TableName:{} TypeName:{} SubNodes:{} 表处理结束  LC1:{} LC2:{} LC5:{}", 
+                        //               stackIndex, depth,lua_gettop(state),tablename,std::string(stypename),len,LC1,LC2,LC5);
+
                         lua_pop(state, 1);
                         if (newline) {
                             luasdorintf("\n");
@@ -949,6 +1015,8 @@
                             free(realtablename); // 释放分配的内存
                         }
                         __checkluastack__(LC1,state);
+                        // AXLOGD("LSD Table stackIndex:{} depth:{} top:{} SubNodes:{} 表处理最后结束  LC1:{} LC2:{} LC5:{}", 
+                        //        stackIndex, depth,lua_gettop(state),len,LC1,LC2,LC5);
                         return;
                     }
                 default:
@@ -991,7 +1059,7 @@
             }
             /* pop the string and the reference copy from the stack to restore the original state */
             lua_pop(state, 2);                      //两个 量出栈，一个是 自身的 字符串表示，一个是 自己。
-            // __checkluastack__(LC1,state);
+            __checkluastack__(LC1,state);
             if (nstackok != lua_gettop(state)) { 
                 AXLOGW("luaSD stack dump value 退出  栈不平衡 进入 stackIndex :{} depth:{} 进入栈:{}  出栈:{}",stackIndex,depth,nstackok,lua_gettop(state));
             } else {
@@ -1028,69 +1096,69 @@
             //   _vec2mt
             //   _CLIBS
             //   FILE*
-            // if (showmode & 64) {
-            //     // lua_pushliteral(state,"_CLIBS");
-            //     // lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
-            //     // luaSD_REGISTRYDump(state,luasdprintf,7,"_CLIBS",regip);
-            //     lua_pushliteral(state,"FILE*");
-            //     lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
-            //     luaSD_REGISTRYDump(state,luasdprintf,7,"FILE*",regip);
-            // }
-            // if (showmode & 32) {
-            //     lua_pushliteral(state,"_PRELOAD");
-            //     lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
-            //     luaSD_REGISTRYDump(state,luasdprintf,6,"_PRELOAD",regip);
-            //     lua_pushliteral(state,"_LOADED");
-            //     lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
-            //     luaSD_REGISTRYDump(state,luasdprintf,6,"_LOADED",regip);
-            // }
-            // if (showmode & 16) {
-            //     lua_pushliteral(state,"tolua_commonclass");
-            //     lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
-            //     luaSD_REGISTRYDump(state,luasdprintf,5,"_TL_Comm_Class",regip);
-            // }
-            // if (showmode & 8) {
-            //     lua_pushliteral(state,TOLUA_REFID_PTR_MAPPING);
-            //     lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
-            //     luaSD_REGISTRYDump(state,luasdprintf,4,"_TLFixM_Ptr",regip);
-            //     lua_pushliteral(state,TOLUA_REFID_TYPE_MAPPING);
-            //     lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
-            //     luaSD_REGISTRYDump(state,luasdprintf,4,"_TLFixM_Type",regip);
-            //     lua_pushliteral(state,TOLUA_REFID_FUNCTION_MAPPING);
-            //     lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
-            //     luaSD_REGISTRYDump(state,luasdprintf,4,"_TLFixM_Func",regip);
-            // }
+            if (showmode & 64) {
+                // lua_pushliteral(state,"_CLIBS");
+                // lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
+                // luaSD_REGISTRYDump(state,luasdprintf,7,"_CLIBS",regip);
+                lua_pushliteral(state,"FILE*");
+                lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
+                luaSD_REGISTRYDump(state,luasdprintf,7,"FILE*",regip);
+            }
+            if (showmode & 32) {
+                lua_pushliteral(state,"_PRELOAD");
+                lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
+                luaSD_REGISTRYDump(state,luasdprintf,6,"_PRELOAD",regip);
+                lua_pushliteral(state,"_LOADED");
+                lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
+                luaSD_REGISTRYDump(state,luasdprintf,6,"_LOADED",regip);
+            }
+            if (showmode & 16) {
+                lua_pushliteral(state,"tolua_commonclass");
+                lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
+                luaSD_REGISTRYDump(state,luasdprintf,5,"_TL_Comm_Class",regip);
+            }
+            if (showmode & 8) {
+                lua_pushliteral(state,TOLUA_REFID_PTR_MAPPING);
+                lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
+                luaSD_REGISTRYDump(state,luasdprintf,4,"_TLFixM_Ptr",regip);
+                lua_pushliteral(state,TOLUA_REFID_TYPE_MAPPING);
+                lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
+                luaSD_REGISTRYDump(state,luasdprintf,4,"_TLFixM_Type",regip);
+                lua_pushliteral(state,TOLUA_REFID_FUNCTION_MAPPING);
+                lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
+                luaSD_REGISTRYDump(state,luasdprintf,4,"_TLFixM_Func",regip);
+            }
 
-            // if (showmode & 4) {
-            //     lua_pushliteral(state,"tolua_super");
-            //     lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
-            //     luaSD_REGISTRYDump(state,luasdprintf,3,"_TL_Super",regip);
+            if (showmode & 4) {
+                lua_pushliteral(state,"tolua_super");
+                lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
+                luaSD_REGISTRYDump(state,luasdprintf,3,"_TL_Super",regip);
 
-            //     lua_pushliteral(state,"tolua_gc");
-            //     lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
-            //     luaSD_REGISTRYDump(state,luasdprintf,3,"_TL_GC",regip);
+                lua_pushliteral(state,"tolua_gc");
+                lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
+                luaSD_REGISTRYDump(state,luasdprintf,3,"_TL_GC",regip);
 
-            //     lua_pushliteral(state,"tolua_gc_event");
-            //     lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
-            //     luaSD_REGISTRYDump(state,luasdprintf,3,"_TL_GC_Event",regip);
+                lua_pushliteral(state,"tolua_gc_event");
+                lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
+                luaSD_REGISTRYDump(state,luasdprintf,3,"_TL_GC_Event",regip);
 
-            //     lua_pushliteral(state,"tolua_peers");
-            //     lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
-            //     luaSD_REGISTRYDump(state,luasdprintf,3,"_TL_Peers",regip);
+                lua_pushliteral(state,"tolua_peers");
+                lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
+                luaSD_REGISTRYDump(state,luasdprintf,3,"_TL_Peers",regip);
 
-            //     lua_pushliteral(state,"tolua_ubox");
-            //     lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
-            //     luaSD_REGISTRYDump(state,luasdprintf,3,"_TL_UBox",regip);
+                lua_pushliteral(state,"tolua_ubox");
+                lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
+                luaSD_REGISTRYDump(state,luasdprintf,3,"_TL_UBox",regip);
 
-            //     lua_pushliteral(state,"tolua_value_root");
-            //     lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
-            //     luaSD_REGISTRYDump(state,luasdprintf,3,"_TL_Value_R",regip);
-            // }
-            // // 检查次右边的位（次低位）
-            // if (showmode & 2) {                 //全局表 
-            //     lua_pushglobaltable(state);     //输出 全局变量。    1
-            //     luaSD_REGISTRYDump(state,luasdprintf,2,"_Grobal",regip);
-            // }
+                lua_pushliteral(state,"tolua_value_root");
+                lua_rawget(state,LUA_REGISTRYINDEX);    /* stack: super */
+                luaSD_REGISTRYDump(state,luasdprintf,3,"_TL_Value_R",regip);
+            }
+            // 检查次右边的位（次低位）
+            if (showmode & 2) {                 //全局表 
+                lua_pushglobaltable(state);     //输出 全局变量。    1
+                luaSD_REGISTRYDump(state,luasdprintf,2,"_Grobal",regip);
+            }
 
             if (showmode & 1) {                //主注册表 
                 lua_pushvalue(state, LUA_REGISTRYINDEX);
