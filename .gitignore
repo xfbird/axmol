@@ -232,3 +232,4 @@ tests/unit-tests/Content
 
 .gitee
 release_note_draft.txt
+/extensions/scripting/lua-bindings/build/.cmake/api/v1/query/client-integration-vscode
