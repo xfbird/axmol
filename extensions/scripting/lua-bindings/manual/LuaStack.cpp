@@ -473,6 +473,7 @@ int LuaStack::executeScriptFile(const char* filename)
     AXASSERT(filename, "CCLuaStack::executeScriptFile() - invalid filename");
 
     std::string filePath{filename};
+    AXLOGD("LuaStack::executeScriptFile :{}",filename);
     Data data = FileUtils::getInstance()->getDataFromFile(filePath);
     int rn    = 0;
     if (!data.isNull())

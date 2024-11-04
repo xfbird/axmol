@@ -92,11 +92,13 @@ private:
     template <typename T>
     void setForKey(const std::string_view& key, T value);
     template <typename T>
-    T getForKey(const std::string_view& key, T def) const;
+    T getForKey(const std::string_view& key, T def);
     std::string Serialize() const;                      //序列化 
     bool Deserialize(const std::string& jsonStr);       //反序列化
 private:
-    ValueExMap* _valueExMap;                            //数据集的值表
+    // ValueExMap* _valueExMap;                            //数据集的值表
+    // std::unique_ptr<ValueExMap> _valueExMap;            //改成智能指针
+    ValueExMap _valueExMap;
     bool _isModified;                                   //是否修改标志
     bool _dataReady;                                    //是否 已经加载数据
     bool _autoSave;                                     //是否 自动保存

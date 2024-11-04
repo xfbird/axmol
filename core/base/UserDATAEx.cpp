@@ -31,14 +31,26 @@ UserDataEx::UserDataEx() :
    _udname(""),
    _key(""),
    _iv(""),
-   _valueExMap(new ValueExMap()){
+   _valueExMap()
+   {
+        AXLOGD("UserDataEx()  Base");
 	    if (_dataExMaps == nullptr) {
 	        _dataExMaps = new DataExMap();
 			//std::unordered_map<std::string, std::unique_ptr<UserDataEx>>();
 	    }
    }
-UserDataEx::UserDataEx(std::string_view name)
+UserDataEx::UserDataEx(std::string_view name):
+   _dataReady(false),
+   _isModified(false),
+   _autoSave(false),
+   _encryptEnabled(false),
+   _udname(""),
+   _key(""),
+   _iv(""),
+   _valueExMap()
 {
+    AXLOGD("UserDataEx:{}", name);
+    // UserDataEx();
     _udname=std::string(name);
     getUserDatainfoFromDefault();
 }
@@ -46,30 +58,33 @@ UserDataEx::UserDataEx(std::string_view name)
 
 bool UserDataEx::getUserDatainfoFromDefault(){
     //从 UserDefault 获得 持久数据加载
-    auto rkey=_storagename+std::string(_udname);       //组合主键       
+    auto rkey=_storagename+std::string(_udname);       //组合主键
+    AXLOGD("UserDataEx    rkey:{}", rkey);
     if (!rkey.empty()) {
         //AXLOGD("getUserDatainfoFromDefault 1 rkey:{} this:{}", rkey, fmt::ptr(this));
         auto ud =UserDefault::getInstance();
         if (ud){
             auto sstrv=ud->getStringForKey(rkey.data());   //获得主键。
-            //AXLOGD("getUserDatainfoFromDefault 2 rkey:{} read:{} this:{}", rkey,sstrv,fmt::ptr(this));
+            AXLOGD("getUserDatainfoFromDefault 2 rkey:{} read:{} this:{}", rkey,sstrv,fmt::ptr(this));
             //直接返回 读出的字符串 并解析 到内部
             if (!sstrv.empty()) 
                 return initFromString(sstrv);
-            _valueExMap->clear();
-            //AXLOGD("getUserDatainfoFromDefault 3 rkey:{} this:{} 读出为空,初始化", 
-            //            rkey,fmt::ptr(this));
+            _valueExMap.clear();
+            AXLOGD("getUserDatainfoFromDefault 3 rkey:{} this:{} 读出为空,初始化", 
+                       rkey,fmt::ptr(this));
             return true;    
         }
     }
     return false;
 }
 
-UserDataEx::~UserDataEx() {
+UserDataEx::~UserDataEx()
+ {
     if (_isModified) {
         saveData();
 	}
-	AX_SAFE_DELETE(_valueExMap);
+	// AX_SAFE_DELETE(_valueExMap);
+    // _valueExMap.reset(); 
 }
 
 void UserDataEx::modify() {
@@ -96,7 +111,7 @@ bool UserDataEx::initFromString(std::string_view rhs){
         };
         std::string_view svdatas = settings["datas"];
         //AXLOGD("initFromString svdatas:{} this:{}", svdatas,fmt::ptr(this));
-        _valueExMap->clear();
+        _valueExMap.clear();
         if (svdatas.empty()) {
             return true;
         }
@@ -193,7 +208,7 @@ std::string UserDataEx::Serialize() const {
     rapidjson::StringBuffer buffer;
     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
 
-    for (const auto& [key, valuePtr] : *_valueExMap) {
+    for (const auto& [key, valuePtr] :_valueExMap) {
         const auto& value = *valuePtr;
         rapidjson::Value jsonKey;
         jsonKey.SetString(key.c_str(), allocator);
@@ -243,7 +258,7 @@ bool UserDataEx::Deserialize(const std::string& jsonStr) {
         return false;
     }
 
-    _valueExMap->clear();
+    _valueExMap.clear();
     for (auto& member : document.GetObj()) {
         std::string key = member.name.GetString();
         const rapidjson::Value& jsonValue = member.value;
@@ -260,7 +275,7 @@ bool UserDataEx::Deserialize(const std::string& jsonStr) {
             case 5: valueEx = std::make_unique<ValueEx>(std::string(jsonValue["value"].GetString())); break;
             default: continue;
         }
-        _valueExMap->emplace(key, std::move(valueEx));
+        _valueExMap.emplace(key, std::move(valueEx));
     }
     return true;
 }
@@ -273,17 +288,18 @@ void UserDataEx::PrintData() const {
 
 template <typename T>
 void UserDataEx::setForKey(const std::string_view& key, T value) {
-    _valueExMap->emplace(std::string(key), std::make_unique<ValueEx>(value));
+    _valueExMap.emplace(std::string(key), std::make_unique<ValueEx>(value));
     modify();
 }
 
 template <typename T>
-T UserDataEx::getForKey(const std::string_view& key, T def) const {
+T UserDataEx::getForKey(const std::string_view& key, T def) {
     std::string keyStr(key);
-    auto it = _valueExMap->find(keyStr);
-    if (it == _valueExMap->end()) {
-        // 如果键不存在，则创建一个新的 ValueEx 对象并初始化为默认值
-        _valueExMap->emplace(keyStr, std::make_unique<ValueEx>(def));
+    auto it = _valueExMap.find(keyStr);
+    if (it == _valueExMap.end()) {
+        // auto valueExPtr = std::make_unique<ValueEx>(def);
+        // _valueExMap.emplace(keyStr, std::move(valueExPtr));
+        _valueExMap.emplace(keyStr, std::make_unique<ValueEx>(def));
         return def;
     }
     try {
@@ -330,11 +346,10 @@ std::string UserDataEx::getStringForKey(const std::string_view& key, const std::
 bool UserDataEx::deleteForKey(std::string_view skey) {
     // 检查 _valueExMap 是否为空以及键是否存在
 	std::string sskey(skey);  
-    if (_valueExMap != nullptr && 
-		_valueExMap->find(sskey) != _valueExMap->end()) 
+    if (_valueExMap.find(sskey) != _valueExMap.end()) 
 		{
 	        // 删除指定的键
-    	    _valueExMap->erase(sskey);
+    	    _valueExMap.erase(sskey);
         	return true;
     }
     // 键不存在或 _valueExMap 为空
@@ -487,14 +502,18 @@ void UserDataEx::_initializecheck()
     _dataExMaps = new DataExMap();
     _storagename = "userdataEx";
     _initialize  = true;
+    AXLOGD("UserDataEx::GetUserDataEx _initializecheck  First Init");
 }
 
 UserDataEx* UserDataEx::GetUserDataEx(const std::string_view& key) {
+    AXLOGD("UserDataEx::GetUserDataEx _initializecheck  key:{}",key);
     _initializecheck();
     std::string skey=std::string(key);
     if (_dataExMaps->find(skey) == _dataExMaps->end()) {
         _dataExMaps->emplace(skey, std::make_unique<UserDataEx>(skey));
+        AXLOGD("UserDataEx::GetUserDataEx 不存在key:{} 创建一个",skey);
     }
+    AXLOGD("UserDataEx::GetUserDataEx 查询key:{} 准备返回",skey);
     return _dataExMaps->at(skey).get();
 }
 bool UserDataEx::DeleteUserDataEx(const std::string_view& key) {

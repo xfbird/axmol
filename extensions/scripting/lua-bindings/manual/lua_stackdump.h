@@ -754,7 +754,7 @@
                                 }
                                 lua_pushfstring(state, "%p (%s)[BaseDICT] (member:%d)",tablep,tablename,len);
                             }
-                        __checkluastack__(LC1+2,state);
+                        __checkluastack__(LC1+1,state);
                         auto str=lua_tostring(state, -1);
                         // AXLOGD("通过类型检查结果 :{}  名字:{}",ttn,str);                        
                         luasdorintf("%s", str);
