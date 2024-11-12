@@ -78,11 +78,17 @@ bool UserDataEx::getUserDatainfoFromDefault(){
     return false;
 }
 
+void UserDataEx::UnUserDataEx(){
+    saveStorage();
+}
+
+
 UserDataEx::~UserDataEx()
  {
-    if (_isModified) {
-        saveData();
-	}
+    checkAndSave();
+    // if (_isModified) {
+    //     saveData();
+	// }
 	// AX_SAFE_DELETE(_valueExMap);
     // _valueExMap.reset(); 
 }
@@ -300,6 +306,7 @@ T UserDataEx::getForKey(const std::string_view& key, T def) {
         // auto valueExPtr = std::make_unique<ValueEx>(def);
         // _valueExMap.emplace(keyStr, std::move(valueExPtr));
         _valueExMap.emplace(keyStr, std::make_unique<ValueEx>(def));
+        modify();
         return def;
     }
     try {
@@ -350,6 +357,7 @@ bool UserDataEx::deleteForKey(std::string_view skey) {
 		{
 	        // 删除指定的键
     	    _valueExMap.erase(sskey);
+            modify();
         	return true;
     }
     // 键不存在或 _valueExMap 为空
@@ -426,13 +434,13 @@ void UserDataEx::deleteStorage(std::string_view name)
     _initializecheck();
     std::string  rkey;                             //组合主键       
     auto ud =UserDefault::getInstance();
-     //AXLOGD("deleteStorage name:{} this:{}",name,fmt::ptr(ud));  
+     AXLOGD("deleteStorage name:{} this:{}",name,fmt::ptr(ud));  
     if (ud){
          for (const auto& pair : *_dataExMaps) {
             //std::cout << "Key: " << pair.first << std::endl;
             auto rkey=std::string(name)+pair.first;
-            //AXLOGD("删除 键:{}",rkey);
-         //    //AXLOGD("deleteStorage name:{} this:{}",name,fmt::ptr(ud));  
+            AXLOGD("删除 键:{}",rkey);
+            //AXLOGD("deleteStorage name:{} this:{}",name,fmt::ptr(ud));  
             ud->deleteValueForKey(rkey.c_str());
          }
     }
@@ -440,11 +448,11 @@ void UserDataEx::deleteStorage(std::string_view name)
 void UserDataEx::saveStorage() 
 {
     auto ud =UserDefault::getInstance();        
-    //AXLOGD("saveStorage this:{}",fmt::ptr(ud));  
+    AXLOGD("saveStorage this:{}",fmt::ptr(ud));  
     if (ud){
         for (const auto& pair : *_dataExMaps) {      //遍历所有的 实例 执行存储
            auto rkey=_storagename+std::string(pair.first);
-           //AXLOGD("执行 所有函数的 保存:{}",rkey);
+           AXLOGD("执行 所有函数的 保存:{}",rkey);
            pair.second->saveData();
         }
     }
@@ -468,21 +476,18 @@ std::string_view UserDataEx::getStorageName() {
 }
 bool UserDataEx::saveData(){
     //从 UserDefault 获得 持久数据加载
-    //if (_isModified) {
     auto rkey=_storagename+std::string(_udname);       //组合主键       
-    //AXLOGD("saveData  rkey:{}",rkey);  
+    AXLOGD("saveData  rkey:{}",rkey);  
     if (!rkey.empty()) {
         auto ud =UserDefault::getInstance();
-        //AXLOGD("saveData  rkey:{}  ud:{} ",rkey,fmt::ptr(ud));
+        AXLOGD("saveData  rkey:{}  ud:{} ",rkey,fmt::ptr(ud));
         if (ud){
             auto svalue =  Serialize();             //获得生成字符串 以 复合Key  写入到 UserDefault
-            //AXLOGD("saveData  rkey:{}  ud:{}  svalue:{}",rkey,fmt::ptr(ud),svalue);
+            AXLOGD("saveData  rkey:{}  ud:{}  svalue:{}",rkey,fmt::ptr(ud),svalue);
             ud->setStringForKey(rkey.c_str(),std::string_view(svalue.data()));
             _isModified=false;
-            // return true;
         }
     }
-    //}
     return true;
 }
 bool UserDataEx::checkAndSave(){
@@ -521,10 +526,10 @@ bool UserDataEx::DeleteUserDataEx(const std::string_view& key) {
    if (_dataExMaps != nullptr) {
 	   std::string sskey(key);  
 	   auto it = _dataExMaps->find(sskey);
-       //AXLOGD("DeleteUserDataEx skey:{}  it:{}",skey,fmt::ptr(it));
+       AXLOGD("DeleteUserDataEx skey:{} ",sskey);
   	   if (it != _dataExMaps->end()) {
 	   //Erase the UserDataEx instance from the map
-	   //AXLOGD("DeleteUserDataEx skey:{} find delete",skey);
+	   AXLOGD("DeleteUserDataEx skey:{} find delete",sskey);
 	   deleteStorage(sskey);                                    //从持久删除 一个 字典。
        _dataExMaps->erase(it);
 	   return true;

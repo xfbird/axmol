@@ -746,8 +746,40 @@ int lua_ax_base_UserDataEx_new(lua_State* tolua_S)
         return 0;
     #endif
 }
+// lua_ax_base_UserDataEx_free
+int lua_ax_base_UserDataEx_free(lua_State* tolua_S)
+{
+    int argc = 0;
+    bool ok  = true;
 
-int lua_ax_base_UserDataEx_destroyInstance(lua_State* tolua_S)
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
+
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertable(tolua_S,1,"ax.UserDataEx",0,&tolua_err)) goto tolua_lerror;
+    #endif
+
+        argc = lua_gettop(tolua_S) - 1;
+
+        if (argc == 0)
+        {
+           
+            UserDataEx::UnUserDataEx();
+            // lua_settop(tolua_S, 1);
+            return 1;
+        }
+        luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d\n ", "UserDataEx:UnUserDataEx",argc, 1);
+        return 0;
+
+    #if _AX_DEBUG >= 1
+    tolua_lerror:
+        tolua_error(tolua_S,"#ferror in function 'lua_ax_base_UserDataEx_free'.",&tolua_err);
+    #endif
+    return 0;
+}
+
+int lua_ax_base_UserDataEx_delInstance(lua_State* tolua_S)
 {
     int argc = 0;
     bool ok  = true;
@@ -769,7 +801,7 @@ int lua_ax_base_UserDataEx_destroyInstance(lua_State* tolua_S)
 
             if (!ok)
             {
-                tolua_error(tolua_S,"invalid arguments in function 'lua_ax_base_UserDataEx_destroyInstance'", nullptr);
+                tolua_error(tolua_S,"invalid arguments in function 'lua_ax_base_UserDataEx_delInstance'", nullptr);
                 return 0;
             }
             
@@ -777,12 +809,12 @@ int lua_ax_base_UserDataEx_destroyInstance(lua_State* tolua_S)
             lua_settop(tolua_S, 1);
             return 1;
         }
-        luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d\n ", "UserDataEx:destroyInstance",argc, 1);
+        luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d\n ", "UserDataEx:delInstance",argc, 1);
         return 0;
 
     #if _AX_DEBUG >= 1
     tolua_lerror:
-        tolua_error(tolua_S,"#ferror in function 'lua_ax_base_UserDataEx_destroyInstance'.",&tolua_err);
+        tolua_error(tolua_S,"#ferror in function 'lua_ax_base_UserDataEx_delInstance'.",&tolua_err);
     #endif
     return 0;
 }
@@ -2146,7 +2178,8 @@ int register_all_axlua_bindings_UserDATAEx(lua_State* tolua_S)
         tolua_function(tolua_S, "new", lua_ax_base_UserDataEx_new);
         //AXLOGI(" bindings UserDATAEx Add New");
         //释放一个 指定键名 的 字典对象 该对象 的数据会立即持久化
-        tolua_function(tolua_S,"destroyInstance", lua_ax_base_UserDataEx_destroyInstance);
+        tolua_function(tolua_S,"free", lua_ax_base_UserDataEx_free);                            //释放所有的实例，也就是强制存储    
+        tolua_function(tolua_S,"del", lua_ax_base_UserDataEx_delInstance);                      //删除指定 Key 的实例 包括存储
         tolua_function(tolua_S,"setStorageName", lua_ax_base_UserDataEx_setStorageName);
         tolua_function(tolua_S,"getStorageName", lua_ax_base_UserDataEx_getStorageName);
         tolua_function(tolua_S,"Cleanup", lua_ax_base_UserDataEx_clearAll);

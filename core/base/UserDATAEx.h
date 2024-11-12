@@ -116,6 +116,7 @@ public:
     static bool DeleteUserDataEx(const std::string_view& key);
     static void setStorageName(std::string_view name);
     static std::string_view getStorageName();
+    static void UnUserDataEx();
 
     static void deleteStorage(std::string_view name);         //  
     static void clearAll();                                   //  清除所有的字典

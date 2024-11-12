@@ -112,6 +112,9 @@ AX_API LogItem& preprocessLog(LogItem&& item,const char* fname,int fline,const c
                 case LogLevel::Error:
                     levelName = "E/"sv;
                     break;
+                case LogLevel::Silent:
+                    levelName = "S/"sv;
+                    break;
                 default:
                     levelName = "?/"sv;
             }
