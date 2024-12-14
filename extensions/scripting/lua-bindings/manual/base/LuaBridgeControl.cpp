@@ -6,6 +6,7 @@
 #include "lua-bindings/manual/lua_module_register.h"
 #include "base/Configuration.h"
 #include "lua-bindings/manual/tolua_fix.h"
+#include "network/HttpClient.h"
 
 NS_AX_BEGIN
 // 初始化静态成员变量
@@ -76,6 +77,14 @@ void LuaBridgeControl::SetModulesSwitch(int index, int value) {
 bool LuaBridgeControl::GameMain()
 {
     AXLOGD("LuaBridgeControl::GameMain in");
+    
+    // network::HttpClient::destroyInstance();
+
+    // auto httpClient = HttpClient::getInstance();
+    // //auto cafile = FileUtils::getInstance()->fullPathForFilename("cacert.pem");
+    // //httpClient->setSSLVerification(cafile);
+    // httpClient->enableCookies(nullptr);
+
     auto engine = LuaEngine::getInstance();
     lua_State* L = engine->getLuaStack()->getLuaState();
     
@@ -116,6 +125,7 @@ bool LuaBridgeControl::GameMain()
            AXLOGD("fileutils SearchPaths :{}", dir);
        };
         AXLOGD("启动脚本运行");
+        // network::HttpClient::getInstance()->clearResponseQueue();
         // FileUtils::getInstance()->addSearchPath("res");
         engine->addSearchPath("scripts");
         if (engine->executeScriptFile("scripts/main.lua"))

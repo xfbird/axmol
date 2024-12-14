@@ -459,6 +459,7 @@ void LuaStack::removeScriptObjectByObject(Object* pObj)
 
 void LuaStack::removeScriptHandler(int nHandler)
 {
+    AXLOGS("LuaStack::removeScriptHandler :{}",nHandler);
     toluafix_remove_function_by_refid(_state, nHandler);
 }
 

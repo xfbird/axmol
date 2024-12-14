@@ -4805,6 +4805,56 @@ int lua_ax_extension_AssetsManagerEx_update(lua_State* tolua_S)
 
     return 0;
 }
+
+
+int lua_ax_extension_AssetsManagerEx_startManualUpdate(lua_State* tolua_S)
+{
+    int argc = 0;
+    ax::extension::AssetsManagerEx* cobj = nullptr;
+    bool ok  = true;
+
+#if _AX_DEBUG >= 1
+    tolua_Error tolua_err;
+#endif
+
+
+#if _AX_DEBUG >= 1
+    if (!tolua_isusertype(tolua_S,1,"ax.AssetsManagerEx",0,&tolua_err)) goto tolua_lerror;
+#endif
+
+    cobj = (ax::extension::AssetsManagerEx*)tolua_tousertype(tolua_S,1,0);
+
+#if _AX_DEBUG >= 1
+    if (!cobj) 
+    {
+        tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_extension_AssetsManagerEx_startManualUpdate'", nullptr);
+        return 0;
+    }
+#endif
+
+    argc = lua_gettop(tolua_S)-1;
+    if (argc == 0) 
+    {
+        if(!ok)
+        {
+            tolua_error(tolua_S,"invalid arguments in function 'lua_ax_extension_AssetsManagerEx_startManualUpdate'", nullptr);
+            return 0;
+        }
+        cobj->startManualUpdate();
+        lua_settop(tolua_S, 1);
+        return 1;
+    }
+    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.AssetsManagerEx:startManualUpdate",argc, 0);
+    return 0;
+
+#if _AX_DEBUG >= 1
+    tolua_lerror:
+    tolua_error(tolua_S,"#ferror in function 'lua_ax_extension_AssetsManagerEx_startManualUpdate'.",&tolua_err);
+#endif
+
+    return 0;
+}
+
 int lua_ax_extension_AssetsManagerEx_downloadFailedAssets(lua_State* tolua_S)
 {
     int argc = 0;
@@ -4899,6 +4949,55 @@ int lua_ax_extension_AssetsManagerEx_getState(lua_State* tolua_S)
 
     return 0;
 }
+
+int lua_ax_extension_AssetsManagerEx_getTotalDiffFileSize(lua_State* tolua_S)
+{
+    int argc = 0;
+    ax::extension::AssetsManagerEx* cobj = nullptr;
+    bool ok  = true;
+
+#if _AX_DEBUG >= 1
+    tolua_Error tolua_err;
+#endif
+
+
+#if _AX_DEBUG >= 1
+    if (!tolua_isusertype(tolua_S,1,"ax.AssetsManagerEx",0,&tolua_err)) goto tolua_lerror;
+#endif
+
+    cobj = (ax::extension::AssetsManagerEx*)tolua_tousertype(tolua_S,1,0);
+
+#if _AX_DEBUG >= 1
+    if (!cobj) 
+    {
+        tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_extension_AssetsManagerEx_getTotalDiffFileSize'", nullptr);
+        return 0;
+    }
+#endif
+
+    argc = lua_gettop(tolua_S)-1;
+    if (argc == 0) 
+    {
+        if(!ok)
+        {
+            tolua_error(tolua_S,"invalid arguments in function 'lua_ax_extension_AssetsManagerEx_getTotalDiffFileSize'", nullptr);
+            return 0;
+        }
+        int ret = (int)cobj->getTotalDiffFileSize();
+        tolua_pushnumber(tolua_S,(lua_Number)ret);
+        return 1;
+    }
+    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.AssetsManagerEx:getTotalDiffFileSize",argc, 0);
+    return 0;
+
+#if _AX_DEBUG >= 1
+    tolua_lerror:
+    tolua_error(tolua_S,"#ferror in function 'lua_ax_extension_AssetsManagerEx_getState'.",&tolua_err);
+#endif
+
+    return 0;
+}
+
 int lua_ax_extension_AssetsManagerEx_getStoragePath(lua_State* tolua_S)
 {
     int argc = 0;
@@ -5191,6 +5290,58 @@ int lua_ax_extension_AssetsManagerEx_setVersionCompareHandle(lua_State* tolua_S)
 
     return 0;
 }
+
+// lua_ax_extension_AssetsManagerEx_setResourceVer
+int lua_ax_extension_AssetsManagerEx_setResourceVer(lua_State* tolua_S)
+{
+    int argc = 0;
+    ax::extension::AssetsManagerEx* cobj = nullptr;
+    bool ok  = true;
+
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
+
+
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertype(tolua_S,1,"ax.AssetsManagerEx",0,&tolua_err)) goto tolua_lerror;
+    #endif
+
+    cobj = (ax::extension::AssetsManagerEx*)tolua_tousertype(tolua_S,1,0);
+
+    #if _AX_DEBUG >= 1
+        if (!cobj) 
+        {
+            tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_extension_AssetsManagerEx_setResourceVer'", nullptr);
+            return 0;
+        }
+    #endif
+
+    argc = lua_gettop(tolua_S)-1;
+    if (argc == 1) 
+    {
+        std::string_view arg0;
+        ok &= luaval_to_std_string_view(tolua_S, 2,&arg0, "ax.AssetsManagerEx:setResourceVer");
+        if(!ok)
+        {
+            tolua_error(tolua_S,"invalid arguments in function 'lua_ax_extension_AssetsManagerEx_setResourceVer'", nullptr);
+            return 0;
+        }
+        cobj->setResourceVer(arg0);
+        lua_settop(tolua_S, 1);
+        return 1;
+    }
+    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.AssetsManagerEx:setResourceVer",argc, 1);
+    return 0;
+
+#if _AX_DEBUG >= 1
+    tolua_lerror:
+    tolua_error(tolua_S,"#ferror in function 'lua_ax_extension_AssetsManagerEx_setResourceVer'.",&tolua_err);
+#endif
+
+    return 0;
+}
+
 int lua_ax_extension_AssetsManagerEx_setVerifyCallback(lua_State* tolua_S)
 {
     int argc = 0;
@@ -5217,6 +5368,7 @@ int lua_ax_extension_AssetsManagerEx_setVerifyCallback(lua_State* tolua_S)
 #endif
 
     argc = lua_gettop(tolua_S)-1;
+    
     if (argc == 1) 
     {
         std::function<bool (std::string_view, ax::extension::ManifestAsset)> arg0;
@@ -5259,23 +5411,23 @@ int lua_ax_extension_AssetsManagerEx_create(lua_State* tolua_S)
     #endif
 
     argc = lua_gettop(tolua_S) - 1;
-
-    if (argc == 2)
-    {
-        std::string_view arg0;
-        std::string_view arg1;
-        ok &= luaval_to_std_string_view(tolua_S, 2,&arg0, "ax.AssetsManagerEx:create");
-        ok &= luaval_to_std_string_view(tolua_S, 3,&arg1, "ax.AssetsManagerEx:create");
-        if(!ok)
-        {
-            tolua_error(tolua_S,"invalid arguments in function 'lua_ax_extension_AssetsManagerEx_create'", nullptr);
-            return 0;
-        }
-        auto&& ret = ax::extension::AssetsManagerEx::create(arg0, arg1);
-        object_to_luaval<ax::extension::AssetsManagerEx>(tolua_S, "ax.AssetsManagerEx",(ax::extension::AssetsManagerEx*)ret);
-        return 1;
-    }
-    if (argc == 6)
+    AXLOGD("lua_ax_extension_AssetsManagerEx_create argc:{}",argc);
+    // if (argc == 2)
+    // {
+    //     std::string_view arg0;
+    //     std::string_view arg1;
+    //     ok &= luaval_to_std_string_view(tolua_S, 2,&arg0, "ax.AssetsManagerEx:create");
+    //     ok &= luaval_to_std_string_view(tolua_S, 3,&arg1, "ax.AssetsManagerEx:create");
+    //     if(!ok)
+    //     {
+    //         tolua_error(tolua_S,"invalid arguments in function 'lua_ax_extension_AssetsManagerEx_create'", nullptr);
+    //         return 0;
+    //     }
+    //     auto&& ret = ax::extension::AssetsManagerEx::create(arg0, arg1);
+    //     object_to_luaval<ax::extension::AssetsManagerEx>(tolua_S, "ax.AssetsManagerEx",(ax::extension::AssetsManagerEx*)ret);
+    //     return 1;
+    // }
+    if (argc >= 7)
     {
         std::string_view arg0;
         std::string_view arg1;
@@ -5283,20 +5435,37 @@ int lua_ax_extension_AssetsManagerEx_create(lua_State* tolua_S)
         std::string_view arg3;
         std::string_view arg4;
         std::string_view arg5;
-        ok &= luaval_to_std_string_view(tolua_S, 2,&arg0, "ax.AssetsManagerEx:create arg localManifestPath");
+        std::string_view arg6;
+        std::string_view arg7;
+        // cc.AssetsManagerEx:create( localManifestPath, storagePath, 
+        //                            true,
+        //                            tempManifestName, tempDirName,
+        //                            resUrl, manifestUrl, versionUrl )
+
+        // create 1 localManifestPath:	mod_launcher_project.manifest
+        // create 2 storagePath:	D:/MW/SHClient/cache/mod_launcher/stab/
+        // create 3 True:
+        // create 4 tempManifestName:	project.manifest.temp
+        // create 5 tempDirName:	/_temp
+        // create 6 resUrl:	http://192.168.249.8:8082/launchers/yshj/mod_launcher/2/stab/
+        // create 7 manifestUrl:	http://192.168.249.8:8082/launchers/yshj/mod_launcher/2/stab/mod_launcher_project.manifest
+        // create 8 versionUrl:	http://192.168.249.8:8082/launchers/yshj/mod_launcher/2/stab/mod_launcher_version.manifest
+        // create 9 resVersion:	?v=1.1.606.234
+
+        ok &= luaval_to_std_string_view(tolua_S, 2,&arg0, "ax.AssetsManagerEx:create arg manifestUrl");
         ok &= luaval_to_std_string_view(tolua_S, 3,&arg1, "ax.AssetsManagerEx:create arg storagePath");
         ok &= luaval_to_boolean(tolua_S, 4,&arg2, "ax.AssetsManagerEx:create arg  manualUpdat");
-        ok &= luaval_to_std_string_view(tolua_S, 5,&arg3, "ax.AssetsManagerEx:create arg resUrl");
-        ok &= luaval_to_std_string_view(tolua_S, 6,&arg4, "ax.AssetsManagerEx:create arg manifestUrl");
-        ok &= luaval_to_std_string_view(tolua_S, 7,&arg5, "ax.AssetsManagerEx:create arg versionUrl");
+        ok &= luaval_to_std_string_view(tolua_S, 5,&arg3, "ax.AssetsManagerEx:create arg tempManifestName");
+        ok &= luaval_to_std_string_view(tolua_S, 6,&arg4, "ax.AssetsManagerEx:create arg tempDirName");
+        ok &= luaval_to_std_string_view(tolua_S, 7,&arg5, "ax.AssetsManagerEx:create arg resUrl");
+        ok &= luaval_to_std_string_view(tolua_S, 8,&arg6, "ax.AssetsManagerEx:create arg versionUrl");
+        ok &= luaval_to_std_string_view(tolua_S, 9,&arg7, "ax.AssetsManagerEx:create arg resourceVer");
         if(!ok)
         {
             tolua_error(tolua_S,"invalid arguments in function 'lua_ax_extension_AssetsManagerEx_create'", nullptr);
             return 0;
         }
-        auto&& ret = ax::extension::AssetsManagerEx::create(arg0, arg1,arg2, arg3,arg4, arg5);
-        //static AssetsManagerEx* create(std::string_view localManifestPath,std::string_view storagePath,bool manualUpdat,
-        //                            std::string_view resUrl,std::string_view manifestUrl,std::string_view versionUrl);
+        auto&& ret = ax::extension::AssetsManagerEx::create(arg0, arg1,arg2, arg3,arg4, arg5,arg6,arg7);
         object_to_luaval<ax::extension::AssetsManagerEx>(tolua_S, "ax.AssetsManagerEx",(ax::extension::AssetsManagerEx*)ret);
         return 1;
     }
@@ -5319,23 +5488,33 @@ int lua_ax_extension_AssetsManagerEx_constructor(lua_State* tolua_S)
         tolua_Error tolua_err;
     #endif
 
-
-
     argc = lua_gettop(tolua_S)-1;
-    if (argc == 2) 
+    AXLOGD("lua_ax_extension_AssetsManagerEx_constructor argc:{}",argc);
+    if (argc == 6) 
     {
+        // std::string_view arg0;
+        // std::string_view arg1;
+        // ok &= luaval_to_std_string_view(tolua_S, 2,&arg0, "ax.AssetsManagerEx:AssetsManagerEx");
+        // ok &= luaval_to_std_string_view(tolua_S, 3,&arg1, "ax.AssetsManagerEx:AssetsManagerEx");
         std::string_view arg0;
         std::string_view arg1;
+        std::string_view arg2;
+        std::string_view arg3;
+        std::string_view arg4;
+        bool arg5=false;
+        ok &= luaval_to_std_string_view(tolua_S, 2,&arg0, "ax.AssetsManagerEx:create arg manifestUrl");
+        ok &= luaval_to_std_string_view(tolua_S, 3,&arg1, "ax.AssetsManagerEx:create arg storagePath");
+        ok &= luaval_to_std_string_view(tolua_S, 4,&arg2, "ax.AssetsManagerEx:create arg resUrl");
+        ok &= luaval_to_std_string_view(tolua_S, 5,&arg3, "ax.AssetsManagerEx:create arg versionUrl");
+        ok &= luaval_to_std_string_view(tolua_S, 6,&arg4, "ax.AssetsManagerEx:create arg resourceVer");
+        ok &= luaval_to_boolean(tolua_S, 7,&arg5, "ax.AssetsManagerEx:create arg  manualUpdat");        
 
-        ok &= luaval_to_std_string_view(tolua_S, 2,&arg0, "ax.AssetsManagerEx:AssetsManagerEx");
-
-        ok &= luaval_to_std_string_view(tolua_S, 3,&arg1, "ax.AssetsManagerEx:AssetsManagerEx");
         if(!ok)
         {
             tolua_error(tolua_S,"invalid arguments in function 'lua_ax_extension_AssetsManagerEx_constructor'", nullptr);
             return 0;
         }
-        cobj = new ax::extension::AssetsManagerEx(arg0, arg1);
+        cobj = new ax::extension::AssetsManagerEx(arg0,arg1,arg2,arg3,arg4,arg5);
         cobj->autorelease();
         int ID =  (int)cobj->_ID ;
         int* luaID =  &cobj->_luaID ;
@@ -5369,11 +5548,18 @@ int lua_register_ax_extension_AssetsManagerEx(lua_State* tolua_S)
         tolua_function(tolua_S,"update",lua_ax_extension_AssetsManagerEx_update);
         tolua_function(tolua_S,"downloadFailedAssets",lua_ax_extension_AssetsManagerEx_downloadFailedAssets);
         tolua_function(tolua_S,"getState",lua_ax_extension_AssetsManagerEx_getState);
+        
+        tolua_function(tolua_S,"setResourceVer",lua_ax_extension_AssetsManagerEx_setResourceVer);
+
         tolua_function(tolua_S,"getStoragePath",lua_ax_extension_AssetsManagerEx_getStoragePath);
+
         tolua_function(tolua_S,"getLocalManifest",lua_ax_extension_AssetsManagerEx_getLocalManifest);
         tolua_function(tolua_S,"getRemoteManifest",lua_ax_extension_AssetsManagerEx_getRemoteManifest);
         tolua_function(tolua_S,"getMaxConcurrentTask",lua_ax_extension_AssetsManagerEx_getMaxConcurrentTask);
         tolua_function(tolua_S,"setMaxConcurrentTask",lua_ax_extension_AssetsManagerEx_setMaxConcurrentTask);
+        tolua_function(tolua_S,"getTotalDiffFileSize",lua_ax_extension_AssetsManagerEx_getTotalDiffFileSize);
+        tolua_function(tolua_S,"startUpdateManually",lua_ax_extension_AssetsManagerEx_startManualUpdate);
+
         tolua_function(tolua_S,"setVersionCompareHandle",lua_ax_extension_AssetsManagerEx_setVersionCompareHandle);
         tolua_function(tolua_S,"setVerifyCallback",lua_ax_extension_AssetsManagerEx_setVerifyCallback);
         tolua_function(tolua_S,"create", lua_ax_extension_AssetsManagerEx_create);

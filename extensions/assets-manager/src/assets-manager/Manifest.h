@@ -206,7 +206,9 @@ protected:
     void setpackageUrl(std::string_view url) { _packageUrl = url; };
 
     void setManifestFileUrl(std::string_view url){_remoteManifestUrl=url;};
-    void setVersionFileUrl(std::string_view url){_remoteVersionUrl=url;};
+    // void setVersionFileUrl(std::string_view url){_remoteVersionUrl=url;};
+    void setRemoteVersionUrl(std::string_view url){_remoteVersionUrl=url;};
+
 
 private:
     //! Indicate whether the version informations have been fully loaded

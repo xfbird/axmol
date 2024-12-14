@@ -38,6 +38,9 @@ UserDataEx::UserDataEx() :
 	        _dataExMaps = new DataExMap();
 			//std::unordered_map<std::string, std::unique_ptr<UserDataEx>>();
 	    }
+        _udname = std::string("userdata");
+        getUserDatainfoFromDefault();
+
    }
 UserDataEx::UserDataEx(std::string_view name):
    _dataReady(false),
@@ -49,7 +52,7 @@ UserDataEx::UserDataEx(std::string_view name):
    _iv(""),
    _valueExMap()
 {
-    AXLOGD("UserDataEx:{}", name);
+    AXLOGD("UserDataEx  String:{}", name);
     // UserDataEx();
     _udname=std::string(name);
     getUserDatainfoFromDefault();
@@ -58,7 +61,7 @@ UserDataEx::UserDataEx(std::string_view name):
 
 bool UserDataEx::getUserDatainfoFromDefault(){
     //从 UserDefault 获得 持久数据加载
-    auto rkey=_storagename+std::string(_udname);       //组合主键
+    auto rkey = _storagename+ "_"+std::string(_udname);  // 组合主键
     AXLOGD("UserDataEx    rkey:{}", rkey);
     if (!rkey.empty()) {
         //AXLOGD("getUserDatainfoFromDefault 1 rkey:{} this:{}", rkey, fmt::ptr(this));
@@ -80,6 +83,7 @@ bool UserDataEx::getUserDatainfoFromDefault(){
 
 void UserDataEx::UnUserDataEx(){
     saveStorage();
+    clearAll();                         //释放所有的资源
 }
 
 
@@ -460,15 +464,17 @@ void UserDataEx::saveStorage()
 void UserDataEx::setStorageName(std::string_view name) {
     _initializecheck();
     if (!_storagename.empty()){
-    deleteStorage(getStorageName());                    //从持久化 删除所有的 数据
-  } 
+        deleteStorage(getStorageName());                    //从持久化 删除所有的 数据
+    } 
     _storagename = std::string(name);
   saveStorage();                        //保存所有数据到 持久化
 }
 void UserDataEx::clearAll(){                                   //  清除所有的字典
     _initializecheck();
-    deleteStorage(_storagename);                               // 清除存储的数据
-    _dataExMaps->clear();                                       // 删除所有的字典地点 
+   AXLOGD("UserDataEx::clearAll _dataExMaps->clear");
+    // deleteStorage(_storagename);                            //  不能清除
+    _dataExMaps->clear();                                      // 删除所有的字典地点 
+    //_uninitializecheck();                                      // 释放 所有的资源     
 }
 std::string_view UserDataEx::getStorageName() {
     _initializecheck();
@@ -502,12 +508,22 @@ void UserDataEx::_initializecheck()
 {
     if (_initialize)
     {
-        return;
+        return;                             //已经初始化完成。
     }
-    _dataExMaps = new DataExMap();
-    _storagename = "userdataEx";
-    _initialize  = true;
+    _dataExMaps = new DataExMap();          //创建一个 数据map
+    _storagename = "userdataEx";            //存储的名字前缀 默认值设置。
+    _initialize  = true;                    //已经初始化完成。
     AXLOGD("UserDataEx::GetUserDataEx _initializecheck  First Init");
+}
+void UserDataEx::_uninitializecheck()
+{
+    if (_initialize)
+    {
+    	AX_SAFE_DELETE(_dataExMaps);
+        _storagename = "userdataEx";            //存储的名字前缀 默认值设置。
+        _initialize  = false;                    //已经初始化完成。
+        AXLOGD("UserDataEx::GetUserDataEx _uninitializecheck  First Init");
+    }
 }
 
 UserDataEx* UserDataEx::GetUserDataEx(const std::string_view& key) {

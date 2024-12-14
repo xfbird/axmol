@@ -75,6 +75,7 @@ Manifest::Manifest(std::string_view manifestUrl /* = ""*/)
     : _versionLoaded(false)
     , _loaded(false)
     , _manifestRoot("")
+    , _packageUrl("")
     , _remoteManifestUrl("")
     , _remoteVersionUrl("")
     , _version("")
@@ -85,6 +86,28 @@ Manifest::Manifest(std::string_view manifestUrl /* = ""*/)
     if (!manifestUrl.empty())
         parse(manifestUrl);                 //如果本地文件存在 ，就清除所有的 并将文件读入，放入_json
 }
+
+// Manifest(std::string_view manifestUrl = "") 
+//         : _versionLoaded(false)
+//         , _loaded(false)
+//         , _fileUtils(nullptr)
+//         , _manifestRoot("")
+//         , _packageUrl("")
+//         , _remoteManifestUrl("")
+//         , _remoteVersionUrl("")
+//         , _version("")
+//         , _groups()
+//         , _groupVer()
+//         , _engineVer()
+//         , _assets()
+//         , _searchPaths()
+//         , _json() 
+//     {
+//         if (!manifestUrl.empty()) {
+//             parse(manifestUrl);
+//         }
+//     }
+// NS_AX_EXT_END
 
 
 void Manifest::loadJson(std::string_view url)
@@ -103,7 +126,7 @@ void Manifest::loadJson(std::string_view url)
         else
         {
             // Parse file with rapid json
-            AXLOGD("Manifest::loadJson LoadFile:{} Content readok ",url);
+            // AXLOGS("Manifest::loadJson LoadFile:{} Content {}",url,content);
             _json.Parse<0>(content.c_str());
             // Print error
             if (_json.HasParseError())
@@ -112,7 +135,7 @@ void Manifest::loadJson(std::string_view url)
                 if (offset > 0)
                     offset--;
                 std::string errorSnippet = content.substr(offset, 10);
-                AXLOGD("File parse error {} at <{}>\n",  static_cast<int>(_json.GetParseError()), errorSnippet);
+                AXLOGS("File parse error {} at <{}>\n",  static_cast<int>(_json.GetParseError()), errorSnippet);
             }
         }
     }
@@ -120,19 +143,19 @@ void Manifest::loadJson(std::string_view url)
 
 void Manifest::parseVersion(std::string_view versionUrl)
 {
-    AXLOGD("parseVersion loadJson versionUrl:{}",versionUrl);
+    AXLOGS("parseVersion loadJson versionUrl:{}",versionUrl);
     loadJson(versionUrl);
 
     if (_json.IsObject())
     {
-        AXLOGD("parseVersion loadVersion");
+        AXLOGS("parseVersion loadVersion");
         loadVersion(_json);
     }
 }
 
 void Manifest::parse(std::string_view manifestUrl)
 {
-    AXLOGD("parse  manifestUrl:{}",manifestUrl);
+    AXLOGS("parse  manifestUrl:{}",manifestUrl);
     loadJson(manifestUrl);                  //文件存在 读出 并用json 解析。
 
     if (!_json.HasParseError() && _json.IsObject())         //没有错误
@@ -142,30 +165,32 @@ void Manifest::parse(std::string_view manifestUrl)
         if (found != std::string::npos)
         {
             _manifestRoot = manifestUrl.substr(0, found + 1);
-            AXLOGD("parse _manifestRoot:{}",_manifestRoot);
+            AXLOGS("parse _manifestRoot:{}",_manifestRoot);
         }
-        AXLOGD("loadManifest josn");                //取出路径部分
+        AXLOGS("loadManifest json");                //取出路径部分
         loadManifest(_json);                        //装载 json  数据装入内存，并 建立装载标志
     }
 }
 
 bool Manifest::isVersionLoaded() const
 {
-    AXLOGD("isVersionLoaded:{}",_versionLoaded);
+    AXLOGS("isVersionLoaded:{}",_versionLoaded);
     return _versionLoaded;
 }
 bool Manifest::isLoaded() const
 {
-    AXLOGD("_loaded:{}",_loaded);
+    AXLOGS("_loaded:{}",_loaded);
     return _loaded;
 }
 
 bool Manifest::versionEquals(const Manifest* b) const
 {
     // Check manifest version
+    AXLOGS("Check _version:{} vs Call B__version:{}",
+                   _version,b->getVersion());
     if (_version != b->getVersion())
     {
-        AXLOGD("versionEquals:false");
+        AXLOGS("versionEquals:false");
         return false;
     }
     // Check group versions
@@ -174,9 +199,11 @@ bool Manifest::versionEquals(const Manifest* b) const
         std::vector<std::string> bGroups = b->getGroups();
         auto& bGroupVer                  = b->getGroupVerions();
         // Check group size
+        AXLOGS("Check b->getGroups() size:{} vs _groups.size():{}",
+                    bGroups.size(),_groups.size());
         if (bGroups.size() != _groups.size())
         {
-            AXLOGD("versionEquals:false");
+            AXLOGS("versionEquals size no:false");
             return false;
         }
          
@@ -189,19 +216,19 @@ bool Manifest::versionEquals(const Manifest* b) const
             if (gid != bGroups[i])
             {
                 
-                AXLOGD("versionEquals:false");
+                AXLOGS("versionEquals gid no :false");
                 return false;
             }   
             // Check group version
             if (_groupVer.at(gid) != bGroupVer.at(gid))
             {
-                AXLOGD("versionEquals:false");
+                AXLOGS("versionEquals at gid no :false");
                 return false;
             }   
         }
     }
-    // AXLOGD("versionEquals:{}",true);
-    AXLOGD("versionEquals:true");
+    // AXLOGS("versionEquals:{}",true);
+    AXLOGS("versionEquals:true");
     return true;
 }
 
@@ -211,7 +238,7 @@ bool Manifest::versionGreater(
 {
     std::string_view localVersion = getVersion();
     std::string_view bVersion     = b->getVersion();
-    AXLOGD("versionGreater localVersion:{}  cmpv:{}",localVersion,bVersion);    
+    AXLOGS("versionGreater localVersion:{}  cmpv:{}",localVersion,bVersion);    
     bool greater;
     if (handle)
     {
@@ -222,15 +249,15 @@ bool Manifest::versionGreater(
         greater = cmpVersion(localVersion, bVersion) > 0;
     }
 
-    AXLOGD("versionGreater return:{}",greater);    
+    AXLOGS("versionGreater return:{}",greater);    
     return greater;
 }
 
 hlookup::string_map<Manifest::AssetDiff> Manifest::genDiff(const Manifest* b) const
 {
    
-    AXLOGD("genDiff self _remoteManifestUrl:{}",_remoteManifestUrl);
-    AXLOGD("genDiff b _remoteManifestUrl:{}",b->getManifestFileUrl());
+    AXLOGS("genDiff self _remoteManifestUrl:{}",_remoteManifestUrl);
+    AXLOGS("genDiff b _remoteManifestUrl:{}",b->getManifestFileUrl());
     hlookup::string_map<AssetDiff> diff_map;
     auto& bAssets = b->getAssets();
     
@@ -244,31 +271,31 @@ hlookup::string_map<Manifest::AssetDiff> Manifest::genDiff(const Manifest* b) co
         key    = it->first;
         valueA = it->second;
 
-        // AXLOGD("genDiff  Check key:{} have ValueB ",key);
+        // AXLOGS("genDiff  Check key:{} have ValueB ",key);
         // Deleted
         valueIt = bAssets.find(key);
         if (valueIt == bAssets.cend())
         {
-            AXLOGD("genDiff  self.Key:{} not in b need Delete Add To Diff",key);
+            AXLOGS("genDiff  self.Key:{} not in b need Delete Add To Diff",key);
             AssetDiff diff;
             diff.asset = valueA;
             diff.type  = DiffType::DELETED;
             diff_map.emplace(key, diff);
-            // AXLOGD("genDiff DiffType::DELETED  diff_map.emplace(key{}, diff) ",key);
+            // AXLOGS("genDiff DiffType::DELETED  diff_map.emplace(key{}, diff) ",key);
             continue;
         }
 
         // Modified
         valueB = valueIt->second;
-        // AXLOGD("genDiff  self.Key:{}   self.md5:{}  b:md5:{}",key,valueA.md5,valueB.md5);
+        // AXLOGS("genDiff  self.Key:{}   self.md5:{}  b:md5:{}",key,valueA.md5,valueB.md5);
         if (valueA.md5 != valueB.md5)
         {
-            AXLOGD("genDiff  self.Key:{} in b and self.md5 != b.md5 need Modify Add To Diff",key);
+            AXLOGS("genDiff  self.Key:{} in b and self.md5 != b.md5 need Modify Add To Diff",key);
             AssetDiff diff;
             diff.asset = valueB;
             diff.type  = DiffType::MODIFIED;
             diff_map.emplace(key, diff);
-            // AXLOGD("genDiff DiffType::MODIFIED  diff_map.emplace(key{}, diff) ",key);
+            // AXLOGS("genDiff DiffType::MODIFIED  diff_map.emplace(key{}, diff) ",key);
         }
     }
 
@@ -277,17 +304,17 @@ hlookup::string_map<Manifest::AssetDiff> Manifest::genDiff(const Manifest* b) co
         key    = it->first;
         valueB = it->second;
 
-        // AXLOGD("genDiff  CheckB key:{} have ValueB ",key);
+        // AXLOGS("genDiff  CheckB key:{} have ValueB ",key);
         // Added
         valueIt = _assets.find(key);
         if (valueIt == _assets.cend())
         {
-            AXLOGD("genDiff  b.Key:{} not in self  need AddEd Add To Diff",key);
+            AXLOGS("genDiff  b.Key:{} not in self  need AddEd Add To Diff",key);
             AssetDiff diff;
             diff.asset = valueB;
             diff.type  = DiffType::ADDED;
             diff_map.emplace(key, diff);
-            // AXLOGD("genDiff DiffType::ADDED  diff_map.emplace(key{}, diff) ",key);
+            // AXLOGS("genDiff DiffType::ADDED  diff_map.emplace(key{}, diff) ",key);
         }
     }
 
@@ -296,11 +323,11 @@ hlookup::string_map<Manifest::AssetDiff> Manifest::genDiff(const Manifest* b) co
 
 void Manifest::genResumeAssetsList(DownloadUnits* units) const
 {
-    AXLOGD("genResumeAssetsList ");    
+    AXLOGS("genResumeAssetsList ");    
     for (auto it = _assets.begin(); it != _assets.end(); ++it)
     {
         Asset asset = it->second;
-        AXLOGD("genResumeAssetsList  asset.path:{},asset.size:{} asset.downloadState:{}",asset.path,asset.size,int(asset.downloadState));    
+        AXLOGS("genResumeAssetsList  asset.path:{},asset.size:{} asset.downloadState:{}",asset.path,asset.size,int(asset.downloadState));    
         if (asset.downloadState != DownloadState::SUCCESSED && asset.downloadState != DownloadState::UNMARKED)
         {
             DownloadUnit unit;
@@ -309,7 +336,7 @@ void Manifest::genResumeAssetsList(DownloadUnits* units) const
             unit.storagePath = _manifestRoot + asset.path;
             unit.size        = asset.size;
             units->emplace(unit.customId, unit);
-            AXLOGD("genResumeAssetsList unit customId:{} srcUrl:{} storagePath:{} size:{}",unit.customId,unit.srcUrl,unit.storagePath,unit.size);    
+            AXLOGS("genResumeAssetsList unit customId:{} srcUrl:{} storagePath:{} size:{}",unit.customId,unit.srcUrl,unit.storagePath,unit.size);    
         }
     }
 }
@@ -338,7 +365,7 @@ void Manifest::prependSearchPaths()
     if (std::find(searchPaths.begin(), searchPaths.end(), _manifestRoot) == searchPaths.end())
     {
         searchPaths.insert(iter, _manifestRoot);
-        AXLOGD("Insert _manifestRoot:{}",_manifestRoot);
+        AXLOGS("Insert _manifestRoot:{}",_manifestRoot);
         needChangeSearchPaths = true;
     }
 
@@ -350,7 +377,7 @@ void Manifest::prependSearchPaths()
         path = _manifestRoot + path;
         iter = searchPaths.begin();
         searchPaths.insert(iter, path);
-        AXLOGD("searchPaths.insert path:{}",path);
+        AXLOGS("searchPaths.insert path:{}",path);
         needChangeSearchPaths = true;
     }
     if (needChangeSearchPaths)
@@ -361,37 +388,37 @@ void Manifest::prependSearchPaths()
 
 std::string_view Manifest::getPackageUrl() const
 {
-    AXLOGD("_packageUrl :{}",_packageUrl);
+    AXLOGS("_packageUrl :{}",_packageUrl);
     return _packageUrl;
 }
 
 std::string_view Manifest::getManifestFileUrl() const
 {
-    AXLOGD("_remoteManifestUrl :{}",_remoteManifestUrl);
+    AXLOGS("_remoteManifestUrl :{}",_remoteManifestUrl);
     return _remoteManifestUrl;
 }
 
 std::string_view Manifest::getVersionFileUrl() const
 {
-    AXLOGD("Manifest::getVersionFileUrl :{}",_remoteVersionUrl);
+    AXLOGS("Manifest::getVersionFileUrl :{}",_remoteVersionUrl);
     return _remoteVersionUrl;
 }
 
 std::string_view Manifest::getVersion() const
 {
-    AXLOGD("_version :{}",_version);
+    AXLOGS("getVersion _version :{}",_version);
     return _version;
 }
 
 const std::vector<std::string>& Manifest::getGroups() const
 {
-    // AXLOGD("_groups :{}",_groups);
+    // AXLOGS("_groups :{}",_groups);
     return _groups;
 }
 
 const hlookup::string_map<std::string>& Manifest::getGroupVerions() const
 {
-    // AXLOGD("_groups :{}",_groups);
+    // AXLOGS("_groups :{}",_groups);
     return _groupVer;
 }
 
@@ -408,7 +435,7 @@ const hlookup::string_map<Manifest::Asset>& Manifest::getAssets() const
 void Manifest::setAssetDownloadState(std::string_view key, const Manifest::DownloadState& state)
 {
     auto valueIt = _assets.find(key);
-    AXLOGD("setAssetDownloadState set:{}  state:{}",key,(int)state);
+    AXLOGS("setAssetDownloadState set:{}  state:{}",key,(int)state);
     if (valueIt != _assets.end())
     {
         valueIt->second.downloadState = state;
@@ -506,14 +533,14 @@ Manifest::Asset Manifest::parseAsset(std::string_view path, const rapidjson::Val
 void Manifest::loadVersion(const rapidjson::Document& json)
 {
     // Retrieve remote manifest url
-    // AXLOGD("loadVersion json:{}",json.GetString());
+    // AXLOGS("loadVersion json:{}",json.GetString());
     //对于 json 取出 相关的 信息，如果存在的化。如果存在 就认为 版本信息已经加载
 
     // #define KEY_MANIFEST_URL "remoteManifestUrl"             远程url
     if (json.HasMember(KEY_MANIFEST_URL) && json[KEY_MANIFEST_URL].IsString())
     {
         _remoteManifestUrl = json[KEY_MANIFEST_URL].GetString();
-        AXLOGD("loadVersion read:{} set _remoteManifestUrl:{}",KEY_MANIFEST_URL,_remoteManifestUrl);
+        AXLOGS("loadVersion read:{} set _remoteManifestUrl:{}",KEY_MANIFEST_URL,_remoteManifestUrl);
     }
 
     // Retrieve remote version url
@@ -521,7 +548,7 @@ void Manifest::loadVersion(const rapidjson::Document& json)
     if (json.HasMember(KEY_VERSION_URL) && json[KEY_VERSION_URL].IsString())
     {
         _remoteVersionUrl = json[KEY_VERSION_URL].GetString();
-        AXLOGD("loadVersion read:{} set _remoteVersionUrl:{}",KEY_VERSION_URL,_remoteVersionUrl);
+        AXLOGS("loadVersion read:{} set _remoteVersionUrl:{}",KEY_VERSION_URL,_remoteVersionUrl);
     }
 
     // Retrieve local version
@@ -529,7 +556,7 @@ void Manifest::loadVersion(const rapidjson::Document& json)
     if (json.HasMember(KEY_VERSION) && json[KEY_VERSION].IsString())
     {
         _version = json[KEY_VERSION].GetString();
-        AXLOGD("loadVersion read:{} set _version:{}",KEY_VERSION,_version);
+        AXLOGS("loadVersion read:{} set _version:{}",KEY_VERSION,_version);
     }
 
     // Retrieve local group version
@@ -559,7 +586,7 @@ void Manifest::loadVersion(const rapidjson::Document& json)
     if (json.HasMember(KEY_ENGINE_VERSION) && json[KEY_ENGINE_VERSION].IsString())
     {
         _engineVer = json[KEY_ENGINE_VERSION].GetString();
-        AXLOGD("loadVersion read set _engineVer:{}",KEY_ENGINE_VERSION,_engineVer);
+        AXLOGS("loadVersion read set _engineVer:{}",KEY_ENGINE_VERSION,_engineVer);
     }
 
     _versionLoaded = true;
@@ -567,7 +594,7 @@ void Manifest::loadVersion(const rapidjson::Document& json)
 
 void Manifest::loadManifest(const rapidjson::Document& json)
 {
-    AXLOGD("loadVersion json");                     //基于 主文件 加载 版本信息
+    AXLOGS("loadVersion json");                     //基于 主文件 加载 版本信息
     loadVersion(json);
 
     // Retrieve package url

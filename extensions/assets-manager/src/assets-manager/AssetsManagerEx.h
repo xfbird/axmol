@@ -77,7 +77,7 @@ public:
      @warning   The cached manifest in your storage path have higher priority and will be searched first,
                 only if it doesn't exist, AssetsManagerEx will use the given manifestUrl.
      */
-    static AssetsManagerEx* create(std::string_view manifestUrl, std::string_view storagePath);
+    // static AssetsManagerEx* create(std::string_view manifestUrl, std::string_view storagePath);
 
     /** @brief  Check out if there is a new version of manifest.
      *          You may use this method before updating, then let user determine whether
@@ -86,10 +86,26 @@ public:
     // -- local downloadEntity = ax.AssetsManagerEx:create( localManifestPath, storagePath, true,
     // --                                                   tempManifestName, tempDirName,
     // --                                                   resUrl, manifestUrl, versionUrl )
+// localManifestPath
+// storagePath
+// ManualUpdat
+// tempManifestName
+// tempDirName
+// resUrl
+// manifestUrl
+// versionUrl
+// resourceVer
 
-
-    static AssetsManagerEx* create(std::string_view localManifestPath,std::string_view storagePath,bool manualUpdat,
-                                    std::string_view resUrl,std::string_view manifestUrl,std::string_view versionUrl);
+    static AssetsManagerEx* create(
+                                std::string_view manifestUrl,
+                                std::string_view storagePath,
+                                bool manualUpdat,
+                                std::string_view tempManifestName,
+                                std::string_view tempDirName,
+                                std::string_view resUrl,
+                                std::string_view versionUrl,
+                                std::string_view resourceVer
+                                );
 
     void checkUpdate();
 
@@ -108,6 +124,9 @@ public:
     /** @brief Gets storage path.
      */
     std::string_view getStoragePath() const;
+
+    //setResourceVer
+    void setResourceVer(const std::string_view ResourceVer);
 
     /** @brief Function for retrieving the local manifest object
      */
@@ -157,18 +176,13 @@ public:
     {
         _verifyCallback = callback;
     };
-
-    AssetsManagerEx(std::string_view manifestUrl, std::string_view storagePath,bool needinit=true);
-                    // std::string_view manifestUrl, std::string_view storagePath,bool needinit
-
-    // void exinitManifests(std:string_view localManifestPath,
-    //                      std::string_view resUrl,
-    //                      std::string_view manifestUrl,
-    //                      std::string_view versionUrl);
-    void exinitManifests(std::string_view localManifestPath,
-                         std::string_view resUrl,
-                         std::string_view manifestUrl,
-                         std::string_view versionUrl);
+    AssetsManagerEx(
+            std::string_view manifestUrl,
+            std::string_view storagePath,
+            std::string_view resUrl,
+            std::string_view versionUrl,
+            std::string_view _resourceVer,
+            bool ManualUpdat);
     virtual ~AssetsManagerEx();
     void startManualUpdate();    
 protected:
@@ -176,7 +190,7 @@ protected:
 
     std::string get(std::string_view key) const;
 
-    void initManifests(std::string_view manifestUrl);
+    void initManifests(std::string_view localManifestPath);
 
     void loadLocalManifest(std::string_view manifestUrl);
 
@@ -265,7 +279,7 @@ private:
     // Called when one DownloadUnits finished
     void onDownloadUnitsFinished();
     void fillZipFunctionOverrides(zlib_filefunc_def_s& zipFunctionOverrides);
-
+    void updateUrl(Manifest* lManifest);
     //! The event of the current AssetsManagerEx in event dispatcher
     std::string _eventName;
 
@@ -327,8 +341,6 @@ private:
     DownloadUnits _failedUnits;
 
     //! Download queue
-    std::vector<std::string> _queue;
-
     //! Max concurrent task count for downloading
     int _maxConcurrentTask = 32;
 
@@ -362,18 +374,21 @@ private:
     //! Next target percent for saving the manifest file
     float _nextSavePoint = 0.f;
 
-
-
     //! Handle function to compare versions between different manifests
     std::function<int(std::string_view versionA, std::string_view versionB)> _versionCompareHandle = nullptr;
 
     //! Callback function to verify the downloaded assets
     std::function<bool(std::string_view path, Manifest::Asset asset)> _verifyCallback = nullptr;
 
+    std::string _ResourceVer;
+    std::string _resUrl;
+    // std::string _manifestUrl;
+    std::string _versionUrl;
     //! Marker for whether the assets manager is inited
     bool _inited = false;
     bool _ManualUpdate=false;
     bool _InterruptFlag=false;
+    std::vector<std::string> _queue;
 };
 
 NS_AX_EXT_END

@@ -80,6 +80,7 @@ public:
     bool getUserDatainfoFromDefault(); //从 User Default 获得一个字典的所有信息       
     bool checkAndSave();
     void setAutoSave(bool enabled){_autoSave=enabled;}
+    std::string getname(){return _udname;}
     // void setEncryptEnabled(bool enabled, std::string_view key, std::string_view iv);
 private:
     //私有 函数
@@ -93,36 +94,34 @@ private:
     void setForKey(const std::string_view& key, T value);
     template <typename T>
     T getForKey(const std::string_view& key, T def);
-    std::string Serialize() const;                      //序列化 
-    bool Deserialize(const std::string& jsonStr);       //反序列化
+    std::string Serialize() const;                            //序列化 
+    bool Deserialize(const std::string& jsonStr);             //反序列化
 private:
-    // ValueExMap* _valueExMap;                            //数据集的值表
-    // std::unique_ptr<ValueExMap> _valueExMap;            //改成智能指针
-    ValueExMap _valueExMap;
-    bool _isModified;                                   //是否修改标志
-    bool _dataReady;                                    //是否 已经加载数据
-    bool _autoSave;                                     //是否 自动保存
-    std::string _udname;                                   //数据集名称
+    ValueExMap _valueExMap;                                   //值表          
+    bool _isModified;                                         //是否修改标志
+    bool _dataReady;                                          //是否 已经加载数据
+    bool _autoSave;                                           //是否 自动保存
+    std::string _udname;                                      //数据集名称
     std::string _key;                                         //加密 Key  
     std::string _iv;                                          //加密 iv  
     bool _encryptEnabled = false;                             //是否 加密标志
     // 模板函数声明
-//----------------------------------------------------------------------------------------------------
-//----------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------
 //类成员 部分    
 public:
-
-    static UserDataEx* GetUserDataEx(const std::string_view& key);
-    static bool DeleteUserDataEx(const std::string_view& key);
-    static void setStorageName(std::string_view name);
-    static std::string_view getStorageName();
-    static void UnUserDataEx();
+    static UserDataEx* GetUserDataEx(const std::string_view& key); //获得一个指定 Key 数据集的 的用户数据实例
+    static bool DeleteUserDataEx(const std::string_view& key);     //释放一个 指定Key 的用户数据实例的内存空间，如果未保存，要先保存
+    static void setStorageName(std::string_view name);             //设置获得 整体存储前缀
+    static std::string_view getStorageName();                      //存储 整体存储前缀
+    static void UnUserDataEx();                                 //
 
     static void deleteStorage(std::string_view name);         //  
     static void clearAll();                                   //  清除所有的字典
 private:    
     static void saveStorage();
     static void _initializecheck();
+    static void _uninitializecheck();
 
 private:
     static bool _initialize;

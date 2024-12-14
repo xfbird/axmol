@@ -746,38 +746,87 @@ int lua_ax_base_UserDataEx_new(lua_State* tolua_S)
         return 0;
     #endif
 }
-// lua_ax_base_UserDataEx_free
+// // lua_ax_base_UserDataEx_free
+// int lua_ax_base_UserDataEx_free(lua_State* tolua_S)
+// {
+//     int argc = 0;
+//     bool ok  = true;
+
+//     #if _AX_DEBUG >= 1
+//         tolua_Error tolua_err;
+//     #endif
+
+//     #if _AX_DEBUG >= 1
+//         if (!tolua_isusertable(tolua_S,1,"ax.UserDataEx",0,&tolua_err)) goto tolua_lerror;
+//     #endif
+
+//         argc = lua_gettop(tolua_S) - 1;
+
+//         if (argc == 0)
+//         {
+           
+//             UserDataEx::UnUserDataEx();
+//             // lua_settop(tolua_S, 1);
+//             return 1;
+//         }
+//         luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d\n ", "UserDataEx:UnUserDataEx",argc, 1);
+//         return 0;
+
+//     #if _AX_DEBUG >= 1
+//     tolua_lerror:
+//         tolua_error(tolua_S,"#ferror in function 'lua_ax_base_UserDataEx_free'.",&tolua_err);
+//     #endif
+//     return 0;
+// }
+
 int lua_ax_base_UserDataEx_free(lua_State* tolua_S)
 {
     int argc = 0;
-    bool ok  = true;
+    ax::UserDataEx* cobj = nullptr;
+    bool ok = true;
 
     #if _AX_DEBUG >= 1
         tolua_Error tolua_err;
     #endif
 
     #if _AX_DEBUG >= 1
-        if (!tolua_isusertable(tolua_S,1,"ax.UserDataEx",0,&tolua_err)) goto tolua_lerror;
+        if (!tolua_isusertype(tolua_S, 1, "ax.UserDataEx", 0, &tolua_err))
+            goto tolua_lerror;
+    #endif
+        cobj = (ax::UserDataEx*)tolua_tousertype(tolua_S, 1, 0);
+    #if _AX_DEBUG >= 1
+        if (!cobj)
+        {
+            tolua_error(tolua_S, "无效的 'cobj' 在函数 'lua_ax_base_UserDataEx_setAutoSave'", nullptr);
+            return 0;
+        }
     #endif
 
-        argc = lua_gettop(tolua_S) - 1;
+    argc = lua_gettop(tolua_S) - 1;
 
-        if (argc == 0)
-        {
-           
-            UserDataEx::UnUserDataEx();
-            // lua_settop(tolua_S, 1);
-            return 1;
+    if (argc == 0)
+    {
+        // bool enabled;
+        if (cobj){
+            UserDataEx::DeleteUserDataEx(cobj->getname());
+            return 0;
         }
-        luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d\n ", "UserDataEx:UnUserDataEx",argc, 1);
-        return 0;
+        // cobj->UnUserDataEx();
+        //DeleteUserDataEx
+        //setAutoSave(enabled);       
+    }
+
+    luaL_error(tolua_S, "%s 参数数量错误: %d, 应该期望 %d\n", "UserDataEx:free", argc, 1);
+    return 0;
 
     #if _AX_DEBUG >= 1
     tolua_lerror:
-        tolua_error(tolua_S,"#ferror in function 'lua_ax_base_UserDataEx_free'.",&tolua_err);
+        tolua_error(tolua_S, "#ferror 在函数 'lua_ax_base_UserDataEx_free'.", &tolua_err);
     #endif
     return 0;
 }
+
+
 
 int lua_ax_base_UserDataEx_delInstance(lua_State* tolua_S)
 {
@@ -2168,22 +2217,18 @@ int register_all_axlua_bindings_UserDATAEx(lua_State* tolua_S)
     tolua_usertype(tolua_S, "ax.UserDataEx");
     //AXLOGI(" bindings UserDATAEx Start ax.UserDataEx");
     tolua_cclass(tolua_S, "UserDataEx", "ax.UserDataEx", "ax.Object", nullptr);
-
     tolua_beginmodule(tolua_S, "UserDataEx");
-
-        // Bind constructor and destructor
         //------------------------------------------------------------------------------------
         //这些都是 类方法 
         //获得 一个 指定键名 的 字典对象
-        tolua_function(tolua_S, "new", lua_ax_base_UserDataEx_new);
-        //AXLOGI(" bindings UserDATAEx Add New");
+        tolua_function(tolua_S, "new", lua_ax_base_UserDataEx_new);                             //创建一个 对应的 名字的实例 并返回对象
         //释放一个 指定键名 的 字典对象 该对象 的数据会立即持久化
         tolua_function(tolua_S,"free", lua_ax_base_UserDataEx_free);                            //释放所有的实例，也就是强制存储    
         tolua_function(tolua_S,"del", lua_ax_base_UserDataEx_delInstance);                      //删除指定 Key 的实例 包括存储
-        tolua_function(tolua_S,"setStorageName", lua_ax_base_UserDataEx_setStorageName);
-        tolua_function(tolua_S,"getStorageName", lua_ax_base_UserDataEx_getStorageName);
-        tolua_function(tolua_S,"Cleanup", lua_ax_base_UserDataEx_clearAll);
-        tolua_function(tolua_S,"setVersionPath", lua_ax_base_UserDataEx_setStorageName);
+        tolua_function(tolua_S,"setStorageName", lua_ax_base_UserDataEx_setStorageName);        //设置存储名字
+        tolua_function(tolua_S,"getStorageName", lua_ax_base_UserDataEx_getStorageName);        //获得存储名字
+        tolua_function(tolua_S,"Cleanup", lua_ax_base_UserDataEx_clearAll);                     //释放所有的实例。
+        tolua_function(tolua_S,"setVersionPath", lua_ax_base_UserDataEx_setStorageName);        //重新设置存储名称
    
         //三个 静态方法 
         //	setStorageName	设置整体存储名称	todo
@@ -2210,6 +2255,7 @@ int register_all_axlua_bindings_UserDATAEx(lua_State* tolua_S)
         tolua_function(tolua_S, "writeMapDataToFile", lua_ax_base_UserDataEx_saveData);
         tolua_function(tolua_S, "saveData", lua_ax_base_UserDataEx_saveData); 
         tolua_function(tolua_S, "setAutoSave", lua_ax_base_UserDataEx_setAutoSave); 
+
     //AXLOGI(" bindings UserDATAEx End");
     tolua_endmodule(tolua_S);
     auto typeName = typeid(ax::UserDataEx).name(); // rtti is literal storage
@@ -2525,3 +2571,21 @@ int register_all_axlua_bindings_LuaBridgeControl(lua_State* tolua_S)
     // AXLOGD("bindings LuaBridgeControl Start ax.LuaBridgeControl ok");
     return 1;
 }
+
+
+// int lua_register_cocos2dx_legend_NativeBridgeCtl(lua_State* tolua_S)
+// {
+//     tolua_usertype(tolua_S,"ax.NativeBridgeCtl");
+//     tolua_cclass(tolua_S,"NativeBridgeCtl","ax.NativeBridgeCtl","ax.Object",nullptr);
+//     tolua_beginmodule(tolua_S,"NativeBridgeCtl");
+//     tolua_map::tolua_function(v1, "removeSelectorsInGroup", lua_NativeBridgeCtl_removeSelectorsInGroup);
+//     tolua_map::tolua_function(v1, "sendMessage2Native", lua_NativeBridgeCtl_sendMessage2Native);
+//     tolua_map::tolua_function(v1, "addNativeSelector", lua_NativeBridgeCtl_addNativeSelector);
+//     tolua_map::tolua_function(v1, "printSelectorList", lua_NativeBridgeCtl_printSelectorList);
+//     tolua_map::tolua_function(v1, "Inst", lua_NativeBridgeCtl_Inst);
+//     tolua_endmodule(tolua_S);
+//     auto typeName = typeid(ax::NativeBridgeCtl).name();
+//     g_luaType[reinterpret_cast<uintptr_t>(typeName)] = "ax.NativeBridgeCtl";
+//     g_typeCast[typeName] = "ax.NativeBridgeCtl";
+//     return 1;
+// }
