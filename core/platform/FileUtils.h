@@ -290,6 +290,26 @@ public:
      * Returns the fullpath for a given dirname.
      * @since 3.17.1
      */
+    virtual void setSearchResolutionsOrder(const std::vector<std::string>& searchResolutionsOrder);
+
+    /**
+     * Append search order of the resources.
+     *
+     * @see setSearchResolutionsOrder(), fullPathForFilename().
+     * @since v2.1
+     */
+    virtual void addSearchResolutionsOrder(std::string_view order, const bool front = false);
+
+    /**
+     *  Gets the array that contains the search order of the resources.
+     *
+     *  @see setSearchResolutionsOrder(const std::vector<std::string>&), fullPathForFilename(const char*).
+     *  @since v2.1
+     *  @lua NA
+     */
+    virtual const std::vector<std::string> getSearchResolutionsOrder() const;
+	
+	
     virtual std::string fullPathForDirectory(std::string_view dirname) const;
 
     /**
@@ -819,10 +839,20 @@ protected:
      *  @param searchPath The search path.
      *  @return The full path of the file. It will return an empty string if the full path of the file doesn't exist.
      */
-    virtual std::string getPathForFilename(std::string_view filename, std::string_view searchPath) const;
+    //virtual std::string getPathForFilename(std::string_view filename, 
+	//std::string_view 
+	//searchPath) const;
 
-    virtual std::string getPathForDirectory(std::string_view dir, std::string_view searchPath) const;
+    //virtual std::string getPathForDirectory(std::string_view dir, 
+	//std::string_view 
+	//searchPath) const;
+    virtual std::string getPathForFilename(std::string_view filename,
+                                           std::string_view resolutionDirectory,
+                                           std::string_view searchPath) const;
 
+    virtual std::string getPathForDirectory(std::string_view dir,
+                                            std::string_view resolutionDiretory,
+                                            std::string_view searchPath) const;
     /**
      *  Gets full path for the directory and the filename.
      *
@@ -835,6 +865,7 @@ protected:
      */
     virtual std::string getFullPathForFilenameWithinDirectory(std::string_view directory,
                                                               std::string_view filename) const;
+    std::vector<std::string> _searchResolutionsOrderArray;
 
     /**
      * The vector contains search paths.

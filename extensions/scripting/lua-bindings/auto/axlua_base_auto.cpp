@@ -33201,6 +33201,240 @@ int lua_ax_base_FileUtils_isAbsolutePath(lua_State* tolua_S)
 
     return 0;
 }
+int lua_ax_base_FileUtils_setSearchResolutionsOrder(lua_State* tolua_S)
+{
+    int argc = 0;
+    ax::FileUtils* cobj = nullptr;
+    bool ok  = true;
+
+#if _AX_DEBUG >= 1
+    tolua_Error tolua_err;
+#endif
+
+
+#if _AX_DEBUG >= 1
+    if (!tolua_isusertype(tolua_S,1,"ax.FileUtils",0,&tolua_err)) goto tolua_lerror;
+#endif
+
+    cobj = (ax::FileUtils*)tolua_tousertype(tolua_S,1,0);
+
+#if _AX_DEBUG >= 1
+    if (!cobj) 
+    {
+        tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_FileUtils_setSearchResolutionsOrder'", nullptr);
+        return 0;
+    }
+#endif
+
+    argc = lua_gettop(tolua_S)-1;
+    if (argc == 1) 
+    {
+        std::vector<std::string> arg0;
+
+        ok &= luaval_to_std_vector_string(tolua_S, 2, &arg0, "ax.FileUtils:setSearchResolutionsOrder");
+        if(!ok)
+        {
+            tolua_error(tolua_S,"invalid arguments in function 'lua_ax_base_FileUtils_setSearchResolutionsOrder'", nullptr);
+            return 0;
+        }
+        cobj->setSearchResolutionsOrder(arg0);
+        lua_settop(tolua_S, 1);
+        return 1;
+    }
+    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.FileUtils:setSearchResolutionsOrder",argc, 1);
+    return 0;
+
+#if _AX_DEBUG >= 1
+    tolua_lerror:
+    tolua_error(tolua_S,"#ferror in function 'lua_ax_base_FileUtils_setSearchResolutionsOrder'.",&tolua_err);
+#endif
+
+    return 0;
+}
+int lua_ax_base_FileUtils_addSearchResolutionsOrder(lua_State* tolua_S)
+{
+    int argc = 0;
+    ax::FileUtils* cobj = nullptr;
+    bool ok  = true;
+
+#if _AX_DEBUG >= 1
+    tolua_Error tolua_err;
+#endif
+
+
+#if _AX_DEBUG >= 1
+    if (!tolua_isusertype(tolua_S,1,"ax.FileUtils",0,&tolua_err)) goto tolua_lerror;
+#endif
+
+    cobj = (ax::FileUtils*)tolua_tousertype(tolua_S,1,0);
+
+#if _AX_DEBUG >= 1
+    if (!cobj) 
+    {
+        tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_FileUtils_addSearchResolutionsOrder'", nullptr);
+        return 0;
+    }
+#endif
+
+    argc = lua_gettop(tolua_S)-1;
+    if (argc == 1) 
+    {
+        std::string_view arg0;
+
+        ok &= luaval_to_std_string_view(tolua_S, 2,&arg0, "ax.FileUtils:addSearchResolutionsOrder");
+        if(!ok)
+        {
+            tolua_error(tolua_S,"invalid arguments in function 'lua_ax_base_FileUtils_addSearchResolutionsOrder'", nullptr);
+            return 0;
+        }
+        cobj->addSearchResolutionsOrder(arg0);
+        lua_settop(tolua_S, 1);
+        return 1;
+    }
+    if (argc == 2) 
+    {
+        std::string_view arg0;
+        bool arg1;
+
+        ok &= luaval_to_std_string_view(tolua_S, 2,&arg0, "ax.FileUtils:addSearchResolutionsOrder");
+
+        ok &= luaval_to_boolean(tolua_S, 3,&arg1, "ax.FileUtils:addSearchResolutionsOrder");
+        if(!ok)
+        {
+            tolua_error(tolua_S,"invalid arguments in function 'lua_ax_base_FileUtils_addSearchResolutionsOrder'", nullptr);
+            return 0;
+        }
+        cobj->addSearchResolutionsOrder(arg0, arg1);
+        lua_settop(tolua_S, 1);
+        return 1;
+    }
+    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.FileUtils:addSearchResolutionsOrder",argc, 1);
+    return 0;
+
+#if _AX_DEBUG >= 1
+    tolua_lerror:
+    tolua_error(tolua_S,"#ferror in function 'lua_ax_base_FileUtils_addSearchResolutionsOrder'.",&tolua_err);
+#endif
+
+    return 0;
+}
+int lua_ax_base_FileUtils_getSearchResolutionsOrder(lua_State* tolua_S)
+{
+    int argc = 0;
+    ax::FileUtils* cobj = nullptr;
+    bool ok  = true;
+
+#if _AX_DEBUG >= 1
+    tolua_Error tolua_err;
+#endif
+
+
+#if _AX_DEBUG >= 1
+    if (!tolua_isusertype(tolua_S,1,"ax.FileUtils",0,&tolua_err)) goto tolua_lerror;
+#endif
+
+    cobj = (ax::FileUtils*)tolua_tousertype(tolua_S,1,0);
+
+#if _AX_DEBUG >= 1
+    if (!cobj) 
+    {
+        tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_FileUtils_getSearchResolutionsOrder'", nullptr);
+        return 0;
+    }
+#endif
+
+    argc = lua_gettop(tolua_S)-1;
+    if (argc == 0) 
+    {
+        if(!ok)
+        {
+            tolua_error(tolua_S,"invalid arguments in function 'lua_ax_base_FileUtils_getSearchResolutionsOrder'", nullptr);
+            return 0;
+        }
+        auto&& ret = cobj->getSearchResolutionsOrder();
+        ccvector_std_string_to_luaval(tolua_S, ret);
+        return 1;
+    }
+    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.FileUtils:getSearchResolutionsOrder",argc, 0);
+    return 0;
+
+#if _AX_DEBUG >= 1
+    tolua_lerror:
+    tolua_error(tolua_S,"#ferror in function 'lua_ax_base_FileUtils_getSearchResolutionsOrder'.",&tolua_err);
+#endif
+
+    return 0;
+}
+
+// int lua_ax_base_FileUtils_addSearchPath(lua_State* tolua_S)
+// {
+//     int argc = 0;
+//     ax::FileUtils* cobj = nullptr;
+//     bool ok  = true;
+
+// #if _AX_DEBUG >= 1
+//     tolua_Error tolua_err;
+// #endif
+
+
+// #if _AX_DEBUG >= 1
+//     if (!tolua_isusertype(tolua_S,1,"ax.FileUtils",0,&tolua_err)) goto tolua_lerror;
+// #endif
+
+//     cobj = (ax::FileUtils*)tolua_tousertype(tolua_S,1,0);
+
+// #if _AX_DEBUG >= 1
+//     if (!cobj) 
+//     {
+//         tolua_error(tolua_S,"invalid 'cobj' in function 'lua_ax_base_FileUtils_addSearchPath'", nullptr);
+//         return 0;
+//     }
+// #endif
+
+//     argc = lua_gettop(tolua_S)-1;
+//     if (argc == 1) 
+//     {
+//         std::string_view arg0;
+
+//         ok &= luaval_to_std_string_view(tolua_S, 2,&arg0, "ax.FileUtils:addSearchPath");
+//         if(!ok)
+//         {
+//             tolua_error(tolua_S,"invalid arguments in function 'lua_ax_base_FileUtils_addSearchPath'", nullptr);
+//             return 0;
+//         }
+//         cobj->addSearchPath(arg0);
+//         lua_settop(tolua_S, 1);
+//         return 1;
+//     }
+//     if (argc == 2) 
+//     {
+//         std::string_view arg0;
+//         bool arg1;
+
+//         ok &= luaval_to_std_string_view(tolua_S, 2,&arg0, "ax.FileUtils:addSearchPath");
+
+//         ok &= luaval_to_boolean(tolua_S, 3,&arg1, "ax.FileUtils:addSearchPath");
+//         if(!ok)
+//         {
+//             tolua_error(tolua_S,"invalid arguments in function 'lua_ax_base_FileUtils_addSearchPath'", nullptr);
+//             return 0;
+//         }
+//         cobj->addSearchPath(arg0, arg1);
+//         lua_settop(tolua_S, 1);
+//         return 1;
+//     }
+//     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.FileUtils:addSearchPath",argc, 1);
+//     return 0;
+
+// #if _AX_DEBUG >= 1
+//     tolua_lerror:
+//     tolua_error(tolua_S,"#ferror in function 'lua_ax_base_FileUtils_addSearchPath'.",&tolua_err);
+// #endif
+
+//     return 0;
+// }
+
+
 int lua_ax_base_FileUtils_isDirectoryExist(lua_State* tolua_S)
 {
     int argc = 0;
@@ -34024,14 +34258,17 @@ int lua_register_ax_base_FileUtils(lua_State* tolua_S)
     tolua_beginmodule(tolua_S,"FileUtils");
         tolua_function(tolua_S,"purgeCachedEntries",lua_ax_base_FileUtils_purgeCachedEntries);
         tolua_function(tolua_S,"getStringFromFile",lua_ax_base_FileUtils_getStringFromFile);
+        tolua_function(tolua_S,"getDataFromFileEx",lua_ax_base_FileUtils_getStringFromFile);
         tolua_function(tolua_S,"fullPathForFilename",lua_ax_base_FileUtils_fullPathForFilename);
         tolua_function(tolua_S,"fullPathFromRelativeFile",lua_ax_base_FileUtils_fullPathFromRelativeFile);
         tolua_function(tolua_S,"fullPathForDirectory",lua_ax_base_FileUtils_fullPathForDirectory);
         tolua_function(tolua_S,"setSearchPaths",lua_ax_base_FileUtils_setSearchPaths);
+        
         tolua_function(tolua_S,"getDefaultResourceRootPath",lua_ax_base_FileUtils_getDefaultResourceRootPath);
         tolua_function(tolua_S,"setDefaultResourceRootPath",lua_ax_base_FileUtils_setDefaultResourceRootPath);
         tolua_function(tolua_S,"addSearchPath",lua_ax_base_FileUtils_addSearchPath);
         tolua_function(tolua_S,"getSearchPaths",lua_ax_base_FileUtils_getSearchPaths);
+        
         tolua_function(tolua_S,"getOriginalSearchPaths",lua_ax_base_FileUtils_getOriginalSearchPaths);
         tolua_function(tolua_S,"getWritablePath",lua_ax_base_FileUtils_getWritablePath);
         tolua_function(tolua_S,"getNativeWritableAbsolutePath",lua_ax_base_FileUtils_getNativeWritableAbsolutePath);
@@ -34043,6 +34280,11 @@ int lua_register_ax_base_FileUtils(lua_State* tolua_S)
         tolua_function(tolua_S,"writeToFile",lua_ax_base_FileUtils_writeToFile);
         tolua_function(tolua_S,"writeStringToFile",lua_ax_base_FileUtils_writeStringToFile);
         tolua_function(tolua_S,"writeValueMapToFile",lua_ax_base_FileUtils_writeValueMapToFile);
+        tolua_function(tolua_S,"setSearchResolutionsOrder",lua_ax_base_FileUtils_setSearchResolutionsOrder);
+        tolua_function(tolua_S,"addSearchResolutionsOrder",lua_ax_base_FileUtils_addSearchResolutionsOrder);
+        tolua_function(tolua_S,"getSearchResolutionsOrder",lua_ax_base_FileUtils_getSearchResolutionsOrder);
+        // tolua_function(tolua_S,"setSearchResolutionsOrder",lua_ax_base_FileUtils_setSearchPaths);
+        // tolua_function(tolua_S,"addSearchPath",lua_ax_base_FileUtils_addSearchPath);
         tolua_function(tolua_S,"writeValueVectorToFile",lua_ax_base_FileUtils_writeValueVectorToFile);
         tolua_function(tolua_S,"getValueVectorFromFile",lua_ax_base_FileUtils_getValueVectorFromFile);
         tolua_function(tolua_S,"isFileExist",lua_ax_base_FileUtils_isFileExist);
