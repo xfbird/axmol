@@ -153,6 +153,80 @@ int axlua_log_with_level(lua_State* L) {
   return 0;
 }
 
+int axlua_log_setlevel(lua_State* tolua_S)
+{
+    int argc = 0;
+    bool ok  = true;
+
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
+
+    argc = lua_gettop(tolua_S)-1;
+    AXLOGD("axlua_log_setlevel argc:{}",argc);
+    if (argc == 0) 
+    {
+        int arg0;
+
+        ok &= luaval_to_int32(tolua_S, 1,&arg0, "ax.setlevel");
+        if(!ok)
+        {
+            tolua_error(tolua_S,"invalid arguments in function 'axlua_log_setlevel'", nullptr);
+            return 0;
+        }
+        if ((arg0>=0) && (arg0<=int(LogLevel::Silent))){
+            AXLOGD("axlua_log_setlevel level:{}",arg0);
+            setLogLevel(LogLevel(arg0));
+            lua_settop(tolua_S, 1);
+            return 1;
+        }
+        tolua_error(tolua_S,"invalid level in function 'axlua_log_setlevel'", nullptr);
+        return 0;
+    }
+    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "axlua_log_setlevel",argc, 1);
+    return 0;
+
+    #if _AX_DEBUG >= 1
+        tolua_lerror:
+        tolua_error(tolua_S,"#ferror in function 'axlua_log_setlevel'.",&tolua_err);
+    #endif
+
+    return 0;
+}
+int axlua_log_with_level_Line(lua_State* L)
+{
+    int argc                = lua_gettop(L);
+    const int max_fmt_count = 32;
+    if (argc >= 5)
+    {
+        luaL_checkstring(L, 1);                                     //源文件名
+        std::string srcfname_msg = axlua_tostr(L, 1);
+        luaL_checkinteger(L, 2);
+        int srclines_msg = lua_tointeger(L, 2);                     //源文件行数
+
+        luaL_checkstring(L, 3);
+        auto call_msg = axlua_tostr(L, 3);                          //调用者
+
+        luaL_checkinteger(L, 4);
+        int level = lua_tointeger(L, 4);                            //日志等级
+
+        luaL_checkstring(L, 5);
+        auto formated_msg = axlua_tostr(L, 5);
+        // AXLOGD("axlua_log_with_level_Line lines_msg:{}  level:{}  formated_msg:{}",lines_msg,level,formated_msg);
+        char fmt_pos_buf[8];
+        const int fmtc = (std::min)((argc - 5), max_fmt_count);
+        for (int fmti = 0; fmti < fmtc; ++fmti)
+        {
+            auto pos     = axlua_format_pos(fmt_pos_buf, sizeof(fmt_pos_buf), fmti);
+            auto cur_val = axlua_tosv(L, fmti + 6);
+
+            axlua_replace_hint(formated_msg, "{}"sv, cur_val, true);
+            axlua_replace_hint(formated_msg, pos, cur_val, false);
+        };
+        AXLOG_WITH_LEVEL(static_cast<ax::LogLevel>(level), "{}",srcfname_msg.c_str(),srclines_msg,call_msg.c_str(),formated_msg);
+    }
+    return 0;
+}
 int lua_version(lua_State* L) {
   lua_pushinteger(L, LUA_VERSION_NUM);
   return 1;
@@ -191,6 +265,8 @@ bool LuaStack::init() {
       {"print", lua_print},
       {"release_print", lua_release_print},
       {"AXLOG_WITH_LEVEL", axlua_log_with_level},
+      {"AXLOG_WITH_LEVELEx", axlua_log_with_level_Line},
+      {"AXLOG_SetLevel",axlua_log_setlevel},
       {"version", lua_version},
       {nullptr, nullptr}};
   luaL_register(_state, "_G", global_functions);

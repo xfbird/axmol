@@ -163,6 +163,7 @@ int lua_register_ax_base_Object(lua_State* tolua_S)
     tolua_beginmodule(tolua_S,"Object");
         tolua_function(tolua_S,"retain",lua_ax_base_Object_retain);
         tolua_function(tolua_S,"release",lua_ax_base_Object_release);
+        tolua_function(tolua_S,"autorelease",lua_ax_base_Object_release);
         tolua_function(tolua_S,"getReferenceCount",lua_ax_base_Object_getReferenceCount);
     tolua_endmodule(tolua_S);
     auto typeName = typeid(ax::Object).name(); // rtti is literal storage
