@@ -507,7 +507,7 @@ tolua_lerror:
   return 0;
 }
 
-static int lua_ax_base_UserData_finalize(lua_State* tolua_S) {
+int lua_ax_base_UserData_finalize(lua_State* tolua_S) {
   UserData* self = (UserData*)tolua_tousertype(tolua_S, 1, 0);
   AXLOGV("luabindings: finalizing LUA object (UserData)");
   if (self) {

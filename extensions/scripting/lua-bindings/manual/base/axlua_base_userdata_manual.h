@@ -6,9 +6,10 @@
 #include "base/UserData.h"
 #include "lua-bindings/manual/LuaBasicConversions.h"
 
-namespace ax {
+using namespace ax;
+//{
 int register_userdata_module(lua_State* tolua_S);
 
-} // namespace ax
+//} // namespace ax
 
-#endif // __AXLUA_BASE_USERDATA_MANUAL_H__
+#endif  // __AXLUA_BASE_USERDATA_MANUAL_H__
