@@ -6,12 +6,13 @@ using namespace ax;
 
 // UserData.create(storageName)
 int lua_ax_base_UserData_create(lua_State* tolua_S) {
+  AXLOGD("lua_ax_base_UserData_create");
   int argc = 0;
   bool ok = true;
 
 #if _AX_DEBUG >= 1
   tolua_Error tolua_err;
-  if (!tolua_isusertable(tolua_S, 1, "ax.UserData", 0, &tolua_err))
+  if (!tolua_isusertable(tolua_S, 1, "UserData", 0, &tolua_err))
     goto tolua_lerror;
 #endif
 
@@ -26,12 +27,13 @@ int lua_ax_base_UserData_create(lua_State* tolua_S) {
       return 0;
     }
     auto ret = UserData::create(arg0);
-    object_to_luaval<UserData>(tolua_S, "ax.UserData", (UserData*)ret);
+    AXLOGD("lua_ax_base_UserData_create ok");
+    object_to_luaval<UserData>(tolua_S, "UserData", (UserData*)ret);
     return 1;
   }
   luaL_error(tolua_S,
              "%s has wrong number of arguments: %d, was expecting %d\n",
-             "ax.UserData:create", argc, 1);
+             "UserData:create", argc, 1);
   return 0;
 
 #if _AX_DEBUG >= 1
@@ -50,7 +52,7 @@ int lua_ax_base_UserData_setString(lua_State* tolua_S) {
 
 #if _AX_DEBUG >= 1
   tolua_Error tolua_err;
-  if (!tolua_isusertype(tolua_S, 1, "ax.UserData", 0, &tolua_err))
+  if (!tolua_isusertype(tolua_S, 1, "UserData", 0, &tolua_err))
     goto tolua_lerror;
 #endif
 
@@ -83,7 +85,7 @@ int lua_ax_base_UserData_setString(lua_State* tolua_S) {
   }
   luaL_error(tolua_S,
              "%s has wrong number of arguments: %d, was expecting %d\n",
-             "ax.UserData:setString", argc, 2);
+             "UserData:setString", argc, 2);
   return 0;
 
 #if _AX_DEBUG >= 1
@@ -102,7 +104,7 @@ int lua_ax_base_UserData_getString(lua_State* tolua_S) {
 
 #if _AX_DEBUG >= 1
   tolua_Error tolua_err;
-  if (!tolua_isusertype(tolua_S, 1, "ax.UserData", 0, &tolua_err))
+  if (!tolua_isusertype(tolua_S, 1, "UserData", 0, &tolua_err))
     goto tolua_lerror;
 #endif
 
@@ -137,7 +139,7 @@ int lua_ax_base_UserData_getString(lua_State* tolua_S) {
   }
   luaL_error(tolua_S,
              "%s has wrong number of arguments: %d, was expecting %d\n",
-             "ax.UserData:getString", argc, 1);
+             "UserData:getString", argc, 1);
   return 0;
 
 #if _AX_DEBUG >= 1
@@ -156,7 +158,7 @@ int lua_ax_base_UserData_setDouble(lua_State* tolua_S) {
 
 #if _AX_DEBUG >= 1
   tolua_Error tolua_err;
-  if (!tolua_isusertype(tolua_S, 1, "ax.UserData", 0, &tolua_err))
+  if (!tolua_isusertype(tolua_S, 1, "UserData", 0, &tolua_err))
     goto tolua_lerror;
 #endif
 
@@ -189,7 +191,7 @@ int lua_ax_base_UserData_setDouble(lua_State* tolua_S) {
   }
   luaL_error(tolua_S,
              "%s has wrong number of arguments: %d, was expecting %d\n",
-             "ax.UserData:setDouble", argc, 2);
+             "UserData:setDouble", argc, 2);
   return 0;
 
 #if _AX_DEBUG >= 1
@@ -208,7 +210,7 @@ int lua_ax_base_UserData_getDouble(lua_State* tolua_S) {
 
 #if _AX_DEBUG >= 1
   tolua_Error tolua_err;
-  if (!tolua_isusertype(tolua_S, 1, "ax.UserData", 0, &tolua_err))
+  if (!tolua_isusertype(tolua_S, 1, "UserData", 0, &tolua_err))
     goto tolua_lerror;
 #endif
 
@@ -243,7 +245,7 @@ int lua_ax_base_UserData_getDouble(lua_State* tolua_S) {
   }
   luaL_error(tolua_S,
              "%s has wrong number of arguments: %d, was expecting %d\n",
-             "ax.UserData:getDouble", argc, 1);
+             "UserData:getDouble", argc, 1);
   return 0;
 
 #if _AX_DEBUG >= 1
@@ -262,7 +264,7 @@ int lua_ax_base_UserData_setBool(lua_State* tolua_S) {
 
 #if _AX_DEBUG >= 1
   tolua_Error tolua_err;
-  if (!tolua_isusertype(tolua_S, 1, "ax.UserData", 0, &tolua_err))
+  if (!tolua_isusertype(tolua_S, 1, "UserData", 0, &tolua_err))
     goto tolua_lerror;
 #endif
 
@@ -295,7 +297,7 @@ int lua_ax_base_UserData_setBool(lua_State* tolua_S) {
   }
   luaL_error(tolua_S,
              "%s has wrong number of arguments: %d, was expecting %d\n",
-             "ax.UserData:setBool", argc, 2);
+             "UserData:setBool", argc, 2);
   return 0;
 
 #if _AX_DEBUG >= 1
@@ -314,7 +316,7 @@ int lua_ax_base_UserData_getBool(lua_State* tolua_S) {
 
 #if _AX_DEBUG >= 1
   tolua_Error tolua_err;
-  if (!tolua_isusertype(tolua_S, 1, "ax.UserData", 0, &tolua_err))
+  if (!tolua_isusertype(tolua_S, 1, "UserData", 0, &tolua_err))
     goto tolua_lerror;
 #endif
 
@@ -349,7 +351,7 @@ int lua_ax_base_UserData_getBool(lua_State* tolua_S) {
   }
   luaL_error(tolua_S,
              "%s has wrong number of arguments: %d, was expecting %d\n",
-             "ax.UserData:getBool", argc, 1);
+             "UserData:getBool", argc, 1);
   return 0;
 
 #if _AX_DEBUG >= 1
@@ -368,7 +370,7 @@ int lua_ax_base_UserData_setInteger(lua_State* tolua_S) {
 
 #if _AX_DEBUG >= 1
   tolua_Error tolua_err;
-  if (!tolua_isusertype(tolua_S, 1, "ax.UserData", 0, &tolua_err))
+  if (!tolua_isusertype(tolua_S, 1, "UserData", 0, &tolua_err))
     goto tolua_lerror;
 #endif
 
@@ -401,7 +403,7 @@ int lua_ax_base_UserData_setInteger(lua_State* tolua_S) {
   }
   luaL_error(tolua_S,
              "%s has wrong number of arguments: %d, was expecting %d\n",
-             "ax.UserData:setInteger", argc, 2);
+             "UserData:setInteger", argc, 2);
   return 0;
 
 #if _AX_DEBUG >= 1
@@ -420,7 +422,7 @@ int lua_ax_base_UserData_getInteger(lua_State* tolua_S) {
 
 #if _AX_DEBUG >= 1
   tolua_Error tolua_err;
-  if (!tolua_isusertype(tolua_S, 1, "ax.UserData", 0, &tolua_err))
+  if (!tolua_isusertype(tolua_S, 1, "UserData", 0, &tolua_err))
     goto tolua_lerror;
 #endif
 
@@ -455,7 +457,7 @@ int lua_ax_base_UserData_getInteger(lua_State* tolua_S) {
   }
   luaL_error(tolua_S,
              "%s has wrong number of arguments: %d, was expecting %d\n",
-             "ax.UserData:getInteger", argc, 1);
+             "UserData:getInteger", argc, 1);
   return 0;
 
 #if _AX_DEBUG >= 1
@@ -474,7 +476,7 @@ int lua_ax_base_UserData_write(lua_State* tolua_S) {
 
 #if _AX_DEBUG >= 1
   tolua_Error tolua_err;
-  if (!tolua_isusertype(tolua_S, 1, "ax.UserData", 0, &tolua_err))
+  if (!tolua_isusertype(tolua_S, 1, "UserData", 0, &tolua_err))
     goto tolua_lerror;
 #endif
 
@@ -496,7 +498,7 @@ int lua_ax_base_UserData_write(lua_State* tolua_S) {
   }
   luaL_error(tolua_S,
              "%s has wrong number of arguments: %d, was expecting %d\n",
-             "ax.UserData:write", argc, 0);
+             "UserData:write", argc, 0);
   return 0;
 
 #if _AX_DEBUG >= 1
@@ -517,10 +519,10 @@ int lua_ax_base_UserData_finalize(lua_State* tolua_S) {
 }
 
 int lua_register_ax_base_UserData(lua_State* tolua_S) {
-  tolua_open(tolua_S);
-  tolua_usertype(tolua_S, "ax.UserData");
-  tolua_cclass(tolua_S, "UserData", "ax.UserData", "",
-               lua_ax_base_UserData_finalize);
+  AXLOGD("lua_register_ax_base_UserData");
+  // tolua_cclass(tolua_S, "ScriptHandlerMgr", "ScriptHandlerMgr", "", NULL);
+  tolua_cclass(tolua_S, "UserData", "UserData", "",
+               NULL);  //               lua_ax_base_UserData_finalize);
   tolua_beginmodule(tolua_S, "UserData");
   tolua_function(tolua_S, "new", lua_ax_base_UserData_create);
   tolua_function(tolua_S, "setStringForKey", lua_ax_base_UserData_setString);
@@ -533,17 +535,17 @@ int lua_register_ax_base_UserData(lua_State* tolua_S) {
   tolua_function(tolua_S, "getIntegerForKey", lua_ax_base_UserData_getInteger);
   tolua_function(tolua_S, "writeMapDataToFile", lua_ax_base_UserData_write);
   tolua_endmodule(tolua_S);
-
   auto typeName = typeid(UserData).name();
-  g_luaType[reinterpret_cast<uintptr_t>(typeName)] = "ax.UserData";
-  g_typeCast[typeName] = "ax.UserData";
+  g_luaType[reinterpret_cast<uintptr_t>(typeName)] = "UserData";
+  g_typeCast[typeName] = "UserData";
   return 1;
 }
 
 int register_userdata_module(lua_State* tolua_S) {
   tolua_open(tolua_S);
-  tolua_module(tolua_S, "ax", 0);
-  tolua_beginmodule(tolua_S, "ax");
+  tolua_usertype(tolua_S, "UserData");
+  tolua_module(tolua_S, NULL, 0);
+  tolua_beginmodule(tolua_S, NULL);
   lua_register_ax_base_UserData(tolua_S);
   tolua_endmodule(tolua_S);
   return 1;

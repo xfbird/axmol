@@ -9,7 +9,7 @@
 
 namespace ax {
 
-class UserData  {
+class UserData : public Object  {
  public:
   static UserData* create(std::string_view aStorageName);
 
