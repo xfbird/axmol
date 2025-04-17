@@ -1,6 +1,7 @@
 #include "axlua_base_userdata_manual.h"
 
 #include "lua-bindings/manual/tolua_fix.h"
+#include "base/logging.h"
 
 using namespace ax;
 

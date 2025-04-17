@@ -45,7 +45,7 @@ class SampleLogOutput : public ILogOutput {
 
     ax::setLogFmtFlag(ax::LogFmtFlag::Level | ax::LogFmtFlag::TimeStamp |
                       ax::LogFmtFlag::Colored | ax::LogFmtFlag::WideName |
-                      //ax::LogFmtFlag::SourceFn | ax::LogFmtFlag::SourceFl |
+                      ax::LogFmtFlag::SourceFn | ax::LogFmtFlag::SourceFl |
                       ax::LogFmtFlag::ThreadId);
     AXLOGW("further log message will write to {}", _filePath);
     ax::setLogOutput(this);

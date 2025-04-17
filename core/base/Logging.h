@@ -25,92 +25,97 @@
 #pragma once
 
 #include "base/bitmask.h"
+#include "fmt/compile.h"
 #include "platform/PlatformMacros.h"
 
-#include "fmt/compile.h"
+namespace ax {
 
-namespace ax
-{
-
-enum class LogLevel
-{
-    Verbose,
-    Trace = Verbose,
-    Debug,
-    Info,
-    Warn,
-    Error,
-    Silent /* only for setLogLevel(); must be last */
+enum class LogLevel {
+  Verbose,
+  Trace = Verbose,
+  Debug,
+  Info,
+  Warn,
+  Error,
+  Silent /* only for setLogLevel(); must be last */
 };
 
-enum class LogFmtFlag
-{
-    Null,
-    Level     = 1,
-    TimeStamp = 1 << 1,
-    ProcessId = 1 << 2,
-    ThreadId  = 1 << 3,
-    Colored   = 1 << 4,
-    Full      = Level | TimeStamp | ProcessId | ThreadId | Colored,
+enum class LogFmtFlag {
+  Null,
+  Level = 1,
+  TimeStamp = 1 << 1,
+  ProcessId = 1 << 2,
+  ThreadId = 1 << 3,
+  Colored = 1 << 4,
+  Date = 1 << 5,
+  SourceFn = 1 << 6,  //源码文件名
+  SourceFl = 1 << 7,  //源码行号
+  WideName = 1 << 8,  //文件名 长度扩展
+  Full = Level | TimeStamp | Date | ProcessId | ThreadId | Colored | SourceFn |
+         SourceFl | WideName,
 };
 AX_ENABLE_BITMASK_OPS(LogFmtFlag);
 
-class LogItem
-{
-    friend AX_API LogItem&& preprocessLog(LogItem&& logItem);
-    friend AX_API void writeLog(LogItem& item, const char* tag);
+class LogItem {
+  friend AX_API LogItem&& preprocessLog(LogItem&& item);
+  friend AX_API void writeLog(LogItem& item, const char* tag);
 
-public:
-    static constexpr auto COLOR_PREFIX_SIZE    = 5;                      // \x1b[00m
-    static constexpr auto COLOR_QUALIFIER_SIZE = COLOR_PREFIX_SIZE + 3;  // \x1b[m
+ public:
+  static constexpr auto COLOR_PREFIX_SIZE = 5;  // \x1b[00m
+  static constexpr auto COLOR_QUALIFIER_SIZE = COLOR_PREFIX_SIZE + 3;  // \x1b[m
 
-    explicit LogItem(LogLevel lvl) : level_(lvl) {}
-    LogItem(const LogItem&) = delete;
+  // explicit LogItem(LogLevel lvl) : level_(lvl) {}
+  explicit LogItem(LogLevel lvl, const char* file = nullptr, int line = 0,
+                   int mod = 0)
+      : level_(lvl), file_(file), line_(line), mode_(mod) {}
+  LogItem(const LogItem&) = delete;
 
-    LogLevel level() const { return level_; }
+  LogLevel level() const { return level_; }
 
-    std::string_view message() const
-    {
-        return has_style_ ? std::string_view{qualified_message_.data() + COLOR_PREFIX_SIZE,
-                                             qualified_message_.size() - COLOR_QUALIFIER_SIZE}
-                          : std::string_view{qualified_message_};
-    }
+  std::string_view message() const {
+    return has_style_
+               ? std::string_view{qualified_message_.data() + COLOR_PREFIX_SIZE,
+                                  qualified_message_.size() -
+                                      COLOR_QUALIFIER_SIZE}
+               : std::string_view{qualified_message_};
+  }
 
-    template <typename _FmtType, typename... _Types>
-    inline static LogItem&& vformat(_FmtType&& fmt, LogItem&& item, _Types&&... args)
-    {
-        item.qualified_message_ =
-            fmt::format(std::forward<_FmtType>(fmt), std::string_view{item.prefix_buffer_, item.prefix_size_},
-                        std::forward<_Types>(args)...);
+  template <typename _FmtType, typename... _Types>
+  inline static LogItem&& vformat(_FmtType&& fmt, LogItem&& item,
+                                  _Types&&... args) {
+    item.qualified_message_ =
+        fmt::format(std::forward<_FmtType>(fmt),
+                    std::string_view{item.prefix_buffer_, item.prefix_size_},
+                    std::forward<_Types>(args)...);
 
-        item.qualifier_size_ = item.prefix_size_;
+    item.qualifier_size_ = item.prefix_size_;
 
-        auto old_size = item.qualified_message_.size();
-        if (item.has_style_)
-            item.qualified_message_.append("\x1b[m"sv);
-        item.qualifier_size_ += (item.qualified_message_.size() - old_size);
-        return std::forward<LogItem>(item);
-    }
+    auto old_size = item.qualified_message_.size();
+    if (item.has_style_) item.qualified_message_.append("\x1b[m"sv);
+    item.qualifier_size_ += (item.qualified_message_.size() - old_size);
+    return std::forward<LogItem>(item);
+  }
 
-private:
-    void writePrefix(std::string_view data)
-    {
-        memcpy(prefix_buffer_ + prefix_size_, data.data(), data.size());
-        prefix_size_ += data.size();
-    }
-    LogLevel level_;
-    bool has_style_{false};
-    size_t prefix_size_{0};     // \x1b[00mD/[2024-02-29 00:00:00.123][PID:][TID:]
-    size_t qualifier_size_{0};  // prefix_size_ + \x1b[m (optional) + \n
-    std::string qualified_message_;
-    char prefix_buffer_[128];
+ private:
+  void writePrefix(std::string_view data) {
+    memcpy(prefix_buffer_ + prefix_size_, data.data(), data.size());
+    prefix_size_ += data.size();
+  }
+  LogLevel level_;
+  const char* file_{nullptr};  // 新增成员
+  int line_{0};                // 新增成员
+  int mode_{0};
+  bool has_style_{false};
+  size_t prefix_size_{0};     // \x1b[00mD/[2024-02-29 00:00:00.123][PID:][TID:]
+  size_t qualifier_size_{0};  // prefix_size_ + \x1b[m (optional) + \n
+  std::string qualified_message_;
+  char prefix_buffer_[128];
 };
 
-class ILogOutput
-{
-public:
-    virtual ~ILogOutput() {}
-    virtual void write(LogItem& item, const char* tag) = 0;
+class ILogOutput {
+ public:
+  virtual ~ILogOutput() {}
+  virtual void write(LogItem& item, const char* tag) = 0;
 };
 
 /* @brief control log level */
@@ -124,48 +129,73 @@ AX_API void setLogFmtFlag(LogFmtFlag flags);
 AX_API void setLogOutput(ILogOutput* output);
 
 /* @brief internal use */
-AX_API LogItem&& preprocessLog(LogItem&& logItem);
+AX_API LogItem&& preprocessLog(LogItem&& Item);
 
 /* @brief internal use */
 AX_API void outputLog(LogItem&& item, const char* tag);
 AX_API void writeLog(LogItem& item, const char* tag);
 
 template <typename _FmtType, typename... _Types>
-inline void printLogT(_FmtType&& fmt, LogItem&& item, _Types&&... args)
-{
-    if (item.level() >= getLogLevel())
-        outputLog(
-            LogItem::vformat(std::forward<_FmtType>(fmt), std::forward<LogItem>(item), std::forward<_Types>(args)...),
-            "axmol");
+inline void printLogT(_FmtType&& fmt, LogItem&& item, _Types&&... args) {
+  if (item.level() >= getLogLevel())
+    outputLog(LogItem::vformat(std::forward<_FmtType>(fmt),
+                               std::forward<LogItem>(item),
+                               std::forward<_Types>(args)...),
+              "axmol");
 }
+#define FMT_TOPOINT(s) reinterpret_cast<std::uintptr_t>(s)
+#define AXLOG_WITH_LEVEL(level, fmtOrMsg, ...)                                \
+  ax::printLogT(FMT_COMPILE("{}" fmtOrMsg "\n"),                              \
+                ax::preprocessLog(ax::LogItem{level, __FILE__, __LINE__, 0}), \
+                ##__VA_ARGS__)
+#define AXLOG_WITH_LEVELLua(level, fmtOrMsg, lFile, lline, ...)         \
+  ax::printLogT(FMT_COMPILE("{}" fmtOrMsg "\n"),                        \
+                ax::preprocessLog(ax::LogItem{level, lFile, lline, 1}), \
+                ##__VA_ARGS__)
 
-#define AXLOG_WITH_LEVEL(level, fmtOrMsg, ...) \
-    ax::printLogT(FMT_COMPILE("{}" fmtOrMsg "\n"), ax::preprocessLog(ax::LogItem{level}), ##__VA_ARGS__)
+#define AXLOG_WITH_LEVELLuaP(level, fmtOrMsg, ...)                        \
+  ax::printLogT(FMT_COMPILE("{}" fmtOrMsg "\n"),                          \
+                ax::preprocessLog(ax::LogItem{level, "Lua_Print", 0, 2}), \
+                ##__VA_ARGS__)
 
+#define AXLOG_WITH_LEVELLuaR(level, fmtOrMsg, ...)                            \
+  ax::printLogT(FMT_COMPILE("{}" fmtOrMsg "\n"),                              \
+                ax::preprocessLog(ax::LogItem{level, "Release_Print", 0, 3}), \
+                ##__VA_ARGS__)
 #if defined(_AX_DEBUG) && _AX_DEBUG > 0
-#    define AXLOGV(fmtOrMsg, ...) AXLOG_WITH_LEVEL(ax::LogLevel::Verbose, fmtOrMsg, ##__VA_ARGS__)
-#    define AXLOGD(fmtOrMsg, ...) AXLOG_WITH_LEVEL(ax::LogLevel::Debug, fmtOrMsg, ##__VA_ARGS__)
+#define AXLOGV(fmtOrMsg, ...) \
+  AXLOG_WITH_LEVEL(ax::LogLevel::Verbose, fmtOrMsg, ##__VA_ARGS__)
+#define AXLOGD(fmtOrMsg, ...) \
+  AXLOG_WITH_LEVEL(ax::LogLevel::Debug, fmtOrMsg, ##__VA_ARGS__)
+#define AXLOGDP(fmtOrMsg, ...) \
+  AXLOG_WITH_LEVELLuaP(ax::LogLevel::Debug, fmtOrMsg, ##__VA_ARGS__)
 #else
-#    define AXLOGV(...) \
-        do              \
-        {               \
-        } while (0)
-#    define AXLOGD(...) \
-        do              \
-        {               \
-        } while (0)
+#define AXLOGV(...) \
+  do {              \
+  } while (0)
+#define AXLOGD(...) \
+  do {              \
+  } while (0)
+#define AXLOGDP(...) \
+  do {               \
+  } while (0)
 #endif
 
-#define AXLOGI(fmtOrMsg, ...) AXLOG_WITH_LEVEL(ax::LogLevel::Info, fmtOrMsg, ##__VA_ARGS__)
-#define AXLOGW(fmtOrMsg, ...) AXLOG_WITH_LEVEL(ax::LogLevel::Warn, fmtOrMsg, ##__VA_ARGS__)
-#define AXLOGE(fmtOrMsg, ...) AXLOG_WITH_LEVEL(ax::LogLevel::Error, fmtOrMsg, ##__VA_ARGS__)
-
-#define AXLOGT                AXLOGV
+#define AXLOGI(fmtOrMsg, ...) \
+  AXLOG_WITH_LEVEL(ax::LogLevel::Info, fmtOrMsg, ##__VA_ARGS__)
+#define AXLOGW(fmtOrMsg, ...) \
+  AXLOG_WITH_LEVEL(ax::LogLevel::Warn, fmtOrMsg, ##__VA_ARGS__)
+#define AXLOGE(fmtOrMsg, ...) \
+  AXLOG_WITH_LEVEL(ax::LogLevel::Error, fmtOrMsg, ##__VA_ARGS__)
+#define AXLOGS(fmtOrMsg, ...) \
+  AXLOG_WITH_LEVEL(ax::LogLevel::Silent, fmtOrMsg, ##__VA_ARGS__)
+#define AXLOGT AXLOGV
 
 #ifndef AX_CORE_PROFILE
 /**
  @brief Output Debug message.
  */
-/* AX_DEPRECATED(2.1)*/ AX_API void print(const char* format, ...) AX_FORMAT_PRINTF(1, 2);  // use AXLOGD instead
+/* AX_DEPRECATED(2.1)*/ AX_API void print(const char* format, ...)
+    AX_FORMAT_PRINTF(1, 2);  // use AXLOGD instead
 #endif
 }  // namespace ax
