@@ -1,0 +1,17 @@
+# 创建库A
+add_library(A SHARED srcA.cpp)
+
+# 将库B链接到库A，使其成为库A的公共依赖
+target_link_libraries(axlua PUBLIC luasocket)
+
+# 创建程序C
+add_executable(C mainC.cpp)
+
+# 链接库A到程序C
+target_link_libraries(C A)
+
+# 此时，程序C会自动获得库B的依赖，无需显式链接B
+
+axmol new -p com.kenwk.axxxcs -d d:\mw -l lua --portrait axxxcs
+axmol new -p com.kenwk.axxxcs -d d:\mw\axn -l lua --portrait axxxcs
+
