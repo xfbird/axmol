@@ -225,6 +225,7 @@ set(_AX_HEADER axmol.h
     ${_AX_BASE_HEADER}
     ${_AX_UI_HEADER}
     ${_AX_NETWORK_HEADER}
+    ${_AX_GAMMEEX_HEADER}
     )
 
 set(_AX_SRC axmol.cpp
@@ -235,6 +236,7 @@ set(_AX_SRC axmol.cpp
     ${_AX_BASE_SRC}
     ${_AX_UI_SRC}
     ${_AX_NETWORK_SRC}
+    ${_AX_GAMMEEX_SRC}
     )
 
 if(AX_ENABLE_3D)
