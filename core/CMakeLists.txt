@@ -206,7 +206,7 @@ include(network/CMakeLists.txt)
 if(AX_ENABLE_AUDIO)
     include(audio/CMakeLists.txt)
 endif()
-
+include(gameex/CMakeLists.txt)
 if(AX_ENABLE_MEDIA)
     file(GLOB_RECURSE _AX_MEDIA_HEADER media/*.h)
     file(GLOB_RECURSE _AX_MEDIA_SRC media/*.cpp)
@@ -225,7 +225,7 @@ set(_AX_HEADER axmol.h
     ${_AX_BASE_HEADER}
     ${_AX_UI_HEADER}
     ${_AX_NETWORK_HEADER}
-    ${_AX_GAMMEEX_HEADER}
+    ${_AX_GAMEEX_HEADER}
     )
 
 set(_AX_SRC axmol.cpp
@@ -236,7 +236,7 @@ set(_AX_SRC axmol.cpp
     ${_AX_BASE_SRC}
     ${_AX_UI_SRC}
     ${_AX_NETWORK_SRC}
-    ${_AX_GAMMEEX_SRC}
+    ${_AX_GAMEEX_SRC}
     )
 
 if(AX_ENABLE_3D)

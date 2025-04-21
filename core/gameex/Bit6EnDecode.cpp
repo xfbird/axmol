@@ -3,7 +3,7 @@
 #include <vector>
 namespace ax
 {
-    namespace gameext
+    namespace gameex
     {
         using namespace std;
         // // 编码结果长度公式：ceil(原始长度 * 8 / 6)
@@ -48,18 +48,18 @@ namespace ax
                  int new_bit_offset = bit_offset + 2;
                  // 处理低位部分
                  uint8_t low_part = (current >> new_bit_offset) | carry;
-                 low_part &= gmxxext::MAX_ENCODE_VALUE;
-                 output[out_idx++] = low_part + gmxxext::BASE_OFFSET; // 0x3C;
+                 low_part &= MAX_ENCODE_VALUE;
+                 output[out_idx++] = low_part + BASE_OFFSET; // 0x3C;
                  // 计算高位部分
                  int shift    = 8 - new_bit_offset;
                  int32_t temp = static_cast<int32_t>(static_cast<uint8_t>(current));
                  temp <<= shift; // 左移(8 - new_bit_offset)位
                  temp >>= 2;     // 算术右移2位，模拟SAR指令
-                 uint8_t high_part = static_cast<uint8_t>(temp) & gmxxext::MAX_ENCODE_VALUE;
+                 uint8_t high_part = static_cast<uint8_t>(temp) & MAX_ENCODE_VALUE;
                  // 判断是否完成一个完整块的处理
                  if (new_bit_offset >= 6)
                   {
-                      output[out_idx++] = high_part + gmxxext::BASE_OFFSET;
+                      output[out_idx++] = high_part + BASE_OFFSET;
                       bit_offset        = 0;
                       carry             = 0;
                   }
@@ -72,7 +72,7 @@ namespace ax
             // 处理剩余未写入的位
             if (bit_offset > 0)
              {
-                 output[out_idx++] = carry + gmxxext::BASE_OFFSET;
+                 output[out_idx++] = carry + BASE_OFFSET;
              }
             *output_size = out_idx;
         }
@@ -88,11 +88,11 @@ namespace ax
              {
                  uint8_t current = input[in_idx];
                  // 有效性检查：输入值必须 >= 0x3C
-                 if (current < gmxxext::BASE_OFFSET)
+                 if (current < BASE_OFFSET)
                   {
                       break;
                   }
-                 current -= gmxxext::BASE_OFFSET; // 减去偏移量
+                 current -= BASE_OFFSET; // 减去偏移量
                  if (bit_offset >= 6)
                   {
                       // 处理完整字节的情况
@@ -134,7 +134,7 @@ namespace ax
             *output_size = out_idx;
         }
         // 新版字符串接口编码函数
-        std::string Encode6BitStr(std::string_view asmsg)
+        AX_DLL std::string Encode6BitStr(std::string_view asmsg)
         {
             const auto* input       = reinterpret_cast<const uint8_t*>(asmsg.data());
             const size_t input_size = asmsg.size();
@@ -146,7 +146,7 @@ namespace ax
             return std::string(reinterpret_cast<const char*>(buffer.data()), output_size);
         }
         // 新版字符串接口解码函数
-        std::string Decode6BitStr(std::string_view asmsg)
+        AX_DLL std::string Decode6BitStr(std::string_view asmsg)
         {
             const auto* input       = reinterpret_cast<const uint8_t*>(asmsg.data());
             const size_t input_size = asmsg.size();
@@ -157,5 +157,5 @@ namespace ax
             // 转换为字符串（包含可能的中途截断）
             return std::string(reinterpret_cast<const char*>(buffer.data()), output_size);
         }
-    }  // namespace gameext
+    }  // namespace gameex
 }  // namespace ax

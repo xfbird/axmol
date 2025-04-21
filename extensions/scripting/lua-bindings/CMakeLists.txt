@@ -31,6 +31,7 @@ set(lua_bindings_manual_headers
     manual/fairygui/axlua_fairygui_manual.hpp
     manual/fairygui/axlua_fairygui_conversions.h
     manual/base/axlua_base_userdata_manual.h
+    manual/gameex/lua_Bit6EnDecode.h    
     )
 
 set(lua_bindings_manual_files
@@ -67,6 +68,7 @@ set(lua_bindings_manual_files
     manual/fairygui/axlua_fairygui_manual.cpp
     manual/fairygui/axlua_fairygui_conversions.cpp
     manual/base/axlua_base_userdata_manual.cpp
+    manual/gameex/lua_Bit6EnDecode.cpp    
     )
 
 set(lua_bindings_auto_headers
