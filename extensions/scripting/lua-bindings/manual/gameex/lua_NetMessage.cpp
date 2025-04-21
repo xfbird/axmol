@@ -10,9 +10,9 @@
 int lua_ax_NetMessage_constructor(lua_State* tolua_S)
 {
     AXLOGD("lua_ax_NetMessage_constructor called");
-    int argc = 0;
+    int argc                     = 0;
     ax::gameex::NetMessage* cobj = nullptr;
-    bool ok  = true;
+    bool ok                      = true;
 
 #if _AX_DEBUG >= 1
     tolua_Error tolua_err;
@@ -35,7 +35,8 @@ int lua_ax_NetMessage_constructor(lua_State* tolua_S)
         return 1;
     }
     AXLOGD("lua_ax_NetMessage_constructor failed: wrong number of arguments");
-    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.netMessage:NetMessage", argc, 0);
+    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.netMessage:NetMessage", argc,
+               0);
     return 0;
 }
 
@@ -51,16 +52,17 @@ static int lua_ax_NetMessage_finalizer(lua_State* tolua_S)
 int lua_ax_NetMessage_getMsgID(lua_State* tolua_S)
 {
     AXLOGD("lua_ax_NetMessage_getMsgID called");
-    int argc = 0;
+    int argc                     = 0;
     ax::gameex::NetMessage* cobj = nullptr;
-    bool ok  = true;
+    bool ok                      = true;
 
 #if _AX_DEBUG >= 1
     tolua_Error tolua_err;
 #endif
 
 #if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S, 1, "ax.netMessage", 0, &tolua_err)) goto tolua_lerror;
+    if (!tolua_isusertype(tolua_S, 1, "ax.netMessage", 0, &tolua_err))
+        goto tolua_lerror;
 #endif
 
     cobj = (ax::gameex::NetMessage*)tolua_tousertype(tolua_S, 1, 0);
@@ -87,7 +89,7 @@ int lua_ax_NetMessage_getMsgID(lua_State* tolua_S)
     return 0;
 
 #if _AX_DEBUG >= 1
-    tolua_lerror:
+tolua_lerror:
     tolua_error(tolua_S, "#ferror in function 'lua_ax_NetMessage_getMsgID'.", &tolua_err);
 #endif
 
@@ -98,16 +100,17 @@ int lua_ax_NetMessage_getMsgID(lua_State* tolua_S)
 int lua_ax_NetMessage_setMsgID(lua_State* tolua_S)
 {
     AXLOGD("lua_ax_NetMessage_setMsgID called");
-    int argc = 0;
+    int argc                     = 0;
     ax::gameex::NetMessage* cobj = nullptr;
-    bool ok  = true;
+    bool ok                      = true;
 
 #if _AX_DEBUG >= 1
     tolua_Error tolua_err;
 #endif
 
 #if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S, 1, "ax.netMessage", 0, &tolua_err)) goto tolua_lerror;
+    if (!tolua_isusertype(tolua_S, 1, "ax.netMessage", 0, &tolua_err))
+        goto tolua_lerror;
 #endif
 
     cobj = (ax::gameex::NetMessage*)tolua_tousertype(tolua_S, 1, 0);
@@ -141,7 +144,7 @@ int lua_ax_NetMessage_setMsgID(lua_State* tolua_S)
     return 0;
 
 #if _AX_DEBUG >= 1
-    tolua_lerror:
+tolua_lerror:
     tolua_error(tolua_S, "#ferror in function 'lua_ax_NetMessage_setMsgID'.", &tolua_err);
 #endif
 
@@ -152,16 +155,17 @@ int lua_ax_NetMessage_setMsgID(lua_State* tolua_S)
 int lua_ax_NetMessage_getRecog(lua_State* tolua_S)
 {
     AXLOGD("lua_ax_NetMessage_getRecog called");
-    int argc = 0;
+    int argc                     = 0;
     ax::gameex::NetMessage* cobj = nullptr;
-    bool ok  = true;
+    bool ok                      = true;
 
 #if _AX_DEBUG >= 1
     tolua_Error tolua_err;
 #endif
 
 #if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S, 1, "ax.netMessage", 0, &tolua_err)) goto tolua_lerror;
+    if (!tolua_isusertype(tolua_S, 1, "ax.netMessage", 0, &tolua_err))
+        goto tolua_lerror;
 #endif
 
     cobj = (ax::gameex::NetMessage*)tolua_tousertype(tolua_S, 1, 0);
@@ -188,7 +192,7 @@ int lua_ax_NetMessage_getRecog(lua_State* tolua_S)
     return 0;
 
 #if _AX_DEBUG >= 1
-    tolua_lerror:
+tolua_lerror:
     tolua_error(tolua_S, "#ferror in function 'lua_ax_NetMessage_getRecog'.", &tolua_err);
 #endif
 
@@ -199,16 +203,17 @@ int lua_ax_NetMessage_getRecog(lua_State* tolua_S)
 int lua_ax_NetMessage_setRecog(lua_State* tolua_S)
 {
     AXLOGD("lua_ax_NetMessage_setRecog called");
-    int argc = 0;
+    int argc                     = 0;
     ax::gameex::NetMessage* cobj = nullptr;
-    bool ok  = true;
+    bool ok                      = true;
 
 #if _AX_DEBUG >= 1
     tolua_Error tolua_err;
 #endif
 
 #if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S, 1, "ax.netMessage", 0, &tolua_err)) goto tolua_lerror;
+    if (!tolua_isusertype(tolua_S, 1, "ax.netMessage", 0, &tolua_err))
+        goto tolua_lerror;
 #endif
 
     cobj = (ax::gameex::NetMessage*)tolua_tousertype(tolua_S, 1, 0);
@@ -242,7 +247,7 @@ int lua_ax_NetMessage_setRecog(lua_State* tolua_S)
     return 0;
 
 #if _AX_DEBUG >= 1
-    tolua_lerror:
+tolua_lerror:
     tolua_error(tolua_S, "#ferror in function 'lua_ax_NetMessage_setRecog'.", &tolua_err);
 #endif
 
@@ -253,16 +258,17 @@ int lua_ax_NetMessage_setRecog(lua_State* tolua_S)
 int lua_ax_NetMessage_getParam1(lua_State* tolua_S)
 {
     AXLOGD("lua_ax_NetMessage_getParam1 called");
-    int argc = 0;
+    int argc                     = 0;
     ax::gameex::NetMessage* cobj = nullptr;
-    bool ok  = true;
+    bool ok                      = true;
 
 #if _AX_DEBUG >= 1
     tolua_Error tolua_err;
 #endif
 
 #if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S, 1, "ax.netMessage", 0, &tolua_err)) goto tolua_lerror;
+    if (!tolua_isusertype(tolua_S, 1, "ax.netMessage", 0, &tolua_err))
+        goto tolua_lerror;
 #endif
 
     cobj = (ax::gameex::NetMessage*)tolua_tousertype(tolua_S, 1, 0);
@@ -285,11 +291,12 @@ int lua_ax_NetMessage_getParam1(lua_State* tolua_S)
         return 1;
     }
     AXLOGD("lua_ax_NetMessage_getParam1 failed: wrong number of arguments");
-    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.netMessage:getParam1", argc, 0);
+    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.netMessage:getParam1", argc,
+               0);
     return 0;
 
 #if _AX_DEBUG >= 1
-    tolua_lerror:
+tolua_lerror:
     tolua_error(tolua_S, "#ferror in function 'lua_ax_NetMessage_getParam1'.", &tolua_err);
 #endif
 
@@ -300,16 +307,17 @@ int lua_ax_NetMessage_getParam1(lua_State* tolua_S)
 int lua_ax_NetMessage_setParam1(lua_State* tolua_S)
 {
     AXLOGD("lua_ax_NetMessage_setParam1 called");
-    int argc = 0;
+    int argc                     = 0;
     ax::gameex::NetMessage* cobj = nullptr;
-    bool ok  = true;
+    bool ok                      = true;
 
 #if _AX_DEBUG >= 1
     tolua_Error tolua_err;
 #endif
 
 #if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S, 1, "ax.netMessage", 0, &tolua_err)) goto tolua_lerror;
+    if (!tolua_isusertype(tolua_S, 1, "ax.netMessage", 0, &tolua_err))
+        goto tolua_lerror;
 #endif
 
     cobj = (ax::gameex::NetMessage*)tolua_tousertype(tolua_S, 1, 0);
@@ -339,11 +347,12 @@ int lua_ax_NetMessage_setParam1(lua_State* tolua_S)
         return 1;
     }
     AXLOGD("lua_ax_NetMessage_setParam1 failed: wrong number of arguments");
-    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.netMessage:setParam1", argc, 1);
+    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.netMessage:setParam1", argc,
+               1);
     return 0;
 
 #if _AX_DEBUG >= 1
-    tolua_lerror:
+tolua_lerror:
     tolua_error(tolua_S, "#ferror in function 'lua_ax_NetMessage_setParam1'.", &tolua_err);
 #endif
 
@@ -354,16 +363,17 @@ int lua_ax_NetMessage_setParam1(lua_State* tolua_S)
 int lua_ax_NetMessage_getParam2(lua_State* tolua_S)
 {
     AXLOGD("lua_ax_NetMessage_getParam2 called");
-    int argc = 0;
+    int argc                     = 0;
     ax::gameex::NetMessage* cobj = nullptr;
-    bool ok  = true;
+    bool ok                      = true;
 
 #if _AX_DEBUG >= 1
     tolua_Error tolua_err;
 #endif
 
 #if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S, 1, "ax.netMessage", 0, &tolua_err)) goto tolua_lerror;
+    if (!tolua_isusertype(tolua_S, 1, "ax.netMessage", 0, &tolua_err))
+        goto tolua_lerror;
 #endif
 
     cobj = (ax::gameex::NetMessage*)tolua_tousertype(tolua_S, 1, 0);
@@ -386,11 +396,12 @@ int lua_ax_NetMessage_getParam2(lua_State* tolua_S)
         return 1;
     }
     AXLOGD("lua_ax_NetMessage_getParam2 failed: wrong number of arguments");
-    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.netMessage:getParam2", argc, 0);
+    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.netMessage:getParam2", argc,
+               0);
     return 0;
 
 #if _AX_DEBUG >= 1
-    tolua_lerror:
+tolua_lerror:
     tolua_error(tolua_S, "#ferror in function 'lua_ax_NetMessage_getParam2'.", &tolua_err);
 #endif
 
@@ -401,16 +412,17 @@ int lua_ax_NetMessage_getParam2(lua_State* tolua_S)
 int lua_ax_NetMessage_setParam2(lua_State* tolua_S)
 {
     AXLOGD("lua_ax_NetMessage_setParam2 called");
-    int argc = 0;
+    int argc                     = 0;
     ax::gameex::NetMessage* cobj = nullptr;
-    bool ok  = true;
+    bool ok                      = true;
 
 #if _AX_DEBUG >= 1
     tolua_Error tolua_err;
 #endif
 
 #if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S, 1, "ax.netMessage", 0, &tolua_err)) goto tolua_lerror;
+    if (!tolua_isusertype(tolua_S, 1, "ax.netMessage", 0, &tolua_err))
+        goto tolua_lerror;
 #endif
 
     cobj = (ax::gameex::NetMessage*)tolua_tousertype(tolua_S, 1, 0);
@@ -440,11 +452,12 @@ int lua_ax_NetMessage_setParam2(lua_State* tolua_S)
         return 1;
     }
     AXLOGD("lua_ax_NetMessage_setParam2 failed: wrong number of arguments");
-    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.netMessage:setParam2", argc, 1);
+    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.netMessage:setParam2", argc,
+               1);
     return 0;
 
 #if _AX_DEBUG >= 1
-    tolua_lerror:
+tolua_lerror:
     tolua_error(tolua_S, "#ferror in function 'lua_ax_NetMessage_setParam2'.", &tolua_err);
 #endif
 
@@ -455,16 +468,17 @@ int lua_ax_NetMessage_setParam2(lua_State* tolua_S)
 int lua_ax_NetMessage_getParam3(lua_State* tolua_S)
 {
     AXLOGD("lua_ax_NetMessage_getParam3 called");
-    int argc = 0;
+    int argc                     = 0;
     ax::gameex::NetMessage* cobj = nullptr;
-    bool ok  = true;
+    bool ok                      = true;
 
 #if _AX_DEBUG >= 1
     tolua_Error tolua_err;
 #endif
 
 #if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S, 1, "ax.netMessage", 0, &tolua_err)) goto tolua_lerror;
+    if (!tolua_isusertype(tolua_S, 1, "ax.netMessage", 0, &tolua_err))
+        goto tolua_lerror;
 #endif
 
     cobj = (ax::gameex::NetMessage*)tolua_tousertype(tolua_S, 1, 0);
@@ -487,11 +501,12 @@ int lua_ax_NetMessage_getParam3(lua_State* tolua_S)
         return 1;
     }
     AXLOGD("lua_ax_NetMessage_getParam3 failed: wrong number of arguments");
-    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.netMessage:getParam3", argc, 0);
+    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.netMessage:getParam3", argc,
+               0);
     return 0;
 
 #if _AX_DEBUG >= 1
-    tolua_lerror:
+tolua_lerror:
     tolua_error(tolua_S, "#ferror in function 'lua_ax_NetMessage_getParam3'.", &tolua_err);
 #endif
 
@@ -502,16 +517,17 @@ int lua_ax_NetMessage_getParam3(lua_State* tolua_S)
 int lua_ax_NetMessage_setParam3(lua_State* tolua_S)
 {
     AXLOGD("lua_ax_NetMessage_setParam3 called");
-    int argc = 0;
+    int argc                     = 0;
     ax::gameex::NetMessage* cobj = nullptr;
-    bool ok  = true;
+    bool ok                      = true;
 
 #if _AX_DEBUG >= 1
     tolua_Error tolua_err;
 #endif
 
 #if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S, 1, "ax.netMessage", 0, &tolua_err)) goto tolua_lerror;
+    if (!tolua_isusertype(tolua_S, 1, "ax.netMessage", 0, &tolua_err))
+        goto tolua_lerror;
 #endif
 
     cobj = (ax::gameex::NetMessage*)tolua_tousertype(tolua_S, 1, 0);
@@ -541,11 +557,12 @@ int lua_ax_NetMessage_setParam3(lua_State* tolua_S)
         return 1;
     }
     AXLOGD("lua_ax_NetMessage_setParam3 failed: wrong number of arguments");
-    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.netMessage:setParam3", argc, 1);
+    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.netMessage:setParam3", argc,
+               1);
     return 0;
 
 #if _AX_DEBUG >= 1
-    tolua_lerror:
+tolua_lerror:
     tolua_error(tolua_S, "#ferror in function 'lua_ax_NetMessage_setParam3'.", &tolua_err);
 #endif
 
@@ -556,16 +573,17 @@ int lua_ax_NetMessage_setParam3(lua_State* tolua_S)
 int lua_ax_NetMessage_getParam4(lua_State* tolua_S)
 {
     AXLOGD("lua_ax_NetMessage_getParam4 called");
-    int argc = 0;
+    int argc                     = 0;
     ax::gameex::NetMessage* cobj = nullptr;
-    bool ok  = true;
+    bool ok                      = true;
 
 #if _AX_DEBUG >= 1
     tolua_Error tolua_err;
 #endif
 
 #if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S, 1, "ax.netMessage", 0, &tolua_err)) goto tolua_lerror;
+    if (!tolua_isusertype(tolua_S, 1, "ax.netMessage", 0, &tolua_err))
+        goto tolua_lerror;
 #endif
 
     cobj = (ax::gameex::NetMessage*)tolua_tousertype(tolua_S, 1, 0);
@@ -588,11 +606,12 @@ int lua_ax_NetMessage_getParam4(lua_State* tolua_S)
         return 1;
     }
     AXLOGD("lua_ax_NetMessage_getParam4 failed: wrong number of arguments");
-    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.netMessage:getParam4", argc, 0);
+    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.netMessage:getParam4", argc,
+               0);
     return 0;
 
 #if _AX_DEBUG >= 1
-    tolua_lerror:
+tolua_lerror:
     tolua_error(tolua_S, "#ferror in function 'lua_ax_NetMessage_getParam4'.", &tolua_err);
 #endif
 
@@ -603,16 +622,17 @@ int lua_ax_NetMessage_getParam4(lua_State* tolua_S)
 int lua_ax_NetMessage_setParam4(lua_State* tolua_S)
 {
     AXLOGD("lua_ax_NetMessage_setParam4 called");
-    int argc = 0;
+    int argc                     = 0;
     ax::gameex::NetMessage* cobj = nullptr;
-    bool ok  = true;
+    bool ok                      = true;
 
 #if _AX_DEBUG >= 1
     tolua_Error tolua_err;
 #endif
 
 #if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S, 1, "ax.netMessage", 0, &tolua_err)) goto tolua_lerror;
+    if (!tolua_isusertype(tolua_S, 1, "ax.netMessage", 0, &tolua_err))
+        goto tolua_lerror;
 #endif
 
     cobj = (ax::gameex::NetMessage*)tolua_tousertype(tolua_S, 1, 0);
@@ -642,11 +662,12 @@ int lua_ax_NetMessage_setParam4(lua_State* tolua_S)
         return 1;
     }
     AXLOGD("lua_ax_NetMessage_setParam4 failed: wrong number of arguments");
-    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.netMessage:setParam4", argc, 1);
+    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.netMessage:setParam4", argc,
+               1);
     return 0;
 
 #if _AX_DEBUG >= 1
-    tolua_lerror:
+tolua_lerror:
     tolua_error(tolua_S, "#ferror in function 'lua_ax_NetMessage_setParam4'.", &tolua_err);
 #endif
 
@@ -657,16 +678,17 @@ int lua_ax_NetMessage_setParam4(lua_State* tolua_S)
 int lua_ax_NetMessage_getStrInfo(lua_State* tolua_S)
 {
     AXLOGD("lua_ax_NetMessage_getStrInfo called");
-    int argc = 0;
+    int argc                     = 0;
     ax::gameex::NetMessage* cobj = nullptr;
-    bool ok  = true;
+    bool ok                      = true;
 
 #if _AX_DEBUG >= 1
     tolua_Error tolua_err;
 #endif
 
 #if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S, 1, "ax.netMessage", 0, &tolua_err)) goto tolua_lerror;
+    if (!tolua_isusertype(tolua_S, 1, "ax.netMessage", 0, &tolua_err))
+        goto tolua_lerror;
 #endif
 
     cobj = (ax::gameex::NetMessage*)tolua_tousertype(tolua_S, 1, 0);
@@ -690,11 +712,12 @@ int lua_ax_NetMessage_getStrInfo(lua_State* tolua_S)
         return 1;
     }
     AXLOGD("lua_ax_NetMessage_getStrInfo failed: wrong number of arguments");
-    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.netMessage:getStrInfo", argc, 0);
+    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.netMessage:getStrInfo", argc,
+               0);
     return 0;
 
 #if _AX_DEBUG >= 1
-    tolua_lerror:
+tolua_lerror:
     tolua_error(tolua_S, "#ferror in function 'lua_ax_NetMessage_getStrInfo'.", &tolua_err);
 #endif
 
@@ -705,16 +728,17 @@ int lua_ax_NetMessage_getStrInfo(lua_State* tolua_S)
 int lua_ax_NetMessage_setStrInfo(lua_State* tolua_S)
 {
     AXLOGD("lua_ax_NetMessage_setStrInfo called");
-    int argc = 0;
+    int argc                     = 0;
     ax::gameex::NetMessage* cobj = nullptr;
-    bool ok  = true;
+    bool ok                      = true;
 
 #if _AX_DEBUG >= 1
     tolua_Error tolua_err;
 #endif
 
 #if _AX_DEBUG >= 1
-    if (!tolua_isusertype(tolua_S, 1, "ax.netMessage", 0, &tolua_err)) goto tolua_lerror;
+    if (!tolua_isusertype(tolua_S, 1, "ax.netMessage", 0, &tolua_err))
+        goto tolua_lerror;
 #endif
 
     cobj = (ax::gameex::NetMessage*)tolua_tousertype(tolua_S, 1, 0);
@@ -744,11 +768,12 @@ int lua_ax_NetMessage_setStrInfo(lua_State* tolua_S)
         return 1;
     }
     AXLOGD("lua_ax_NetMessage_setStrInfo failed: wrong number of arguments");
-    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.netMessage:setStrInfo", argc, 1);
+    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.netMessage:setStrInfo", argc,
+               1);
     return 0;
 
 #if _AX_DEBUG >= 1
-    tolua_lerror:
+tolua_lerror:
     tolua_error(tolua_S, "#ferror in function 'lua_ax_NetMessage_setStrInfo'.", &tolua_err);
 #endif
 
@@ -767,33 +792,68 @@ int lua_ax_NetMessage_setStrInfo(lua_State* tolua_S)
 // SetHeaderParam2
 // SetHeaderParam4
 // GetData
-int lua_register_ax_NetMessage(lua_State* tolua_S)
+// int lua_register_ax_NetMessage(lua_State* tolua_S)
+// {
+//     AXLOGD("lua_register_ax_NetMessage called");
+//     tolua_usertype(tolua_S, "netMessage");
+//     tolua_cclass(tolua_S, "netMessage", "netMessage", "ax.Object", nullptr);
+
+//     tolua_beginmodule(tolua_S, "NetMessage");
+//         tolua_function(tolua_S, "new", lua_ax_NetMessage_constructor);
+//         tolua_function(tolua_S, "getMsgID", lua_ax_NetMessage_getMsgID);
+//         tolua_function(tolua_S, "setMsgID", lua_ax_NetMessage_setMsgID);
+//         tolua_function(tolua_S, "getRecog", lua_ax_NetMessage_getRecog);
+//         tolua_function(tolua_S, "setRecog", lua_ax_NetMessage_setRecog);
+//         tolua_function(tolua_S, "getParam1", lua_ax_NetMessage_getParam1);
+//         tolua_function(tolua_S, "setParam1", lua_ax_NetMessage_setParam1);
+//         tolua_function(tolua_S, "getParam2", lua_ax_NetMessage_getParam2);
+//         tolua_function(tolua_S, "setParam2", lua_ax_NetMessage_setParam2);
+//         tolua_function(tolua_S, "getParam3", lua_ax_NetMessage_getParam3);
+//         tolua_function(tolua_S, "setParam3", lua_ax_NetMessage_setParam3);
+//         tolua_function(tolua_S, "getParam4", lua_ax_NetMessage_getParam4);
+//         tolua_function(tolua_S, "setParam4", lua_ax_NetMessage_setParam4);
+//         tolua_function(tolua_S, "getStrInfo", lua_ax_NetMessage_getStrInfo);
+//         tolua_function(tolua_S, "setStrInfo", lua_ax_NetMessage_setStrInfo);
+//     tolua_endmodule(tolua_S);
+
+//     auto typeName = typeid(ax::gameex::NetMessage).name(); // rtti is literal storage
+//     g_luaType[reinterpret_cast<uintptr_t>(typeName)] = "ax.gameex.netMessage";
+//     g_typeCast[typeName] = "ax.gameex.NetMessage";
+//     AXLOGD("NetMessage registered in Lua");
+//     return 1;
+// }
+
+// WriteHeader
+// GetHeader
+// WriteData
+// GetData
+// GetDataLength
+// ClearData
+
+int lua_register_NetMessage(lua_State* tolua_S)
 {
-    AXLOGD("lua_register_ax_NetMessage called");
-    tolua_usertype(tolua_S, "ax.netMessage");
-    tolua_cclass(tolua_S, "netMessage", "ax.netMessage", "ax.Object", nullptr);
-
+    tolua_usertype(tolua_S, "netMessage");
+    tolua_cclass(tolua_S, "netMessage", "netMessage", "", nullptr);
     tolua_beginmodule(tolua_S, "NetMessage");
-        tolua_function(tolua_S, "new", lua_ax_NetMessage_constructor);
-        tolua_function(tolua_S, "getMsgID", lua_ax_NetMessage_getMsgID);
-        tolua_function(tolua_S, "setMsgID", lua_ax_NetMessage_setMsgID);
-        tolua_function(tolua_S, "getRecog", lua_ax_NetMessage_getRecog);
-        tolua_function(tolua_S, "setRecog", lua_ax_NetMessage_setRecog);
-        tolua_function(tolua_S, "getParam1", lua_ax_NetMessage_getParam1);
-        tolua_function(tolua_S, "setParam1", lua_ax_NetMessage_setParam1);
-        tolua_function(tolua_S, "getParam2", lua_ax_NetMessage_getParam2);
-        tolua_function(tolua_S, "setParam2", lua_ax_NetMessage_setParam2);
-        tolua_function(tolua_S, "getParam3", lua_ax_NetMessage_getParam3);
-        tolua_function(tolua_S, "setParam3", lua_ax_NetMessage_setParam3);
-        tolua_function(tolua_S, "getParam4", lua_ax_NetMessage_getParam4);
-        tolua_function(tolua_S, "setParam4", lua_ax_NetMessage_setParam4);
-        tolua_function(tolua_S, "getStrInfo", lua_ax_NetMessage_getStrInfo);
-        tolua_function(tolua_S, "setStrInfo", lua_ax_NetMessage_setStrInfo);
+    tolua_function(tolua_S, "new", lua_ax_NetMessage_constructor);
+    tolua_function(tolua_S, "getMsgID", lua_ax_NetMessage_getMsgID);
+    tolua_function(tolua_S, "SetHeaderMsgId", lua_ax_NetMessage_setMsgID);
+    tolua_function(tolua_S, "getRecog", lua_ax_NetMessage_getRecog);
+    tolua_function(tolua_S, "SetHeaderRecog", lua_ax_NetMessage_setRecog);
+    tolua_function(tolua_S, "getParam1", lua_ax_NetMessage_getParam1);
+    tolua_function(tolua_S, "SetHeaderParam1", lua_ax_NetMessage_setParam1);
+    tolua_function(tolua_S, "getParam2", lua_ax_NetMessage_getParam2);
+    tolua_function(tolua_S, "SetHeaderParam2", lua_ax_NetMessage_setParam2);
+    tolua_function(tolua_S, "getParam3", lua_ax_NetMessage_getParam3);
+    tolua_function(tolua_S, "SetHeaderParam3", lua_ax_NetMessage_setParam3);
+    tolua_function(tolua_S, "getParam4", lua_ax_NetMessage_getParam4);
+    tolua_function(tolua_S, "SetHeaderParam4", lua_ax_NetMessage_setParam4);
+    tolua_function(tolua_S, "getStrInfo", lua_ax_NetMessage_getStrInfo);
+    tolua_function(tolua_S, "setStrInfo", lua_ax_NetMessage_setStrInfo);
     tolua_endmodule(tolua_S);
-
-    auto typeName = typeid(ax::gameex::NetMessage).name(); // rtti is literal storage
-    g_luaType[reinterpret_cast<uintptr_t>(typeName)] = "ax.gameex.netMessage";
-    g_typeCast[typeName] = "ax.gameex.NetMessage";
+    auto typeName = typeid(ax::gameex::NetMessage).name();  // rtti is literal storage
+    g_luaType[reinterpret_cast<uintptr_t>(typeName)] = "netMessage";
+    g_typeCast[typeName]                             = "NetMessage";
     AXLOGD("NetMessage registered in Lua");
     return 1;
 }

@@ -237,8 +237,9 @@ namespace ax {
             {nullptr, nullptr}};
         luaL_register(_state, "_G", global_functions);
         lua_register_EnDecode6BitStr(_state);
-        lua_register_ax_NetMessage(_state);
+
         g_luaType.clear();
+        lua_register_NetMessage(_state);
         register_all_ax_base(_state);
         register_all_ax_backend(_state);
         register_all_ax_manual(_state);
