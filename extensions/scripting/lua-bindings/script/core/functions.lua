@@ -631,31 +631,140 @@ function string.formatnumberthousands(num)
     return formatted
 end
 
--- The axmol new logging stubs, since v2.1.3
-local LogLevel = {
-    Trace = 0,
-    Debug = 1,
-    Info = 2,
-    Warn = 3,
-    Error = 4
-}
+if not AXLOGD then 
+    -- The axmol new logging stubs, since v2.1.3
+    local LogLevel = {
+        Trace = 0,
+        Debug = 1,
+        Info = 2,
+        Warn = 3,
+        Error = 4
+    }
+    local function GetTracebackFL(tb)
+        if tb then
+            local lineinfo = string.split(string.trim(tb[3]), ":")
+            if lineinfo then
+                if lineinfo[1] then
+                    local spath = string.split(string.trim(lineinfo[1]), "/")
+                    local sspinfo = ""
+                    local sssinfo = ""
+                    local sps = ""
+                    if spath then
+                        -- dump(spath)
+                        if #spath >= 2 then
+                            sspinfo = string.trim(spath[#spath - 1])
+                            sssinfo = string.trim(spath[#spath])
+                        else
+                            sspinfo = string.trim(spath[1])
+                            sssinfo = ""
+                        end
+                        sps = sspinfo .. "/" .. sssinfo
+                    else
+                        sps = ""
+                    end
+                    return  sps,checknumber(string.trim(lineinfo[2]),10)
+                    -- GetStandFileAndLineStr(sps, string.trim(lineinfo[2]))
+                else
+                    return string.trim(lineinfo[1]),checknumber(string.trim(lineinfo[2]),10)
+                    -- GetStandFileAndLineStr(string.trim(lineinfo[1]), string.trim(lineinfo[2]))
+                end
+            else
+                return "",-1
+            end
+        else
+            return "",-1
+        end
+    end
 
-function AXLOGT(...)
-    AXLOG_WITH_LEVEL(LogLevel.Trace, ...)
+
+    function AXLOGT(...)
+        if DEBUG == 3 and (AXLOG_WITH_LEVELEx) then
+            -- local traceback = string.split(debug.traceback("", 2), "\n")
+            -- local lineinfo = string.split(string.trim(traceback[3]), ":")
+            -- AXLOG_WITH_LEVELEx(GetTracebackFL(string.split(debug.traceback("", 2), "\n")), LogLevel.Trace,
+            --     ...)
+            local fn,fl=GetTracebackFL(string.split(debug.traceback("", 2), "\n"))
+            AXLOG_WITH_LEVELEx(fn,fl,LogLevel.Trace,...)
+        else
+            AXLOG_WITH_LEVEL(LogLevel.Trace, ...)
+        end
+    end
+
+    function AXLOGD(...)
+        if DEBUG == 3 and (AXLOG_WITH_LEVELEx) then
+            -- local traceback = string.split(debug.traceback("", 2), "\n")
+            -- local lineinfo = string.split(string.trim(traceback[3]), ":")
+            local fn,fl=GetTracebackFL(string.split(debug.traceback("", 2), "\n"))
+            -- print(fn,"    ",fl,"    ",...);
+            AXLOG_WITH_LEVELEx(fn,fl,LogLevel.Debug,...)
+        else
+            AXLOG_WITH_LEVEL(LogLevel.Debug, ...)
+        end
+    end
+
+    function AXLOGI(...)
+        if DEBUG == 3 and (AXLOG_WITH_LEVELEx) then
+            -- local traceback = string.split(debug.traceback("", 2), "\n")
+            -- local lineinfo = string.split(string.trim(traceback[3]), ":")
+            -- if
+            -- AXLOG_WITH_LEVELEx(GetTracebackFL(string.split(debug.traceback("", 2), "\n")), LogLevel.Info, ...)
+            local fn,fl=GetTracebackFL(string.split(debug.traceback("", 2), "\n"))
+            AXLOG_WITH_LEVELEx(fn,fl,LogLevel.Info,...)
+        else
+            AXLOG_WITH_LEVEL(LogLevel.Info, ...)
+        end
+    end
+
+    function AXLOGW(...)
+        if DEBUG == 3 and (AXLOG_WITH_LEVELEx) then
+            -- local traceback = string.split(debug.traceback("", 2), "\n")
+            -- local lineinfo = string.split(string.trim(traceback[3]), ":")
+            -- AXLOG_WITH_LEVELEx(GetTracebackFL(string.split(debug.traceback("", 2), "\n")), LogLevel.Warn, ...)
+            local fn,fl=GetTracebackFL(string.split(debug.traceback("", 2), "\n"))
+            AXLOG_WITH_LEVELEx(fn,fl,LogLevel.Warn,...)
+        else
+            AXLOG_WITH_LEVEL(LogLevel.Warn, ...)
+        end
+    end
+
+    function AXLOGE(...)
+        if DEBUG == 3 and (AXLOG_WITH_LEVELEx) then
+            -- local traceback = string.split(debug.traceback("", 2), "\n")
+            -- local lineinfo = string.split(string.trim(traceback[3]), ":")
+            -- AXLOG_WITH_LEVELEx(GetTracebackFL(string.split(debug.traceback("", 2), "\n")), LogLevel.Error, ...)
+            local fn,fl=GetTracebackFL(string.split(debug.traceback("", 2), "\n"))
+            AXLOG_WITH_LEVELEx(fn,fl,LogLevel.Error,...)
+        else
+            AXLOG_WITH_LEVEL(LogLevel.Error, ...)
+        end
+    end
+
+
+    function toupptr(p)
+        return string.upper(tostring(p))
+    end
+
+    if print then
+        if DEBUG == 3 or DEBUG == 2 then
+            print = function(...)
+                return AXLOGD(...)
+            end
+        end
+    end
+
+    function tosf_ptr(vaddr)
+        return string.format("%x",tonumber(vaddr))
+    end    
+
 end
-    
-function AXLOGD(...)
-    AXLOG_WITH_LEVEL(LogLevel.Debug, ...)
+
+function performWithDelay(node, callback, delay)
+    AXLOGD("performWithDelay node:{} delay:{}",tostring(node),delay)
+    local delay = cc.DelayTime:create(delay)
+    local sequence = cc.Sequence:create(delay, cc.CallFunc:create(callback))
+    node:runAction(sequence)
+    return sequence
 end
-    
-function AXLOGI(...)
-    AXLOG_WITH_LEVEL(LogLevel.Info, ...)
-end
-    
-function AXLOGW(...)
-    AXLOG_WITH_LEVEL(LogLevel.Warn, ...)
-end
-    
-function AXLOGE(...)
-    AXLOG_WITH_LEVEL(LogLevel.Error, ...)
-end
+
+
+AXLOGD("performWithDelay 函数 已经添加")

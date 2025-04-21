@@ -50,6 +50,7 @@ extern "C" {
 #include "lua-bindings/manual/base/axlua_base_manual.hpp"
 #include "lua-bindings/manual/base/axlua_base_userdata_manual.h"
 #include "lua-bindings/manual/gameex/lua_Bit6EnDecode.h"
+#include "lua-bindings/manual/gameex/lua_NetMessage.h"
 #include "lua-bindings/manual/physics/axlua_physics_manual.hpp"
 #include "platform/FileUtils.h"
 namespace {
@@ -236,6 +237,7 @@ namespace ax {
             {nullptr, nullptr}};
         luaL_register(_state, "_G", global_functions);
         lua_register_EnDecode6BitStr(_state);
+        lua_register_ax_NetMessage(_state);
         g_luaType.clear();
         register_all_ax_base(_state);
         register_all_ax_backend(_state);
