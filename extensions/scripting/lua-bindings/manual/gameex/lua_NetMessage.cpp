@@ -830,30 +830,75 @@ tolua_lerror:
 // GetDataLength
 // ClearData
 
-int lua_register_NetMessage(lua_State* tolua_S)
+// tolua_open(tolua_S);
+// tolua_reg_script_handler_mgr_type(tolua_S);
+// tolua_module(tolua_S, NULL, 0);
+// tolua_beginmodule(tolua_S, NULL);
+// tolua_cclass(tolua_S, "ScriptHandlerMgr", "ScriptHandlerMgr", "", NULL);
+// tolua_beginmodule(tolua_S, "ScriptHandlerMgr");
+// tolua_function(tolua_S, "getInstance", tolua_Cocos2d_ScriptHandlerMgr_getInstance00);
+// tolua_function(tolua_S, "registerScriptHandler", tolua_Cocos2d_ScriptHandlerMgr_registerScriptHandler00);
+// tolua_function(tolua_S, "unregisterScriptHandler", tolua_Cocos2d_ScriptHandlerMgr_unregisterScriptHandler00);
+// tolua_function(tolua_S, "removeObjectAllHandlers", tolua_Cocos2d_ScriptHandlerMgr_removeObjectAllHandlers00);
+// tolua_endmodule(tolua_S);
+// tolua_endmodule(tolua_S);
+// return 1;
+
+
+
+int lua_register_NetMessage_Sub(lua_State* tolua_S)
 {
-    tolua_usertype(tolua_S, "netMessage");
-    tolua_cclass(tolua_S, "netMessage", "netMessage", "", nullptr);
-    tolua_beginmodule(tolua_S, "NetMessage");
-    tolua_function(tolua_S, "new", lua_ax_NetMessage_constructor);
-    tolua_function(tolua_S, "getMsgID", lua_ax_NetMessage_getMsgID);
-    tolua_function(tolua_S, "SetHeaderMsgId", lua_ax_NetMessage_setMsgID);
-    tolua_function(tolua_S, "getRecog", lua_ax_NetMessage_getRecog);
-    tolua_function(tolua_S, "SetHeaderRecog", lua_ax_NetMessage_setRecog);
-    tolua_function(tolua_S, "getParam1", lua_ax_NetMessage_getParam1);
-    tolua_function(tolua_S, "SetHeaderParam1", lua_ax_NetMessage_setParam1);
-    tolua_function(tolua_S, "getParam2", lua_ax_NetMessage_getParam2);
-    tolua_function(tolua_S, "SetHeaderParam2", lua_ax_NetMessage_setParam2);
-    tolua_function(tolua_S, "getParam3", lua_ax_NetMessage_getParam3);
-    tolua_function(tolua_S, "SetHeaderParam3", lua_ax_NetMessage_setParam3);
-    tolua_function(tolua_S, "getParam4", lua_ax_NetMessage_getParam4);
-    tolua_function(tolua_S, "SetHeaderParam4", lua_ax_NetMessage_setParam4);
-    tolua_function(tolua_S, "getStrInfo", lua_ax_NetMessage_getStrInfo);
-    tolua_function(tolua_S, "setStrInfo", lua_ax_NetMessage_setStrInfo);
+    //tolua_cclass(tolua_S, "ScriptHandlerMgr", "ScriptHandlerMgr", "", NULL);
+    tolua_cclass(tolua_S, "netMessage","netMessage", "ax.Object", NULL);
+    tolua_beginmodule(tolua_S, "netMessage");
+        tolua_function(tolua_S, "new", lua_ax_NetMessage_constructor);
+        tolua_function(tolua_S, "getMsgID", lua_ax_NetMessage_getMsgID);
+        tolua_function(tolua_S, "SetHeaderMsgId", lua_ax_NetMessage_setMsgID);
+        tolua_function(tolua_S, "getRecog", lua_ax_NetMessage_getRecog);
+        tolua_function(tolua_S, "SetHeaderRecog", lua_ax_NetMessage_setRecog);
+        tolua_function(tolua_S, "getParam1", lua_ax_NetMessage_getParam1);
+        tolua_function(tolua_S, "SetHeaderParam1", lua_ax_NetMessage_setParam1);
+        tolua_function(tolua_S, "getParam2", lua_ax_NetMessage_getParam2);
+        tolua_function(tolua_S, "SetHeaderParam2", lua_ax_NetMessage_setParam2);
+        tolua_function(tolua_S, "getParam3", lua_ax_NetMessage_getParam3);
+        tolua_function(tolua_S, "SetHeaderParam3", lua_ax_NetMessage_setParam3);
+        tolua_function(tolua_S, "getParam4", lua_ax_NetMessage_getParam4);
+        tolua_function(tolua_S, "SetHeaderParam4", lua_ax_NetMessage_setParam4);
+        tolua_function(tolua_S, "getStrInfo", lua_ax_NetMessage_getStrInfo);
+        tolua_function(tolua_S, "setStrInfo", lua_ax_NetMessage_setStrInfo);
     tolua_endmodule(tolua_S);
     auto typeName = typeid(ax::gameex::NetMessage).name();  // rtti is literal storage
     g_luaType[reinterpret_cast<uintptr_t>(typeName)] = "netMessage";
     g_typeCast[typeName]                             = "NetMessage";
+    return 1;
+}
+
+// tolua_open(tolua_S);
+// tolua_usertype(tolua_S, "ScheduleHandlerDelegate");
+// tolua_usertype(tolua_S, "ScriptHandlerMgr");
+// tolua_module(tolua_S, NULL, 0);
+// tolua_beginmodule(tolua_S, NULL);
+    // tolua_cclass(tolua_S, "ScriptHandlerMgr", "ScriptHandlerMgr", "", NULL);
+    // tolua_beginmodule(tolua_S, "ScriptHandlerMgr");
+    // tolua_function(tolua_S, "getInstance", tolua_Cocos2d_ScriptHandlerMgr_getInstance00);
+    // tolua_function(tolua_S, "registerScriptHandler", tolua_Cocos2d_ScriptHandlerMgr_registerScriptHandler00);
+    // tolua_function(tolua_S, "unregisterScriptHandler", tolua_Cocos2d_ScriptHandlerMgr_unregisterScriptHandler00);
+    // tolua_function(tolua_S, "removeObjectAllHandlers", tolua_Cocos2d_ScriptHandlerMgr_removeObjectAllHandlers00);
+    // tolua_endmodule(tolua_S);
+// tolua_endmodule(tolua_S);
+// return 1;
+
+
+
+int lua_register_NetMessage(lua_State* tolua_S)
+{
+
+    tolua_open(tolua_S);
+    tolua_usertype(tolua_S, "netMessage");
+    tolua_module(tolua_S, NULL, 0);
+    tolua_beginmodule(tolua_S, NULL);
+        lua_register_NetMessage_Sub(tolua_S);
+    tolua_endmodule(tolua_S);
     AXLOGD("NetMessage registered in Lua");
     return 1;
 }
