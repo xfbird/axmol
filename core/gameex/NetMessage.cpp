@@ -108,6 +108,21 @@ void NetMessage::SetParam4(int32_t value)
 {
     _msgh.param4 = value;
 }
+
+
+int32_t NetMessage::GetLength() const
+{
+    return _msgh.Length;
+}
+int32_t NetMessage::GetIsZlib() const
+{
+    return _msgh.nIsZlib;
+}
+int32_t NetMessage::GetIndex() const
+{
+    return _msgh.nIndex;
+}
+
 std::string_view NetMessage::GetStrInfo() const
 {
     return std::string_view(strinfo);
@@ -115,6 +130,7 @@ std::string_view NetMessage::GetStrInfo() const
 void NetMessage::SetStrInfo(const std::string_view& info)
 {
     strinfo = std::string(info);  // 将 std::string_view 转换为 std::string
+    _msgh.Length = info.size();
 }
 std::string NetMessage::serializedHeader() const
 {

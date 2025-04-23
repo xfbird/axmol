@@ -53,6 +53,11 @@ public:
     // 获取和设置 param4 的值
     int32_t GetParam4() const;
     void SetParam4(int32_t value);
+
+    int32_t GetLength() const;
+    int32_t GetIsZlib() const;
+    int32_t GetIndex() const;
+
     // 消息内容的 Get 和 Set 方法
     std::string_view GetStrInfo() const;
     void SetStrInfo(const std::string_view& info);

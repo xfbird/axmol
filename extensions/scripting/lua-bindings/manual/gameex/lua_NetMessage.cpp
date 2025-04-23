@@ -622,6 +622,148 @@ tolua_lerror:
     return 0;
 }
 
+int lua_ax_NetMessage_getLength(lua_State* tolua_S)
+{
+    AXLOGD("lua_ax_NetMessage_getLength called");
+    int argc                     = 0;
+    ax::gameex::NetMessage* cobj = nullptr;
+    bool ok                      = true;
+
+#if _AX_DEBUG >= 1
+    tolua_Error tolua_err;
+#endif
+
+#if _AX_DEBUG >= 1
+    if (!tolua_isusertype(tolua_S, 1, "netMessage", 0, &tolua_err))
+        goto tolua_lerror;
+#endif
+
+    cobj = (ax::gameex::NetMessage*)tolua_tousertype(tolua_S, 1, 0);
+
+#if _AX_DEBUG >= 1
+    if (!cobj)
+    {
+        tolua_error(tolua_S, "invalid 'cobj' in function 'lua_ax_NetMessage_getLength'", nullptr);
+        AXLOGD("Invalid 'cobj' in lua_ax_NetMessage_getLength");
+        return 0;
+    }
+#endif
+
+    argc = lua_gettop(tolua_S) - 1;
+    if (argc == 0)
+    {
+        int32_t ret = cobj->GetLength();
+        tolua_pushnumber(tolua_S, (lua_Number)ret);
+        AXLOGD("Length retrieved: {}", ret);
+        return 1;
+    }
+    AXLOGD("lua_ax_NetMessage_getLength failed: wrong number of arguments");
+    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.netMessage:getLength", argc,
+               0);
+    return 0;
+
+#if _AX_DEBUG >= 1
+tolua_lerror:
+    tolua_error(tolua_S, "#ferror in function 'lua_ax_NetMessage_getLength'.", &tolua_err);
+#endif
+
+    return 0;
+}
+int lua_ax_NetMessage_getIsZlib(lua_State* tolua_S)
+{
+    AXLOGD("lua_ax_NetMessage_getIsZlib called");
+    int argc                     = 0;
+    ax::gameex::NetMessage* cobj = nullptr;
+    bool ok                      = true;
+
+#if _AX_DEBUG >= 1
+    tolua_Error tolua_err;
+#endif
+
+#if _AX_DEBUG >= 1
+    if (!tolua_isusertype(tolua_S, 1, "netMessage", 0, &tolua_err))
+        goto tolua_lerror;
+#endif
+
+    cobj = (ax::gameex::NetMessage*)tolua_tousertype(tolua_S, 1, 0);
+
+#if _AX_DEBUG >= 1
+    if (!cobj)
+    {
+        tolua_error(tolua_S, "invalid 'cobj' in function 'lua_ax_NetMessage_getIsZlib'", nullptr);
+        AXLOGD("Invalid 'cobj' in lua_ax_NetMessage_getIsZlib");
+        return 0;
+    }
+#endif
+
+    argc = lua_gettop(tolua_S) - 1;
+    if (argc == 0)
+    {
+        int32_t ret = cobj->GetIsZlib();
+        tolua_pushnumber(tolua_S, (lua_Number)ret);
+        AXLOGD("IsZlib retrieved: {}", ret);
+        return 1;
+    }
+    AXLOGD("lua_ax_NetMessage_getIsZlib failed: wrong number of arguments");
+    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.netMessage:getIsZlib", argc,
+               0);
+    return 0;
+
+#if _AX_DEBUG >= 1
+tolua_lerror:
+    tolua_error(tolua_S, "#ferror in function 'lua_ax_NetMessage_getIsZlib'.", &tolua_err);
+#endif
+
+    return 0;
+}
+
+int lua_ax_NetMessage_getIndex(lua_State* tolua_S)
+{
+    AXLOGD("lua_ax_NetMessage_getIndex called");
+    int argc                     = 0;
+    ax::gameex::NetMessage* cobj = nullptr;
+    bool ok                      = true;
+
+#if _AX_DEBUG >= 1
+    tolua_Error tolua_err;
+#endif
+
+#if _AX_DEBUG >= 1
+    if (!tolua_isusertype(tolua_S, 1, "netMessage", 0, &tolua_err))
+        goto tolua_lerror;
+#endif
+
+    cobj = (ax::gameex::NetMessage*)tolua_tousertype(tolua_S, 1, 0);
+
+#if _AX_DEBUG >= 1
+    if (!cobj)
+    {
+        tolua_error(tolua_S, "invalid 'cobj' in function 'lua_ax_NetMessage_getIndex'", nullptr);
+        AXLOGD("Invalid 'cobj' in lua_ax_NetMessage_getIndex");
+        return 0;
+    }
+#endif
+
+    argc = lua_gettop(tolua_S) - 1;
+    if (argc == 0)
+    {
+        int32_t ret = cobj->GetIndex();
+        tolua_pushnumber(tolua_S, (lua_Number)ret);
+        AXLOGD("Index retrieved: {}", ret);
+        return 1;
+    }
+    AXLOGD("lua_ax_NetMessage_getIndex failed: wrong number of arguments");
+    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.netMessage:getIndex", argc,
+               0);
+    return 0;
+
+#if _AX_DEBUG >= 1
+tolua_lerror:
+    tolua_error(tolua_S, "#ferror in function 'lua_ax_NetMessage_getIndex'.", &tolua_err);
+#endif
+
+    return 0;
+}
 // 设置 Param4
 int lua_ax_NetMessage_setParam4(lua_State* tolua_S)
 {
@@ -866,6 +1008,11 @@ int lua_register_NetMessage_Sub(lua_State* tolua_S)
     tolua_function(tolua_S, "SetHeaderParam3", lua_ax_NetMessage_setParam3);
     tolua_function(tolua_S, "getParam4", lua_ax_NetMessage_getParam4);
     tolua_function(tolua_S, "SetHeaderParam4", lua_ax_NetMessage_setParam4);
+
+    tolua_function(tolua_S, "getLength", lua_ax_NetMessage_getLength);
+    tolua_function(tolua_S, "getIsZlib", lua_ax_NetMessage_getIsZlib);
+    tolua_function(tolua_S, "getIndex", lua_ax_NetMessage_getIndex);
+
     tolua_function(tolua_S, "getStrInfo", lua_ax_NetMessage_getStrInfo);
     tolua_function(tolua_S, "setStrInfo", lua_ax_NetMessage_setStrInfo);
     tolua_endmodule(tolua_S);
