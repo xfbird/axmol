@@ -6,9 +6,9 @@
 #include "platform/PlatformMacros.h"  // 引入axmol平台判定宏
 namespace ax
 {
-    namespace gameex
-    {
-    
+namespace gameex
+{
+
 struct msgHeader
 {
     int32_t recog;    // Recog
@@ -62,6 +62,6 @@ private:
     msgHeader _msgh;      // 消息头
     std::string strinfo;  // 消息内容
 };
-}
+}  // namespace gameex
 }  // namespace ax
 #endif  // AXNETMESSAGE_H
