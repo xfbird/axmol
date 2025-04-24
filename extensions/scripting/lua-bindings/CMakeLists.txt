@@ -34,6 +34,7 @@ set(lua_bindings_manual_headers
     manual/gameex/lua_Bit6EnDecode.h    
     manual/gameex/lua_NetMessage.h
     manual/gameex/lua_NetClient.h
+    manual/gameex/lua_gameex.h
     )
 
 set(lua_bindings_manual_files
@@ -73,6 +74,7 @@ set(lua_bindings_manual_files
     manual/gameex/lua_Bit6EnDecode.cpp    
     manual/gameex/lua_NetMessage.cpp
     manual/gameex/lua_NetClient.cpp
+    manual/gameex/lua_gameex.cpp
     )
 
 set(lua_bindings_auto_headers

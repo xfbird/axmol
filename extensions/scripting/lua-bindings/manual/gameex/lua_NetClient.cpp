@@ -1,8 +1,6 @@
 
-#include "lua-bindings/manual/LuaBasicConversions.h"
-#include "lua-bindings/manual/LuaEngine.h"
-#include "lua-bindings/manual/LuaStack.h"
-#include "lua-bindings/manual/gameex/lua_NetClient.h"
+
+#include "lua_NetClient.h"
 
 // NetClient 构造函数
 int lua_ax_NetClient_constructor(lua_State* tolua_S)
@@ -523,40 +521,9 @@ tolua_lerror:
 #endif
     return 0;
 }
-int lua_register_type_ax_NetClient(lua_State* tolua_S)
+
+int lua_register_NetClient(lua_State* tolua_S)
 {
-    AXLOGD("register type netClient");
-    tolua_usertype(tolua_S, "netClient");
-    return 1;
-}
-// int lua_register_NetClient_Sub(lua_State* tolua_S)
-// {
-//     lua_register_type_ax_NetClient(tolua_S);
-//     AXLOGD("lua_register_ax_NetClient");
-//     tolua_cclass(tolua_S, "netClient", "netClient", "ax.Object", nullptr);
-//     tolua_beginmodule(tolua_S, "netClient");
-//     tolua_function(tolua_S, "new", lua_ax_NetClient_constructor);       // 构造
-//     tolua_function(tolua_S, "create", lua_ax_NetClient_deconstructor);  // 创建 如果不被Lua 集成就可以有
-//     tolua_function(tolua_S, "Tick", lua_ax_NetClient_Tick);
-//     tolua_function(tolua_S, "Connect", lua_ax_NetClient_connect);        // 连接
-//     tolua_function(tolua_S, "Disconnect", lua_ax_NetClient_disconnect);  // 断开
-//     tolua_function(tolua_S, "SendNetMessage", lua_ax_NetClient_sendMsg);
-//     tolua_function(tolua_S, "IsConnected", lua_ax_NetClient_isConnected);
-//     tolua_function(tolua_S, "GetNetServerKey", lua_ax_NetClient_getServerKey);
-//     tolua_function(tolua_S, "SetNetServerKey", lua_ax_NetClient_setServerKey);
-//     tolua_function(tolua_S, "GetNetMessageTypeSData", lua_ax_NetClient_getTypeData);
-//     tolua_function(tolua_S, "SetNetMessageTypeSData", lua_ax_NetClient_setTypeData);
-//     tolua_function(tolua_S, "CleanAllMessageHandler", lua_ax_NetClient_CleanAllMessageHandler);  // 清除所有的消息处理句柄
-//     tolua_endmodule(tolua_S);
-//     auto typeName                                    = typeid(ax::gameex::NetClient).name();  // rtti is literal storage
-//     g_luaType[reinterpret_cast<uintptr_t>(typeName)] = "netClient";
-//     g_typeCast[typeName]                             = "netClient";
-//     AXLOGD("netclient registered in Lua ok");
-//     return 1;
-// }
-int lua_register_NetClient_Sub(lua_State* tolua_S)
-{
-    // tolua_cclass(tolua_S, "ScriptHandlerMgr", "ScriptHandlerMgr", "", NULL);
     tolua_cclass(tolua_S, "netClient", "netClient", "ax.Object", NULL);
     tolua_beginmodule(tolua_S, "netClient");
     tolua_function(tolua_S, "new", lua_ax_NetClient_constructor);       // 构造
@@ -579,15 +546,14 @@ int lua_register_NetClient_Sub(lua_State* tolua_S)
     return 1;
 }
 
-
-int lua_register_ax_NetClient(lua_State* tolua_S)
-{
-    tolua_open(tolua_S);
-    tolua_usertype(tolua_S, "netClient");
-    tolua_module(tolua_S, NULL, 0);
-    tolua_beginmodule(tolua_S, NULL);
-    lua_register_NetClient_Sub(tolua_S);
-    tolua_endmodule(tolua_S);
-    AXLOGD("NetClient registered in Lua");
-    return 1;
-}
+// int register_NetClient(lua_State* tolua_S)
+// {
+//     tolua_open(tolua_S);
+//     tolua_usertype(tolua_S, "netClient");
+//     tolua_module(tolua_S, NULL, 0);
+//     tolua_beginmodule(tolua_S, NULL);
+//     lua_register_NetClient_Sub(tolua_S);
+//     tolua_endmodule(tolua_S);
+//     AXLOGD("NetClient registered in Lua");
+//     return 1;
+// }
