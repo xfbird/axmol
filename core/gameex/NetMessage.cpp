@@ -6,8 +6,7 @@ namespace gameex
 {
 
 // 默认构造函数
-NetMessage::NetMessage()
-{
+NetMessage::NetMessage(){
     memset(&_msgh, 0, sizeof(msgHeader));  // 如果 ainfo 的大小小于消息头的大小，初始化消息头为零 
     strinfo.clear();                       // 清空消息内容
 }

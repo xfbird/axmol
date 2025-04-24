@@ -1,0 +1,91 @@
+#ifndef _NETCLIENT_H_
+#define _NETCLIENT_H_
+#include <mutex>
+#include <string>
+
+#include "NetMessage.h"
+#include "base/Object.h"
+#include "platform/PlatformMacros.h"  // 引入axmol平台判定宏
+#include "yasio/obstream.hpp"
+#include "yasio/yasio.hpp"
+namespace ax
+{
+namespace gameex
+{
+using namespace yasio;
+class NetClientSink : public Object
+{
+   public:
+    virtual ~NetClientSink() {};
+    virtual void OnConnect(bool ok)                      = 0;
+    virtual void OnRecv(const char* data, uint32_t size) = 0;
+    virtual void OnClose()                               = 0;
+};
+class NetClient : public Object
+{
+   public:
+    using MessageHandler = std::function<void(const std::string_view)>;
+    static NetClient* create();
+    void destroyInstance();
+    bool Connect(const std::string& ip, unsigned short port);
+    void Close();
+    bool IsConnected(void);
+    std::string get_ServerKey() const;
+    void set_ServerKey(const std::string& value);
+    int32_t get_TypeData() const;
+    void set_TypeData(int32_t value);
+    int Send(const void* data, int size);
+    void SendMsg(NetMessage* nmsg);
+    void SetTcpSink(NetClientSink* tcpSink);
+    void CleanTcpSink();
+    void GetsocketInfo() const;
+    void Tick();
+    bool CheckMemoryIntegrity() const;
+
+   protected:
+    NetClient();
+    ~NetClient();
+
+   private:
+    const uint64_t PRE_GUARD[64] = {
+        0xDEADBEEFDEADBEEF, 0xBAADF00DBAADF00D, 0xCAFEBABECAFEBABE, 0xBADBADBADBADBAD,  0xABADBABEABADBABE, 0x1BADB0021BADB002, 0x8BADF00D8BADF00D,
+        0xB105F00DB105F00D, 0xDEADBEEFDEADBEEF, 0xBAADF00DBAADF00D, 0xCAFEBABECAFEBABE, 0xBADBADBADBADBAD,  0xABADBABEABADBABE, 0x1BADB0021BADB002,
+        0x8BADF00D8BADF00D, 0xB105F00DB105F00D, 0xDEADBEEFDEADBEEF, 0xBAADF00DBAADF00D, 0xCAFEBABECAFEBABE, 0xBADBADBADBADBAD,  0xABADBABEABADBABE,
+        0x1BADB0021BADB002, 0x8BADF00D8BADF00D, 0xB105F00DB105F00D, 0xDEADBEEFDEADBEEF, 0xBAADF00DBAADF00D, 0xCAFEBABECAFEBABE, 0xBADBADBADBADBAD,
+        0xABADBABEABADBABE, 0x1BADB0021BADB002, 0x8BADF00D8BADF00D, 0xB105F00DB105F00D, 0xDEADBEEFDEADBEEF, 0xBAADF00DBAADF00D, 0xCAFEBABECAFEBABE,
+        0xBADBADBADBADBAD,  0xABADBABEABADBABE, 0x1BADB0021BADB002, 0x8BADF00D8BADF00D, 0xB105F00DB105F00D, 0xDEADBEEFDEADBEEF, 0xBAADF00DBAADF00D,
+        0xCAFEBABECAFEBABE, 0xBADBADBADBADBAD,  0xABADBABEABADBABE, 0x1BADB0021BADB002, 0x8BADF00D8BADF00D, 0xB105F00DB105F00D, 0xDEADBEEFDEADBEEF,
+        0xBAADF00DBAADF00D, 0xCAFEBABECAFEBABE, 0xBADBADBADBADBAD,  0xABADBABEABADBABE, 0x1BADB0021BADB002, 0x8BADF00D8BADF00D, 0xB105F00DB105F00D,
+        0xDEADBEEFDEADBEEF, 0xBAADF00DBAADF00D, 0xCAFEBABECAFEBABE, 0xBADBADBADBADBAD,  0xABADBABEABADBABE, 0x1BADB0021BADB002, 0x8BADF00D8BADF00D,
+        0xB105F00DB105F00D};
+    std::string _ServerKey;
+    int32_t _TypeData;
+    // NetClientSink* m_tcpSink;
+    // std::unique_ptr<yasio::io_service> m_tcpClient;
+    // yasio::inet::transport_handle_t m_transport;
+    // mutable std::shared_mutex _tcpClientMutex;  // 保护 m_tcpClient
+    // mutable std::shared_mutex _transportMutex;  // 保护 m_transport
+    // mutable std::shared_mutex _tcpSinkMutex;    // 保护 m_tcpSink
+    bool IsConnectedInternal() const;  // 内部版本，不加锁
+    std::shared_ptr<yasio::io_service> m_tcpClient;
+    yasio::io_transport* m_transport = nullptr;
+    NetClientSink* m_tcpSink         = nullptr;
+    // 线程安全保护
+    mutable std::shared_mutex _tcpClientMutex;
+    mutable std::shared_mutex _transportMutex;
+    mutable std::shared_mutex _tcpSinkMutex;
+    const uint64_t POST_GUARD[64] = {
+        0xDEADBEEFDEADBEEF, 0xBAADF00DBAADF00D, 0xCAFEBABECAFEBABE, 0xBADBADBADBADBAD,  0xABADBABEABADBABE, 0x1BADB0021BADB002, 0x8BADF00D8BADF00D,
+        0xB105F00DB105F00D, 0xDEADBEEFDEADBEEF, 0xBAADF00DBAADF00D, 0xCAFEBABECAFEBABE, 0xBADBADBADBADBAD,  0xABADBABEABADBABE, 0x1BADB0021BADB002,
+        0x8BADF00D8BADF00D, 0xB105F00DB105F00D, 0xDEADBEEFDEADBEEF, 0xBAADF00DBAADF00D, 0xCAFEBABECAFEBABE, 0xBADBADBADBADBAD,  0xABADBABEABADBABE,
+        0x1BADB0021BADB002, 0x8BADF00D8BADF00D, 0xB105F00DB105F00D, 0xDEADBEEFDEADBEEF, 0xBAADF00DBAADF00D, 0xCAFEBABECAFEBABE, 0xBADBADBADBADBAD,
+        0xABADBABEABADBABE, 0x1BADB0021BADB002, 0x8BADF00D8BADF00D, 0xB105F00DB105F00D, 0xDEADBEEFDEADBEEF, 0xBAADF00DBAADF00D, 0xCAFEBABECAFEBABE,
+        0xBADBADBADBADBAD,  0xABADBABEABADBABE, 0x1BADB0021BADB002, 0x8BADF00D8BADF00D, 0xB105F00DB105F00D, 0xDEADBEEFDEADBEEF, 0xBAADF00DBAADF00D,
+        0xCAFEBABECAFEBABE, 0xBADBADBADBADBAD,  0xABADBABEABADBABE, 0x1BADB0021BADB002, 0x8BADF00D8BADF00D, 0xB105F00DB105F00D, 0xDEADBEEFDEADBEEF,
+        0xBAADF00DBAADF00D, 0xCAFEBABECAFEBABE, 0xBADBADBADBADBAD,  0xABADBABEABADBABE, 0x1BADB0021BADB002, 0x8BADF00D8BADF00D, 0xB105F00DB105F00D,
+        0xDEADBEEFDEADBEEF, 0xBAADF00DBAADF00D, 0xCAFEBABECAFEBABE, 0xBADBADBADBADBAD,  0xABADBABEABADBABE, 0x1BADB0021BADB002, 0x8BADF00D8BADF00D,
+        0xB105F00DB105F00D};
+};
+}  // namespace gameex
+}  // namespace ax
+#endif  // _NETCLIENT_H_

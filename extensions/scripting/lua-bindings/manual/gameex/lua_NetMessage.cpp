@@ -1,10 +1,4 @@
-// #include "lua-bindings/manual/gmxxext/NetMessage.h"
-// #include "lua-bindings/manual/gmxxext/NetMessage.h"
 #include "lua-bindings/manual/gameex/lua_NetMessage.h"
-// #include "lua-bindings/manual/tolua_fix.h"
-// #include "lua-bindings/manual/LuaBasicConversions.h"
-// #include "lua-bindings/manual/LuaStack.h"
-// #include "lua-bindings/manual/LuaEngine.h"
 
 // NetMessage 构造函数
 int lua_ax_NetMessage_constructor(lua_State* tolua_S)
