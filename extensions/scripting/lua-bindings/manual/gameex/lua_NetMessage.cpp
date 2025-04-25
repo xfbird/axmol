@@ -35,7 +35,7 @@
 //         AXLOGW("NetMessage instance created Cobj Faile");
 //         return 0;
 //     }
-    
+
 //     AXLOGD("lua_NetMessage_constructor failed: wrong number of arguments");
 //     luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.netMessage:NetMessage", argc, 0);
 //     return 0;
@@ -47,34 +47,35 @@
 // }
 int lua_NetMessage_constructor(lua_State* tolua_S)
 {
-    int argc = 0;
+    int argc                     = 0;
     ax::gameex::NetMessage* cobj = nullptr;
-    bool ok  = true;
-    #if _AX_DEBUG >= 1
-        tolua_Error tolua_err;
-    #endif
-    argc = lua_gettop(tolua_S)-1;
-    if (argc == 0) 
+    bool ok                      = true;
+#if _AX_DEBUG >= 1
+    tolua_Error tolua_err;
+#endif
+    argc = lua_gettop(tolua_S) - 1;
+    if (argc == 0)
     {
-        if(!ok)
+        if (!ok)
         {
-            tolua_error(tolua_S,"invalid arguments in function 'lua_NetMessage_constructor'", nullptr);
+            tolua_error(tolua_S, "invalid arguments in function 'lua_NetMessage_constructor'", nullptr);
             return 0;
         }
         cobj = new ax::gameex::NetMessage();
-        if (cobj) {
+        if (cobj)
+        {
             cobj->autorelease();
-            object_to_luaval<ax::gameex::NetMessage>(tolua_S, "NetMessage",(ax::gameex::NetMessage*)cobj);
-            return 1;   
+            object_to_luaval<ax::gameex::NetMessage>(tolua_S, "NetMessage", (ax::gameex::NetMessage*)cobj);
+            return 1;
         }
-        AXLOGW("lua_NetMessage_constructor Fail"); 
+        AXLOGW("lua_NetMessage_constructor Fail");
         return 0;
     }
-    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d ", "ax.NetMessage",argc, 0);
+    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d ", "ax.NetMessage", argc, 0);
     return 0;
-    #if _AX_DEBUG >= 1
-        tolua_error(tolua_S,"#ferror in function 'lua_NetMessage_constructor'.",&tolua_err);
-    #endif
+#if _AX_DEBUG >= 1
+    tolua_error(tolua_S, "#ferror in function 'lua_NetMessage_constructor'.", &tolua_err);
+#endif
     return 0;
 }
 
@@ -916,6 +917,51 @@ tolua_lerror:
 }
 
 // 获取消息内容
+int lua_NetMessage_getData(lua_State* tolua_S)
+{
+    AXLOGD("lua_NetMessage_getData called");
+    int argc                     = 0;
+    ax::gameex::NetMessage* cobj = nullptr;
+    bool ok                      = true;
+
+    #if _AX_DEBUG >= 1
+        tolua_Error tolua_err;
+    #endif
+
+    #if _AX_DEBUG >= 1
+        if (!tolua_isusertype(tolua_S, 1, "netMessage", 0, &tolua_err))
+            goto tolua_lerror;
+    #endif
+
+    cobj = (ax::gameex::NetMessage*)tolua_tousertype(tolua_S, 1, 0);
+
+    #if _AX_DEBUG >= 1
+        if (!cobj)
+        {
+            tolua_error(tolua_S, "invalid 'cobj' in function 'lua_NetMessage_getData'", nullptr);
+            AXLOGD("Invalid 'cobj' in lua_NetMessage_getData");
+            return 0;
+        }
+    #endif
+
+    argc = lua_gettop(tolua_S) - 1;
+    if (argc == 0)
+    {
+        object_to_luaval<ax::gameex::NetMessage>(tolua_S, "NetMessage", (ax::gameex::NetMessage*)cobj);
+        AXLOGD("getData retrieved: {:12X}",FMT_TOPOINT(cobj));
+        return 1;
+    }
+    AXLOGD("lua_NetMessage_getData failed: wrong number of arguments");
+    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ax.netMessage:getData", argc, 0);
+    return 0;
+    #if _AX_DEBUG >= 1
+    tolua_lerror:
+        tolua_error(tolua_S, "#ferror in function 'lua_NetMessage_getStrInfo'.", &tolua_err);
+    #endif
+    return 0;
+}
+
+// 获取消息内容
 int lua_NetMessage_getStrInfo(lua_State* tolua_S)
 {
     AXLOGD("lua_NetMessage_getStrInfo called");
@@ -1049,8 +1095,10 @@ int lua_register_NetMessage(lua_State* tolua_S)
     tolua_function(tolua_S, "getIsZlib", lua_NetMessage_getIsZlib);
     tolua_function(tolua_S, "getIndex", lua_NetMessage_getIndex);
 
-    tolua_function(tolua_S, "GetData", lua_NetMessage_getStrInfo);
-    tolua_function(tolua_S, "getData", lua_NetMessage_getStrInfo);
+    tolua_function(tolua_S, "ReadString", lua_NetMessage_getStrInfo);
+
+    tolua_function(tolua_S, "GetData", lua_NetMessage_getData);
+    tolua_function(tolua_S, "getData", lua_NetMessage_getData);
     tolua_function(tolua_S, "WriteData", lua_NetMessage_setStrInfo);
     tolua_function(tolua_S, "writeData", lua_NetMessage_setStrInfo);
     tolua_function(tolua_S, "GetHeader", lua_NetMessage_GetHeader);

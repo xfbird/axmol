@@ -6,25 +6,20 @@ namespace gameex
 {
 
 // 默认构造函数
-NetMessage::NetMessage(){
-    memset(&_msgh, 0, sizeof(msgHeader));  // 如果 ainfo 的大小小于消息头的大小，初始化消息头为零 
+NetMessage::NetMessage()
+{
+    memset(&_msgh, 0, sizeof(msgHeader));  // 如果 ainfo 的大小小于消息头的大小，初始化消息头为零
     strinfo.clear();                       // 清空消息内容
 }
 // 参数化构造函数
-NetMessage::NetMessage(int32_t amsgid,
-                       int32_t arecog,
-                       int32_t aparam1,
-                       int32_t aparam2,
-                       int32_t aparam3,
-                       int32_t aparam4,
-                       const std::string_view& asmsg)
+NetMessage::NetMessage(int32_t amsgid, int32_t arecog, int32_t aparam1, int32_t aparam2, int32_t aparam3, int32_t aparam4, const std::string_view& asmsg)
     : _msgh{arecog, amsgid, aparam1, aparam2, aparam3, aparam4}, strinfo(asmsg)
 {
     //_msgh.sessionID = 0;
     //_msgh.IsZlib    = 0;
     _msgh.Length = strinfo.length();
     _msgh.nIndex = 0;  // Index
-    AXLOGD("NetMessage::NetMessage  this:{}",FMT_TOPOINT(this));
+    AXLOGD("NetMessage::NetMessage  this:{}", FMT_TOPOINT(this));
 }
 NetMessage::NetMessage(const std::string_view& ainfo)
 {
@@ -34,24 +29,26 @@ NetMessage::NetMessage(const std::string_view& ainfo)
         if (ainfo.size() > sizeof(msgHeader))
         {
             strinfo = std::string(ainfo.data() + sizeof(msgHeader), ainfo.size() - sizeof(msgHeader));
-            AXLOGD("NetMessage::NetMessage  string this:{}",FMT_TOPOINT(this));
+            AXLOGD("NetMessage::NetMessage  string this:{}", FMT_TOPOINT(this));
             return;
         }
         strinfo.clear();  // 如果 ainfo 的大小刚好等于消息头的大小，则将 strinfo 设置为空字符串
-        AXLOGD("NetMessage::NetMessage  string clear this:{}",FMT_TOPOINT(this));
+        AXLOGD("NetMessage::NetMessage  string clear this:{}", FMT_TOPOINT(this));
         return;
     }
     memset(&_msgh, 0, sizeof(msgHeader));  // 如果 ainfo 的大小小于消息头的大小，初始化消息头为零
-    AXLOGD("NetMessage::NetMessage mgh clear string  clear this:{}",FMT_TOPOINT(this));
-    strinfo.clear();                       // 清空消息内容
+    AXLOGD("NetMessage::NetMessage mgh clear string  clear this:{}", FMT_TOPOINT(this));
+    strinfo.clear();  // 清空消息内容
 }
 
-void NetMessage::Destory(){
+void NetMessage::Destory()
+{
     AXLOGD("NetClient::Destory this:{:12X}", FMT_TOPOINT(this));
     delete this;
 }
 // 析构函数
-NetMessage::~NetMessage() {
+NetMessage::~NetMessage()
+{
     AXLOGD("NetClient::~NetMessage this:{:12X}", FMT_TOPOINT(this));
 };
 msgHeader NetMessage::GetMsgHeader() const
@@ -64,22 +61,22 @@ void NetMessage::SetMsgHeader(const msgHeader& header)
 }
 int32_t NetMessage::GetMsgID() const
 {
-    AXLOGD("NetMessage::GetMsgID  this:{}  msgid:{}",FMT_TOPOINT(this),_msgh.msgid);
+    AXLOGD("NetMessage::GetMsgID  this:{}  msgid:{}", FMT_TOPOINT(this), _msgh.msgid);
     return _msgh.msgid;
 }
 void NetMessage::SetMsgID(int32_t value)
 {
-    AXLOGD("NetMessage::SetMsgID  this:{} value:{} msgid:{}",FMT_TOPOINT(this),value,_msgh.msgid);
+    AXLOGD("NetMessage::SetMsgID  this:{} value:{} msgid:{}", FMT_TOPOINT(this), value, _msgh.msgid);
     _msgh.msgid = value;
 }
 int32_t NetMessage::GetRecog() const
 {
-    AXLOGD("NetMessage::GetRecog  this:{}  Recog:{}",FMT_TOPOINT(this),_msgh.recog);
+    AXLOGD("NetMessage::GetRecog  this:{}  Recog:{}", FMT_TOPOINT(this), _msgh.recog);
     return _msgh.recog;
 }
 void NetMessage::SetRecog(int32_t value)
 {
-    AXLOGD("NetMessage::SetRecog  this:{} value:{} recog:{}",FMT_TOPOINT(this),value,_msgh.recog);
+    AXLOGD("NetMessage::SetRecog  this:{} value:{} recog:{}", FMT_TOPOINT(this), value, _msgh.recog);
     _msgh.recog = value;
 }
 int32_t NetMessage::GetParam1() const
@@ -115,7 +112,6 @@ void NetMessage::SetParam4(int32_t value)
     _msgh.param4 = value;
 }
 
-
 int32_t NetMessage::GetLength() const
 {
     return _msgh.Length;
@@ -135,7 +131,7 @@ std::string_view NetMessage::GetStrInfo() const
 }
 void NetMessage::SetStrInfo(const std::string_view& info)
 {
-    strinfo = std::string(info);  // 将 std::string_view 转换为 std::string
+    strinfo      = std::string(info);  // 将 std::string_view 转换为 std::string
     _msgh.Length = info.size();
 }
 std::string NetMessage::serializedHeader() const
