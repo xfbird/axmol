@@ -62,6 +62,7 @@ public:
     std::string_view GetStrInfo() const;
     void SetStrInfo(const std::string_view& info);
     std::string serializedHeader() const;
+    void Destory();
 
 private:
     msgHeader _msgh;      // 消息头

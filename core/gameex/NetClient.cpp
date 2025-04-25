@@ -8,10 +8,21 @@ namespace ax
 {
 namespace gameex
 {
+
+//create 与 new 的区别,是会调用 autorelease  要求 从 Object 继承
 NetClient* NetClient::create()
 {
     AXLOGD("NetClient::create");
-    return new NetClient();
+    auto netClient = new NetClient();
+    if (netClient)
+    {
+        netClient->autorelease();
+    }
+    else
+    {
+        AX_SAFE_DELETE(netClient);
+    }
+    return netClient;    
 }
 void NetClient::destroyInstance()
 {
@@ -58,13 +69,13 @@ void NetClient::GetsocketInfo() const
 }
 void NetClient::Tick()
 {
-    // if (IsConnected()) {
-#if defined(_WIN32) && defined(_DEBUG)
+    
+    #if defined(_WIN32) && defined(_DEBUG)
     if (_CrtCheckMemory() == 0)
     {
         AXLOGE("Heap corruption detected!");
     }
-#endif
+    #endif
     GetsocketInfo();
     std::shared_lock<std::shared_mutex> lock(_tcpClientMutex);
     if (m_tcpClient)

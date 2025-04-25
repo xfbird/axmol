@@ -60,12 +60,6 @@ class NetClient : public Object
         0xB105F00DB105F00D};
     std::string _ServerKey;
     int32_t _TypeData;
-    // NetClientSink* m_tcpSink;
-    // std::unique_ptr<yasio::io_service> m_tcpClient;
-    // yasio::inet::transport_handle_t m_transport;
-    // mutable std::shared_mutex _tcpClientMutex;  // 保护 m_tcpClient
-    // mutable std::shared_mutex _transportMutex;  // 保护 m_transport
-    // mutable std::shared_mutex _tcpSinkMutex;    // 保护 m_tcpSink
     bool IsConnectedInternal() const;  // 内部版本，不加锁
     std::shared_ptr<yasio::io_service> m_tcpClient;
     yasio::io_transport* m_transport = nullptr;

@@ -45,8 +45,15 @@ NetMessage::NetMessage(const std::string_view& ainfo)
     AXLOGD("NetMessage::NetMessage mgh clear string  clear this:{}",FMT_TOPOINT(this));
     strinfo.clear();                       // 清空消息内容
 }
+
+void NetMessage::Destory(){
+    AXLOGD("NetClient::Destory this:{:12X}", FMT_TOPOINT(this));
+    delete this;
+}
 // 析构函数
-NetMessage::~NetMessage() = default;
+NetMessage::~NetMessage() {
+    AXLOGD("NetClient::~NetMessage this:{:12X}", FMT_TOPOINT(this));
+};
 msgHeader NetMessage::GetMsgHeader() const
 {
     return _msgh;
